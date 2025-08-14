@@ -10,14 +10,16 @@ class Cliente extends Model
     use HasFactory;
 
     protected $fillable = [
-        'nombre', 'direccion', 'numero_contacto', 'numero_alterno',
-        'pertenece_ruta', 'pago_mensual', 'fecha_inicio', 'fecha_vencimiento',
-        'recordatorio', 'mensaje_personalizado', 'mensaje_general',
-        'costo_plataforma', 'costo_sim', 'descuento', 'ganancia', 'cobro_adicional'
+        'nombre',
+        'direccion',
+        'numero_contacto',
+        'numero_alterno',
+        'pertenece_ruta', 
+        'mensaje_personalizado',
     ];
 
     public function serviciosAgendados()
     {
-        return $this->hasMany(ServicioAgendado::class);
+        return $this->hasMany(ServiciosAgendado::class);
     }
 }

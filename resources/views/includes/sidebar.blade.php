@@ -26,7 +26,12 @@
                 </a>
             </li>
             @endif
-
+            <li class="nav-item @if( Route::is('collections.index') || Route::is('collections.create')) active @endif">
+                <a href="{{ url('./collections') }}" class="nav-link @if( Route::is('collections.index')) active @endif">
+                    <i class="link-icon" data-feather="bell"></i>
+                    <span class="link-title">Gestión de cobranza</span>
+                </a>
+            </li>
 
             @if(Auth::user()->hasPermission('clientes.index') || Auth::user()->hasPermission('tecnicos.index') ||  Auth::user()->hasPermission('inventario.index'))
                 <li class="nav-item nav-category">Páginas</li>
@@ -48,6 +53,31 @@
                             </li>
                         </ul>
                     </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="collapse" href="#unidades" role="button" aria-expanded="false"
+                        aria-controls="unidades">
+                        <i class="link-icon" data-feather="truck"></i>
+                        <span class="link-title">Unidades</span>
+                        <i class="link-arrow" data-feather="chevron-down"></i>
+                    </a>
+                    <div class="collapse @if(Route::is('unidades.index') || Route::is('unidades.edit') || Route::is('unidades.create')) show @endif" id="unidades">
+                        <ul class="nav sub-menu">
+                            <li class="nav-item">
+                                <a href="{{ route('unidades.index') }}" class="nav-link @if(Route::is('unidades.index')) active @endif">Listado</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('unidades.create') }}" class="nav-link @if( Route::is('unidades.create')) active @endif">Agregar Elemento</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                 <li class="nav-item @if(Route::is('assignements.index')) active @endif">
+                    <a href="{{ route('assignements.index') }}" class="nav-link">
+                        <i class="link-icon" data-feather="file-plus"></i>
+                        <span class="link-title">Asignaciones</span>
+                        <i class="link-arrow" data-feather="chevron-right"></i>
+                    </a> 
                 </li>
                 @endif
 

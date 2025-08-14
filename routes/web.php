@@ -1,9 +1,13 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SubaccountController;
 use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\UnidadesController;
+use App\Http\Controllers\AssignementsController;
+use App\Http\Controllers\CollectionsController;
 
 use App\Http\Controllers\TecnicoController;
 use App\Http\Controllers\EjecucionInstalacionController;
@@ -39,15 +43,30 @@ Route::group(['middleware' => 'isAdmin'], function () {
     Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
 
     /**
+     * Gestor de cobranza
+     */
+    Route::resource('collections', CollectionsController::class);
+    Route::get('sendTestNotify/{type}', [CollectionsController::class, 'sendTestNoify']);
+
+    /**
      * * Subaccounts Routes
      */
     Route::resource('subaccounts', SubaccountController::class)->except(['show']);
-
 
     /**
      * * Clientes Routes
      */
     Route::resource('clientes', ClienteController::class);
+
+    /**
+     * * Unidades Routes
+     */
+    Route::resource('unidades', UnidadesController::class);
+
+    /**
+     * Asignaciones
+     */
+    Route::resource('assignements', AssignementsController::class);
 
     /**
      * Tecnicos

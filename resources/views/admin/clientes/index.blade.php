@@ -23,29 +23,24 @@
                         <thead class="table-light">
                             <tr>
                                 <th>Nombre</th>
-                                <th>Contacto</th>
-                                <th>Ruta 22</th>
-                                <th>Pago Mensual</th>
-                                <th>Inicio</th>
-                                <th>Vencimiento</th>
-                                <th>Recordatorio</th>
-                                <td>Cobro adicional</td>
+                                <th>Dirección</th>
+                                <th>Contácto</th>
+                                <th>Contácto alterno</th>
+                                <th>Ruta / Zona</th>
                                 <th class="w-100 d-flex justify-content-end align-items-center">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
                         @foreach ($clientes as $cliente)
                             <tr>
-                                <td>{{ $cliente->nombre }}</td>
-                                <td>{{ $cliente->numero_contacto }}</td>
-                                <td>{{ $cliente->pertenece_ruta_22 ? 'Sí' : 'No' }}</td>
-                                <td>${{ number_format($cliente->pago_mensual, 2) }}</td>
-                                <td>{{ $cliente->fecha_inicio }}</td>
-                                <td>{{ $cliente->fecha_vencimiento }}</td>
-                                <td>{{ $cliente->recordatorio }}</td>
-                                <td>{{ $cliente->cobro_adicional }}</td>
+                                <td>{{ ucwords($cliente->nombre) }}</td>
+                                <td>{{ $cliente->direccion }}</td>
+                                <td>{{ $cliente->numero_contacto ?? 'Indefinido' }}</td>
+                                <td>{{ $cliente->numero_alterno ?? 'Indefinido' }}</td>
+                                <td>{{ str_replace('_',' ',ucwords($cliente->pertenece_ruta)) }}</td> 
                                 <td class="d-flex justify-content-end align-items-center">
-                                    <a href="{{ route('clientes.edit', $cliente) }}" class="btn btn-sm btn-warning">Editar</a>
+                                    <a href="{{ route('assignements.create') }}" class="btn btn-sm btn-success">Asignar Unidad</a>
+                                    <a href="{{ route('clientes.edit', $cliente) }}" class="btn btn-sm btn-warning ml-2">Editar</a>
                                     <form action="{{ route('clientes.destroy', $cliente) }}" method="POST" class="d-inline-block ml-2" onsubmit="return confirm('¿Eliminar cliente?')">
                                         @csrf @method('DELETE')
                                         <button class="btn btn-sm btn-danger">Eliminar</button>
