@@ -101,7 +101,7 @@
                             </div>
                             <div class="col-lg-12 mt-4">
                                 <label for="phone_test">Telefono para Test</label>
-                                <input type="tel" id="phone_test" class="form-control">
+                                <input type="tel" id="phone_test" class="form-control" placeholder="Ej.= +5216361229546">
                             </div>
                             <div class="col-lg-12 mt-4">
                                 <label for="email_test">Email para Test</label>
