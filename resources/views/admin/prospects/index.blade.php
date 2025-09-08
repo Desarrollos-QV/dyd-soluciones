@@ -70,7 +70,7 @@
                                             <span
                                                 class="{{ $badgeClass }} text-dark text-uppercase">{{ $prosp->potencial }}</span>
                                         </td>
-                                        <td>{{ $prosp->seller->name }}</td>
+                                        <td>{{ $prosp->seller ? $prosp->seller->name : 'Sin Asignar' }}</td>
                                         <td>{{ $prosp->location }}</td>
                                         <td>{{ $prosp->contacts }}</td>
                                         <td>{{ $prosp->observations }}</td>
