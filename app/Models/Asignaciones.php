@@ -12,34 +12,34 @@ class Asignaciones extends Model
     protected $fillable = [
         'cliente_id',
         'tecnico_id',
-        'unidad_id',
-        'coban_dvr',
-        'pago_mensual',
-        'fecha_inicio',
-        'ultima_fecha_pago',
-        'costo_plataforma',
-        'costo_sim',
-        'descuento',
-        'ganancia',
-        'cobro_adicional',        
-        'fecha_ultimo_mantenimiento',
+        'tipo_servicio',
+        'tel_contact',
+        'encargado_recibir',
+        'location',
+        'lat',
+        'lng',
+        'viaticos',
+        'tipo_vehiculo',
+        'marca',
+        'modelo',
+        'devices_id',
+        'placa',
         'observaciones',
-        'observaciones_mantenimiento'
     ];
 
 
     public function cliente()
     {
-        return $this->belongsTo(Cliente::class,'cliente_id','id');
+        return $this->belongsTo(Cliente::class,'cliente_id',);
     }
 
-    public function unidad()
+    public function device()
     {
-        return $this->belongsTo(Unidades::class,'unidad_id','id');
+        return $this->belongsTo(Devices::class,'devices_id',);
     }
 
     public function tecnico()
     {
-        return $this->belongsTo(User::class, 'tecnico_id','id');
+        return $this->belongsTo(User::class, 'tecnico_id');
     }
 }

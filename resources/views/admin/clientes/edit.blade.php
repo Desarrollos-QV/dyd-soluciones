@@ -1,71 +1,66 @@
 @extends('layouts.app')
-@section('title')
-    Clientes
+@section('title', 'Editar Cliente')
+@section('css')
+<link rel="stylesheet" href="{{ asset('assets/vendors/dropify/dist/dropify.min.css') }}">
 @endsection
 @section('content')
-    <nav class="page-breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ url('./') }}">Inicio</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Actualizando cliente</li>
-        </ol>
-    </nav>
+<form action="{{ route('clientes.update', $cliente) }}" method="POST" class="row" enctype="multipart/form-data" id="cliente_form">
+    @csrf
+    @method('PUT')
+    @include('admin.clientes.form')
+</form>
+@endsection
+@section('js')
+<script src="{{ asset('assets/vendors/dropify/dist/dropify.min.js') }}"></script>
+<script src="{{ asset('assets/js/dropify.js') }}"></script>
 
-    <div class="row">
-        <div class="col-lg-10 mx-auto grid-margin stretch-card">
-            <div class="card">
-                <div class="card-header"><h4>Editando el cliente #{{ $cliente->id }} - <small>({{$cliente->nombre}})</small> </h4></div>
-                <div class="card-body">
-                    <form action="{{ route('clientes.update', $cliente) }}" method="POST">
-                        @csrf @method('PUT')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('cliente_form');
 
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label>Nombre</label>
-                                <input type="text" name="nombre" class="form-control" required value="{{ $cliente->nombre }}">
-                            </div>
-                            <div class="col-md-6">
-                                <label>Dirección</label>
-                                <input type="text" name="direccion" class="form-control" value="{{ $cliente->direccion }}">
-                            </div>
-                        </div>
+        form.addEventListener('submit', async function (event) {
+            event.preventDefault(); // Evita el envío tradicional del formulario
 
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label>Teléfono</label>
-                                <input type="text" name="numero_contacto" class="form-control" required value="{{ $cliente->numero_contacto }}">
-                            </div>
-                            <div class="col-md-6">
-                                <label>Teléfono Emergencia</label>
-                                <input type="text" name="numero_alterno" class="form-control" value="{{ $cliente->numero_alterno }}">
-                            </div>
-                        </div>
+            const formData = new FormData(form);
 
-                        <div class="mb-3">
-                            <label>Ruta / Zona</label>
-                            <select name="pertenece_ruta" class="form-select">
-                                <option value="transporte_publico" @if($cliente->pertenece_ruta == 'transporte_publico') selected @endif>Transporte publico</option>
-                                <option value="sindicato" @if($cliente->pertenece_ruta == 'sindicato') selected @endif>Sindicato</option>
-                                <option value="particular" @if($cliente->pertenece_ruta == 'particular') selected @endif>particular</option>
-                                <option value="empresarial" @if($cliente->pertenece_ruta == 'empresarial') selected @endif>Empresarial</option>
-                                <option value="otros" @if($cliente->pertenece_ruta == 'otros') selected @endif>Otros</option>
-                            </select>
-                        </div>
- 
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: formData
+                });
 
-                        <div class="mb-3">
-                            <label>Recordatorios</label><br>
-                           
-                        </div>
-
-                        <div class="mb-3">
-                            <label>Mensaje Personalizado</label>
-                            <textarea name="mensaje_personalizado" rows="8" placeholder="Mensaje personalizado para los recordatorios" class="form-control">{!! $cliente->mensaje_personalizado !!}</textarea>
-                        </div> 
-                        
-                        <button class="btn btn-success">Actualizar Cliente Cliente</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+                if (response.ok) {
+                    const data = await response.json();
+                    // alert('Elemento del inventario creado exitosamente.');
+                    // Redirigir o realizar alguna acción adicional
+                    window.location.href = `${data.redirect}?success=${encodeURIComponent(data.message)}`;
+                } else {
+                    const errorData = await response.json();
+                    console.error('Errores:', errorData);
+                    // alert('Hubo un error al enviar el formulario.');
+                    Swal.fire({
+                        type: 'error',
+                        title: 'Oops... Hubo un error al enviar el formulario.',
+                        text: errorData.message
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire({
+                    type: 'error',
+                    title: 'Oops...',
+                    text: "Ocurrió un error inesperado."
+                }).then(() => {
+                    window.location.reload();
+                });
+            }
+        });
+    });
+</script>
 @endsection

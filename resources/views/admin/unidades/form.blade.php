@@ -5,24 +5,9 @@
                 <h5>Información de la unidad</h5>
             </h4>
         </div>
-
         <div class="card-body">
             <div class="form-group">
                 <div class="row">
-                    <div class="col-lg-6">
-                        <label for="tipo_unidad">Tipo de unidad</label>
-                        <input type="text" name="tipo_unidad" id="tipo_unidad" class="form-control"
-                            value="{{ $unidad->tipo_unidad }}" required>
-                    </div>
-                    <div class="col-lg-6">
-                        <label for="precio">Precio</label>
-                        <input name="precio" class="form-control mb-4 mb-md-0" step="0.01"
-                            data-inputmask="'alias': 'currency'" value="{{ $unidad->precio ?? old('precio') }}"
-                            required />
-                    </div>
-                </div>
-
-                <div class="row mt-4">
                     <div class="col-lg-6">
                         <label for="economico">Economico</label>
                         <input type="text" name="economico" id="economico" class="form-control"
@@ -37,9 +22,22 @@
 
                 <div class="row mt-4">
                     <div class="col-lg-6">
-                        <label for="sim_dvr">SIM DVR</label>
-                        <input type="text" name="sim_dvr" id="sim_dvr" class="form-control"
-                            value="{{ $unidad->sim_dvr }}">
+                        <label for="tipo_unidad">Tipo de unidad</label>
+                        <input type="text" name="tipo_unidad" id="tipo_unidad" class="form-control"
+                            value="{{ $unidad->tipo_unidad }}" required>
+                    </div>
+                    <div class="col-lg-6">
+                        <label for="fecha_instalacion">Fecha Instalacion</label>
+                        <input type="date" name="fecha_instalacion" id="fecha_instalacion" class="form-control"
+                            value="{{ old('fecha_instalacion', isset($unidad->fecha_instalacion) ? \Carbon\Carbon::parse($unidad->fecha_instalacion)->format('Y-m-d') : now()->format('Y-m-d')) }}" required>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-lg-6">
+                        <label for="np_sim">N.P. SIM</label>
+                        <input type="text" name="np_sim" id="np_sim" class="form-control"
+                            value="{{ $unidad->np_sim }}">
                     </div>
 
                     <div class="col-lg-6">
@@ -50,42 +48,48 @@
                 </div>
 
                 <div class="row mt-4">
-                    <div class="col-lg-4">
+                    <div class="col-lg-3">
                         <label for="anio_unidad">Año de la unidad</label>
                         <input type="number" name="anio_unidad" id="anio_unidad" class="form-control"
                         min="1900" max="{{ date('Y') }}"
                         value="{{ $unidad->anio_unidad ?? old('anio_unidad') }}" required>
                     </div>
                     <div class="col-lg-3">
-                        <label for="marca_submarca">Marca/Submarca</label>
-                        <input type="text" name="marca_submarca" id="marca_submarca" class="form-control"
-                            value="{{ $unidad->marca_submarca }}">
+                        <label for="marca">Marca</label>
+                        <input type="text" name="marca" id="marca" class="form-control"
+                            value="{{ $unidad->marca }}">
                     </div>
-               
+                    <div class="col-lg-3">
+                        <label for="submarca">Submarca</label>
+                        <input type="text" name="submarca" id="submarca" class="form-control"
+                            value="{{ $unidad->submarca }}">
+                    </div>
                     <div class="col-lg-3">
                         <label for="vin">Número VIN</label>
                         <input type="text" name="vin" id="vin" class="form-control"
                             value="{{ $unidad->vin }}">
                     </div>
+                </div>
 
-                    <div class="col-lg-2">
+                <div class="row mt-4">
+                    <div class="col-lg-6">
                         <label for="imei">IMEI</label>
                         <input type="text" name="imei" id="imei" class="form-control"
                             value="{{ $unidad->imei }}">
                     </div>
-                </div>
-
-             
-
-                <div class="row mt-4">
-                    
-
                     <div class="col-lg-6">
                         <label for="cuenta_con_apagado">¿Cuenta con apagado?</label>
                         <select name="cuenta_con_apagado" id="cuenta_con_apagado" class="form-select" required>
                             <option value="si">SI</option>
                             <option value="no">NO</option>
                         </select>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-lg-12">
+                        <label for="observaciones">Observaciones</label>
+                        <textarea name="observaciones" id="observaciones" class="form-control mb-4" rows="5" cols="5" placeholder="Ingresa las observaciones correspondientes">{!! $unidad->observaciones !!}</textarea>
                     </div>
                 </div>
             </div>
@@ -104,21 +108,36 @@
             <div class="form-group">
                 <div class="row">
                     <div class="col-lg-12">
-                        <label for="usuario">usuario</label>
-                        <input type="text" name="usuario" id="usuario" class="form-control"
-                            value="{{ $unidad->usuario }}" required>
+                        <label for="cliente_id">Asignado a cliente:</label>
+                        <select name="cliente_id" id="cliente_id" class="form-select mb-4">
+                            @foreach($clientes as $client)
+                            <option value="{{ $client->id }}"> {{$client->nombre}} </option>
+                            @endforeach
+                        </select>
                     </div>
-                    <div class="col-lg-12 mt-4">
-                        <label for="password">Contraseña</label>
-                        <input type="password" name="password" class="form-control"
-                            value="{{ $unidad->password ?? old('password') }}" required>
-                    </div>
-
                     <div class="col-lg-12 mt-4">
                         <label for="numero_de_emergencia">Número de emergencia</label>
                         <input type="tel" name="numero_de_emergencia" id="numero_de_emergencia"
                             class="form-control"
                             value="{{ $unidad->numero_de_emergencia ?? old('numero_de_emergencia') }}">
+                    </div>
+
+                    <div class="col-lg-12 mt-4">
+                        <label for="foto_unidad">Fotografia de la unidad</label>
+                        @if(isset($unidad->id))
+                            <label for="identificacion">Sube una Identificación Oficial</label>
+                            <div class="row">
+                                <div class="col-lg-8">
+                                    <input type="file" name="foto_unidad" id="myDropify" class="form-control" value="{{$unidad->foto_unidad}}">
+                                </div>
+                                <div class="col-lg-4" style="display: flex;justify-content: center;align-items: center;">
+                                    <img src="{{ asset($unidad->foto_unidad) }}" alt="foto_unidad" style="width:100px;height: 100px;border-radius: 25px;">
+                                </div>
+                            </div>
+                        @else
+                            <label for="foto_unidad">Sube una Identificación Oficial</label>
+                            <input type="file" name="foto_unidad" id="myDropify" class="form-control" value="{{$unidad->foto_unidad}}">
+                        @endif
                     </div>
                 </div>
             </div>

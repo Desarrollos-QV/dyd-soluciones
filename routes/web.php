@@ -18,6 +18,9 @@ use App\Http\Controllers\InventarioController;
 use App\Http\Controllers\GastoController;
 use App\Http\Controllers\ReporteIngresoEgresoController;
 use App\Http\Controllers\ServicioAgendadoController;
+use App\Http\Controllers\ProspectsController;
+use App\Http\Controllers\SellersController;
+use App\Http\Controllers\DevicesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,6 +52,16 @@ Route::group(['middleware' => 'isAdmin'], function () {
     Route::get('sendTestNotify/{type}', [CollectionsController::class, 'sendTestNoify']);
 
     /**
+     * Prospectos
+     */
+    Route::resource('prospects', ProspectsController::class);
+
+    /**
+     * Vendedores
+     */
+    Route::resource('sellers', SellersController::class);
+
+    /**
      * * Subaccounts Routes
      */
     Route::resource('subaccounts', SubaccountController::class)->except(['show']);
@@ -57,6 +70,12 @@ Route::group(['middleware' => 'isAdmin'], function () {
      * * Clientes Routes
      */
     Route::resource('clientes', ClienteController::class);
+
+    /**
+     * Dispositivos y materiales
+     */
+    Route::resource('devices', DevicesController::class);
+
 
     /**
      * * Unidades Routes

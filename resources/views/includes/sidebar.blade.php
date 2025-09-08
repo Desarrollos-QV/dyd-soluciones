@@ -26,15 +26,49 @@
                 </a>
             </li>
             @endif
-            <li class="nav-item @if( Route::is('collections.index') || Route::is('collections.create')) active @endif">
-                <a href="{{ url('./collections') }}" class="nav-link @if( Route::is('collections.index')) active @endif">
-                    <i class="link-icon" data-feather="bell"></i>
-                    <span class="link-title">Gestión de cobranza</span>
-                </a>
-            </li>
+           
 
             @if(Auth::user()->hasPermission('clientes.index') || Auth::user()->hasPermission('tecnicos.index') ||  Auth::user()->hasPermission('inventario.index'))
                 <li class="nav-item nav-category">Páginas</li>
+                
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="collapse" href="#prospects" role="button" aria-expanded="false"
+                        aria-controls="prospects">
+                        <i class="link-icon" data-feather="user-plus"></i>
+                        <span class="link-title">Prospectos</span>
+                        <i class="link-arrow" data-feather="chevron-down"></i>
+                    </a>
+                    <div class="collapse @if(Route::is('prospects.index') || Route::is('prospects.edit') || Route::is('prospects.create')) show @endif" id="prospects">
+                        <ul class="nav sub-menu">
+                            <li class="nav-item">
+                                <a href="{{ route('prospects.index') }}" class="nav-link @if(Route::is('prospects.index')) active @endif">Listado</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('prospects.create') }}" class="nav-link @if( Route::is('prospects.create')) active @endif">Agregar Elemento</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="collapse" href="#sellers" role="button" aria-expanded="false"
+                        aria-controls="sellers">
+                        <i class="link-icon" data-feather="shopping-bag"></i>
+                        <span class="link-title">Vendedores</span>
+                        <i class="link-arrow" data-feather="chevron-down"></i>
+                    </a>
+                    <div class="collapse @if(Route::is('sellers.index') || Route::is('sellers.edit') || Route::is('sellers.create')) show @endif" id="sellers">
+                        <ul class="nav sub-menu">
+                            <li class="nav-item">
+                                <a href="{{ route('sellers.index') }}" class="nav-link @if(Route::is('sellers.index')) active @endif">Listado</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('sellers.create') }}" class="nav-link @if( Route::is('sellers.create')) active @endif">Agregar Elemento</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
                 @if(Auth::user()->hasPermission('clientes.index'))
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="collapse" href="#clientes" role="button" aria-expanded="false"
@@ -54,7 +88,25 @@
                         </ul>
                     </div>
                 </li>
-                <li class="nav-item">
+                 <li class="nav-item">
+                    <a class="nav-link" data-toggle="collapse" href="#devices" role="button" aria-expanded="false"
+                        aria-controls="devices">
+                        <i class="link-icon" data-feather="shopping-bag"></i>
+                        <span class="link-title">Disp. y Materiales</span>
+                        <i class="link-arrow" data-feather="chevron-down"></i>
+                    </a>
+                    <div class="collapse @if(Route::is('devices.index') || Route::is('devices.edit') || Route::is('devices.create')) show @endif" id="devices">
+                        <ul class="nav sub-menu">
+                            <li class="nav-item">
+                                <a href="{{ route('devices.index') }}" class="nav-link @if(Route::is('devices.index')) active @endif">Listado</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('devices.create') }}" class="nav-link @if( Route::is('devices.create')) active @endif">Agregar Elemento</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item mb-1">
                     <a class="nav-link" data-toggle="collapse" href="#unidades" role="button" aria-expanded="false"
                         aria-controls="unidades">
                         <i class="link-icon" data-feather="truck"></i>
@@ -72,17 +124,11 @@
                         </ul>
                     </div>
                 </li>
-                 <li class="nav-item @if(Route::is('assignements.index')) active @endif">
-                    <a href="{{ route('assignements.index') }}" class="nav-link">
-                        <i class="link-icon" data-feather="file-plus"></i>
-                        <span class="link-title">Asignaciones</span>
-                        <i class="link-arrow" data-feather="chevron-right"></i>
-                    </a> 
-                </li>
                 @endif
 
                 @if(Auth::user()->hasPermission('tecnicos.index'))
-                <li class="nav-item">
+                <li class="nav-item nav-category">Técnicos</li>
+                <li class="nav-item mt-1">
                     <a class="nav-link" data-toggle="collapse" href="#tecnicos" role="button" aria-expanded="false"
                         aria-controls="tecnicos">
                         <i class="link-icon" data-feather="briefcase"></i>
@@ -102,7 +148,16 @@
                 </li>
                 @endif
 
-                @if(Auth::user()->hasPermission('inventario.index'))
+                <li class="nav-item nav-category">Servicios</li>
+                <li class="nav-item @if(Route::is('assignements.index')) active @endif">
+                    <a href="{{ route('assignements.index') }}" class="nav-link">
+                        <i class="link-icon" data-feather="file-plus"></i>
+                        <span class="link-title">Alta de servicios</span>
+                        <i class="link-arrow" data-feather="chevron-right"></i>
+                    </a> 
+                </li>
+
+                {{-- @if(Auth::user()->hasPermission('inventario.index'))
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="collapse" href="#inventario" role="button" aria-expanded="false"
                         aria-controls="inventario">
@@ -121,11 +176,11 @@
                         </ul>
                     </div>
                 </li>
-                @endif
+                @endif --}}
             @endif
  
             @if(Auth::user()->hasPermission('gastos.index') || Auth::user()->hasPermission('reports.index'))
-                <li class="nav-item nav-category">Contabilidad</li>
+                <li class="nav-item nav-category">Contabilidad y Cobranza</li>
                 @if(Auth::user()->hasPermission('gastos.index'))
                 <li class="nav-item">
                     <a class="nav-link" data-toggle="collapse" href="#reg_fastos" role="button" aria-expanded="false"
@@ -166,8 +221,16 @@
                     </div>
                 </li>
                 @endif
+                <li class="nav-item @if( Route::is('collections.index') || Route::is('collections.create')) active @endif">
+                    <a href="{{ url('./collections') }}" class="nav-link @if( Route::is('collections.index')) active @endif">
+                        <i class="link-icon" data-feather="bell"></i>
+                        <span class="link-title">Gestión de cobranza</span>
+                        <i class="link-arrow" data-feather="chevron-right"></i>
+                    </a>
+                </li>
             @endif
-
+            
+            {{--
             @if(Auth::user()->hasPermission('servicios_agendados.index') || Auth::user()->hasPermission('reports_services.index'))
                 <li class="nav-item nav-category">Servicios</li>
                 @if(Auth::user()->hasPermission('servicios_agendados.index'))
@@ -190,18 +253,20 @@
                     </div>
                 </li>
                 @endif
-                {{-- @if(Auth::user()->hasPermission('reports_services.index'))
+                 @if(Auth::user()->hasPermission('reports_services.index'))
                 <li class="nav-item">
                     <a href="#reports_services" class="nav-link">
                         <i class="link-icon" data-feather="file"></i>
                         <span class="link-title">Reportes</span>
                     </a>
                 </li>
-                @endif --}}
+                @endif 
             @endif
+            --}}
 
-
-            <li class="nav-item nav-category">Extras</li>
+            <li class="nav-item nav-category">
+                
+            </li>
             <li class="nav-item">
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf

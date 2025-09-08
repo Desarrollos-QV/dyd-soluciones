@@ -10,25 +10,26 @@ class Unidades extends Model
     use HasFactory;
 
     protected $fillable = [
-        'tipo_unidad',
-        'fecha_instalacion',
-        'precio',
+        'cliente_id',
         'economico',
         'placa',
+        'tipo_unidad',
+        'fecha_instalacion',
         'anio_unidad',
+        'marca',
+        'submarca',
+        'numero_de_motor',
         'vin',
         'imei',
-        'sim_dvr',
-        'marca_submarca',
-        'numero_de_motor',
-        'usuario',
-        'password',
+        'np_sim', //<-'sim_dvr',
         'cuenta_con_apagado',
+        'foto_unidad',
         'numero_de_emergencia',
+        'observaciones',
     ];
 
     public function cliente()
     {
-        return $this->belongsTo(Cliente::class);
+        return $this->belongsTo(Cliente::class,'cliente_id');
     }
 }

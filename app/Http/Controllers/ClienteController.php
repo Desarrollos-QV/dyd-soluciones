@@ -14,27 +14,64 @@ class ClienteController extends Controller
     
     public function index()
     {
-        $clientes = Cliente::all();
+        $clientes = Cliente::orderBy('created_at','DESC')->get();
         return view('admin.clientes.index', compact('clientes'));
     }
 
-    public function create()
+    public function create(Cliente $cliente)
     {
-        return view('admin.clientes.create');
+        return view('admin.clientes.create', compact('cliente'));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'nombre' => 'required',
-            'numero_contacto' => 'required',
-            'pago_mensual' => 'required|numeric',
-            'fecha_inicio' => 'required|date',
-            'fecha_vencimiento' => 'required|date',
-        ]);
+        try{
+            $request->validate([
+                'nombre' => 'required',
+                'avatar' => 'required',
+                'direccion' => 'required',
+                'numero_contacto' => 'required',
+                'numero_alterno' => 'required',
+                'tipo_empresa' => 'required',
+                'empresa' => 'required',
+                'identificacion' => 'required',
+                'direccion_empresa' => 'required',
+                'usuario' => 'required',
+                'password' => 'required'
+            ]);
 
-        Cliente::create($request->all());
-        return redirect()->route('clientes.index')->with('success', 'Cliente creado exitosamente.');
+            $data = $request->all();
+
+            // Manejo de la imagen ine_comprobante
+            if ($request->hasFile('avatar')) {
+                $file = $request->file('avatar');
+                $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('uploads/avatars'), $filename); // Guardar en la carpeta 'uploads/ine_comprobantes'
+                $data['avatar'] = 'uploads/avatars/' . $filename; // Ruta relativa para guardar en la base de datos
+            }
+
+            // Manejo de la imagen ine_comprobante
+            if ($request->hasFile('identificacion')) {
+                $file = $request->file('identificacion');
+                $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('uploads/identificaciones'), $filename); // Guardar en la carpeta 'uploads/ine_comprobantes'
+                $data['identificacion'] = 'uploads/identificaciones/' . $filename; // Ruta relativa para guardar en la base de datos
+            }
+
+
+            Cliente::create($data);
+            return response()->json([
+                'ok' => true,
+                'message' => 'Cliente creado con éxito.',
+                'code' => 200,
+                'redirect' => route('clientes.index')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Error al crear el inventario: ' . $e->getMessage(),
+            ]);
+        }
     }
 
     public function edit(Cliente $cliente)
@@ -45,18 +82,73 @@ class ClienteController extends Controller
 
     public function update(Request $request, Cliente $cliente)
     {
-        $request->validate([
-            'nombre' => 'required',
-            'numero_contacto' => 'required',
-        ]);
+        try {
+            $request->validate([
+                'nombre' => 'required',
+                'avatar' => 'required',
+                'direccion' => 'required',
+                'numero_contacto' => 'required',
+                'numero_alterno' => 'required',
+                'tipo_empresa' => 'required',
+                'empresa' => 'required',
+                'identificacion' => 'required',
+                'direccion_empresa' => 'required',
+                'usuario' => 'required',
+                'password' => 'required'
+            ]);
 
-        $cliente->update($request->all());
-        return redirect()->route('clientes.index')->with('success', 'Cliente actualizado correctamente.');
+            $data = $request->all();
+
+            // Manejo de la imagen avatar
+            if ($request->hasFile('avatar')) {
+                // Eliminar el archivo anterior si existe
+                if ($cliente->avatar && file_exists(public_path($cliente->avatar))) {
+                    unlink(public_path($cliente->avatar));
+                }
+
+                // Subir el nuevo archivo
+                $file = $request->file('avatar');
+                $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('uploads/avatars'), $filename); // Guardar en la carpeta 'uploads/ine_comprobantes'
+                $data['avatar'] = 'uploads/avatars/' . $filename; // Ruta relativa para guardar en la base de datos
+            }
+
+            // Manejo de la imagen avatar
+            if ($request->hasFile('identificacion')) {
+                // Eliminar el archivo anterior si existe
+                if ($cliente->identificacion && file_exists(public_path($cliente->identificacion))) {
+                    unlink(public_path($cliente->identificacion));
+                }
+
+                // Subir el nuevo archivo
+                $file = $request->file('identificacion');
+                $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('uploads/identificaciones'), $filename); // Guardar en la carpeta 'uploads/ine_comprobantes'
+                $data['identificacion'] = 'uploads/identificaciones/' . $filename; // Ruta relativa para guardar en la base de datos
+            }
+
+            $cliente->update($data); 
+            return response()->json([
+                'ok' => true,
+                'message' => 'Cliente actualizado con éxito.',
+                'code' => 200,
+                'redirect' => route('clientes.index')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Error al crear el inventario: ' . $e->getMessage(),
+            ]);
+        }
     }
 
     public function destroy(Cliente $cliente)
     {
-        $cliente->delete();
-        return redirect()->route('clientes.index')->with('success', 'Cliente eliminado.');
+        try {
+            $cliente->delete();
+            return redirect()->route('clientes.index')->with('success', 'Cliente eliminado.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Ha ocurrido un problema: ' . $e->getMessage());
+        }
     }
 }

@@ -11,11 +11,16 @@ class Cliente extends Model
 
     protected $fillable = [
         'nombre',
+        'avatar',
         'direccion',
         'numero_contacto',
         'numero_alterno',
-        'pertenece_ruta', 
-        'mensaje_personalizado',
+        'tipo_empresa',
+        'empresa',
+        'identificacion',
+        'direccion_empresa',
+        'usuario',
+        'password'
     ];
 
     public function serviciosAgendados()

@@ -2,46 +2,62 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Unidades;
+use App\Models\{
+    Unidades,
+    Cliente
+};
 use Illuminate\Http\Request;
 
 class UnidadesController extends Controller
 {
     public function index()
     {
-        $unidades = Unidades::all();
+        $unidades = Unidades::with('cliente')->get();
         return view('admin.unidades.index', compact('unidades'));
     }
 
     public function create()
     {
         $unidad = new Unidades;
-        return view('admin.unidades.create', compact('unidad'));
+        $clientes = Cliente::all();
+        return view('admin.unidades.create', compact('unidad','clientes'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'tipo_unidad'           => 'required|string|max:100', 
-            'precio'                => 'required|numeric|min:0',
-            'economico'             => 'required|string|max:50',
-            'placa'                 => 'required|string|max:20',
-            'anio_unidad'           => 'required|digits:4|integer|min:1900|max:' . date('Y'),
+            'cliente_id'            => 'required|string|max:100', 
+            'economico'             => 'required|numeric|min:0',
+            'placa'                 => 'required|string|max:50',
+            'tipo_unidad'           => 'required|string|max:20',
+            'fecha_instalacion'     => 'required|digits:4|integer|min:1900|max:' . date('Y-m-d'),
+            'anio_unidad'           => 'nullable|numeric|max:50',
+            'marca'                 => 'nullable|string|max:30',
+            'submarca'              => 'nullable|string|max:30',
+            'numero_de_motor'       => 'nullable|string|max:100',
             'vin'                   => 'nullable|string|max:50',
-            'imei'                  => 'nullable|string|max:30',
-            'sim_dvr'               => 'nullable|string|max:30',
-            'marca_submarca'        => 'nullable|string|max:100',
-            'numero_de_motor'       => 'nullable|string|max:50',
-            'usuario'               => 'nullable|string|max:100',
-            'password'              => 'nullable|string|max:100',
+            'imei'                  => 'nullable|string|max:100',
+            'np_sim'                => 'nullable|string|max:100',
             'cuenta_con_apagado'    => 'nullable|string',
-            'numero_de_emergencia'  => 'nullable|string|max:20',
+            'foto_unidad'           => 'nullable|string|max:20',
+            'numero_de_emergencia'  =>  'nullable|string',
+            'observaciones'         =>  'nullable|string',
         ]);
 
         try {
 
             $data = $request->all();
+            // Manejo de la imagen avatar
+            if ($request->hasFile('foto_unidad')) {
+                // Subir el nuevo archivo
+                $file = $request->file('foto_unidad');
+                $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('uploads/fotos_unidades'), $filename); // Guardar en la carpeta 'uploads/ine_comprobantes'
+                $data['foto_unidad'] = 'uploads/fotos_unidades/' . $filename; // Ruta relativa para guardar en la base de datos
+            }
 
+            $data['fecha_instalacion'] = \Carbon\Carbon::parse($request->garantia)->format('Y-m-d');
+            
             Unidades::create($data);
             return response()->json([
                 'ok' => true,
@@ -60,30 +76,51 @@ class UnidadesController extends Controller
     public function edit(Unidades $unidade)
     {
         $unidad = $unidade;
-        return view('admin.unidades.edit', compact('unidad'));
+        $clientes = Cliente::all();
+        return view('admin.unidades.edit', compact('unidad','clientes'));
     }
 
     public function update(Request $request, Unidades $unidade)
     {
-        $request->validate([
-            'tipo_unidad'           => 'required|string|max:100',
-            'precio'                => 'required|numeric|min:0',
-            'economico'             => 'required|string|max:50',
-            'placa'                 => 'required|string|max:20',
-            'anio_unidad'           => 'required|digits:4|integer|min:1900|max:' . date('Y'),
+         $request->validate([
+            'cliente_id'            => 'required|string|max:100', 
+            'economico'             => 'required|numeric|min:0',
+            'placa'                 => 'required|string|max:50',
+            'tipo_unidad'           => 'required|string|max:200',
+            'fecha_instalacion'     => 'required|string|max:100',
+            'anio_unidad'           => 'nullable|string|max:50',
+            'marca'                 => 'nullable|string|max:30',
+            'submarca'              => 'nullable|string|max:30',
+            'numero_de_motor'       => 'nullable|string|max:100',
             'vin'                   => 'nullable|string|max:50',
-            'imei'                  => 'nullable|string|max:30',
-            'sim_dvr'               => 'nullable|string|max:30',
-            'marca_submarca'        => 'nullable|string|max:100',
-            'numero_de_motor'       => 'nullable|string|max:50',
-            'usuario'               => 'nullable|string|max:100',
-            'password'              => 'nullable|string|max:100',
+            'imei'                  => 'nullable|string|max:100',
+            'np_sim'                => 'nullable|string|max:100',
             'cuenta_con_apagado'    => 'nullable|string',
-            'numero_de_emergencia'  => 'nullable|string|max:20',
+            'foto_unidad'           => 'file',
+            'numero_de_emergencia'  => 'nullable|string',
+            'observaciones'         => 'nullable|string',
         ]);
 
         try {
             $data = $request->all();
+
+            // Manejo de la imagen avatar
+            if ($request->hasFile('foto_unidad')) {
+                // Eliminar el archivo anterior si existe
+                if ($unidade->foto_unidad && file_exists(public_path($unidade->foto_unidad))) {
+                    unlink(public_path($unidade->foto_unidad));
+                }
+
+                // Subir el nuevo archivo
+                $file = $request->file('foto_unidad');
+                $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('uploads/fotos_unidades'), $filename); // Guardar en la carpeta 'uploads/ine_comprobantes'
+                $data['foto_unidad'] = 'uploads/fotos_unidades/' . $filename; // Ruta relativa para guardar en la base de datos
+            }
+
+           
+            $data['fecha_instalacion'] = \Carbon\Carbon::parse($request->garantia)->format('Y-m-d');
+
             $unidade->update($data);
 
             return response()->json([
@@ -95,7 +132,7 @@ class UnidadesController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'ok' => false,
-                'message' => 'Error al crear el inventario: ' . $e->getMessage(),
+                'message' => 'Error al crear la unidad: ' . $e->getMessage(),
             ]);
         }
     }

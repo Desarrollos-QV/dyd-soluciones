@@ -23,7 +23,7 @@
       <div class="card">
         <div class="card-body">
             <div class="table-responsive">
-                <table id="dataTableExample" class="table">
+                <table id="dataTableExample" class="w-100 table table-bordered table-hover">
                     <thead>
                         <tr>
                             <th>Nombre Completo</th>

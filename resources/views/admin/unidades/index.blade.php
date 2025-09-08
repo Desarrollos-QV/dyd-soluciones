@@ -23,34 +23,61 @@
             <div class="card">
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table id="dataTableExample" class="table">
+                        <table id="dataTableExample" class="w-100 table table-bordered table-hover">
                             <thead>
                                 <tr>
+                                    <td>Cliente asignado</td>
+                                    <td>Economico/Placas</td>
                                     <td>Tipo de unidad</td>
-                                    <td>Precio</td>
-                                    <td>Economico</td>
-                                    <td>Placa</td>
-                                    <td>Año</td>
-                                    <td>VIN</td>
-                                    <td>IMEI</td>
-                                    <td>SIM DVR</td>
-                                    <td>Marca/Submarca</td>
+                                    <td>Instalacion</td>
+                                    <td>Año/Marca/Submarca</td>
                                     <td>Número de motor</td>
+                                    <td>VIN / IMEI</td>
+                                    <td>N.P. SIM</td>
+                                    <td>¿Cuenta con apagado?</td>
+                                    <td>Número de emergencias</td>
+                                    <td class="d-flex justify-content-end">Opciones</td>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach ($unidades as $unit)
                                     <tr>
-                                        <td>{{ $unit->tipo_unidad }}</td>
-                                        <td>${{ number_format($unit->precio, 2) }}</td>
-                                        <td>{{ $unit->economico }}</td>
-                                        <td>{{ $unit->placa }}</td>
-                                        <td>{{ $unit->anio_unidad }}</td>
-                                        <td>{{ $unit->vin }}</td>
-                                        <td>{{ $unit->imei }}</td>
-                                        <td>{{ $unit->sim_dvr }}</td>
-                                        <td>{{ $unit->marca_submarca }}</td>
-                                        <td>{{ $unit->numero_de_motor }}</td>
+                                        <td>
+                                            <span class="text-uppercase">{{ $unit->cliente->nombre }}</span>
+                                        </td>
+                                        <td>{{ $unit->economico }} / {{ $unit->placa }}</td>
+                                        <td>{{ $unit->tipo_unidad }}</td> 
+                                        <td>{{ \Carbon\Carbon::parse($unit->fecha_instalacion)->format('Y-m-d') }}</td>
+                                        <td>
+                                            <span class="badge bg-info text-white">{{ $unit->anio_unidad }}</span> / <span class="badge bg-warning">{{ $unit->marca }}</span> / <span class="badge bg-success">{{ $unit->submarca }}</span></td>
+                                        <td>
+                                            <span class="badge bg-primary text-white">{{ $unit->numero_de_motor }}</span>
+                                        </td>
+                                        <td><span class="badge bg-secondary text-white">{{ $unit->vin }}</span> / <span class="badge bg-primary text-white">{{ $unit->imei }}</span></td>
+                                        <td>
+                                            <span class="badge bg-success text-white">{{ $unit->np_sim }}</span>
+                                        </td>
+                                        <td class="d-flex justify-content-center">
+                                            @php
+                                            switch ($unit->cuenta_con_apagado) {
+                                                case 'si':
+                                                    $badgeClass = 'badge bg-success';
+                                                    break;
+                                                case 'no':
+                                                    $badgeClass = 'badge bg-danger';
+                                                    break;
+                                                default:
+                                                    $badgeClass = 'badge bg-warning';
+                                            }
+                                        @endphp
+                                        <span class="{{ $badgeClass }} text-white text-uppercase"> {{ $unit->cuenta_con_apagado }}</span>
+                                        </td>
+                                        <td>
+                                            <a href="tel:{{ $unit->numero_de_emergencia }}" target="_blank">
+                                               <i class="link-icon icon-sm" data-feather="phone"></i>
+                                                {{ $unit->numero_de_emergencia }}
+                                            </a>
+                                        </td> 
                                         <td>
                                             <div class="btn-group">
                                                 <button type="button" class="btn btn-primary dropdown-toggle"
@@ -59,6 +86,8 @@
                                                 <div class="dropdown-menu">
                                                     <a class="dropdown-item"
                                                         href="{{ route('unidades.edit', $unit->id) }}">Editar</a>
+                                                    <a href="javascript:void(0)" class="dropdown-item" onclick="alertSwwet('Observaciones', '{{$unit->observaciones ?? 'Sin Obersaciones'}}')">Ver observaciones</a>
+                                                    <a href="javascript:void(0)" class="dropdown-item" onclick="alertSweetImage('Foto de la unidad', '{{ asset($unit->foto_unidad)  }}')">Ver Foto de la unidad</a>
                                                     <hr />
                                                     <a class="dropdown-item" href="#">
                                                         <form action="{{ route('unidades.destroy', $unit) }}" method="POST"

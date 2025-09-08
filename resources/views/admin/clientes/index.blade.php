@@ -26,7 +26,8 @@
                                 <th>Dirección</th>
                                 <th>Contácto</th>
                                 <th>Contácto alterno</th>
-                                <th>Ruta / Zona</th>
+                                <th>Empresa</th>
+                                <th>Tipo de empresa</th>
                                 <th class="w-100 d-flex justify-content-end align-items-center">Acciones</th>
                             </tr>
                         </thead>
@@ -37,14 +38,25 @@
                                 <td>{{ $cliente->direccion }}</td>
                                 <td>{{ $cliente->numero_contacto ?? 'Indefinido' }}</td>
                                 <td>{{ $cliente->numero_alterno ?? 'Indefinido' }}</td>
-                                <td>{{ str_replace('_',' ',ucwords($cliente->pertenece_ruta)) }}</td> 
-                                <td class="d-flex justify-content-end align-items-center">
-                                    <a href="{{ route('assignements.create') }}" class="btn btn-sm btn-success">Asignar Unidad</a>
-                                    <a href="{{ route('clientes.edit', $cliente) }}" class="btn btn-sm btn-warning ml-2">Editar</a>
-                                    <form action="{{ route('clientes.destroy', $cliente) }}" method="POST" class="d-inline-block ml-2" onsubmit="return confirm('¿Eliminar cliente?')">
-                                        @csrf @method('DELETE')
-                                        <button class="btn btn-sm btn-danger">Eliminar</button>
-                                    </form>
+                                <td>{{ $cliente->empresa }}</td>
+                                <td>{{ $cliente->tipo_empresa }}</td> 
+                                <td class="d-flex justify-content-end">
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-primary dropdown-toggle"
+                                            data-toggle="dropdown" aria-haspopup="true"
+                                            aria-expanded="false">Opciones</button>
+                                        <div class="dropdown-menu">
+                                            <a class="dropdown-item"
+                                                href="{{ route('clientes.edit', $cliente->id) }}">Editar</a>
+                                            <hr /> 
+                                            <form action="{{ route('clientes.destroy', $cliente) }}"
+                                                method="POST"  style="display:inline-block;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button class="btn btn-sm dropdown-item" type="submit">Eliminar</button>
+                                            </form> 
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach

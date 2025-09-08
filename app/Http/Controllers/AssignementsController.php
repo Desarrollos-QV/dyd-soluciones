@@ -10,7 +10,7 @@ use App\Models\{
     Tecnico,
     User,
     Asignaciones,
-    Unidades
+    Devices
 };
 
 class AssignementsController extends Controller
@@ -23,7 +23,7 @@ class AssignementsController extends Controller
      */
     public function index()
     {
-        $assignements = Asignaciones::with('cliente','unidad','tecnico')->get();
+        $assignements = Asignaciones::with('cliente','device','tecnico')->get();
 
         // return response()->json([
         //     'assignements' => $assignements
@@ -42,9 +42,9 @@ class AssignementsController extends Controller
         $assignement = new Asignaciones;
         $clientes    = Cliente::all();
         $tecnicos    = User::where('role', 'tecnico')->get();
-        $unidades    = Unidades::all();
+        $devices    = Devices::all();
 
-        return view($this->folder . 'create', compact('assignement', 'clientes', 'tecnicos', 'unidades'));
+        return view($this->folder . 'create', compact('assignement', 'clientes', 'tecnicos', 'devices'));
     }
 
     /**
@@ -54,23 +54,38 @@ class AssignementsController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'cliente_id'                  => 'required|exists:clientes,id',
-            'unidad_id'                   => 'required|exists:unidades,id',
-            'costo_plataforma'            => 'required|numeric|min:0',
-            'costo_sim'                   => 'required|numeric|min:0',
-            'pago_mensual'                => 'required|numeric|min:0',
-            'fecha_inicio'                => 'required|date',
-            'fecha_ultimo_mantenimiento'  => 'required|date',
-            'descuento'                   => 'nullable|numeric|min:0',
-            'cobro_adicional'             => 'nullable|numeric|min:0',
-            'ganancia'                    => 'nullable|numeric|min:0',
-            'observaciones'               => 'nullable|string',
-            'observaciones_mantenimiento' => 'nullable|string',
+            'cliente_id'        => 'required|exists:clientes,id',
+            'tecnico_id'        => 'nullable',
+            'tipo_servicio'     => 'required|string',
+            'tel_contact'       => 'required|string',
+            'encargado_recibir' => 'required|string',
+            'location'          => 'required|string',
+            'lat'               => 'required|string',
+            'lng'               => 'required|string',
+            'viaticos'          => 'required|string',
+            'tipo_vehiculo'     => 'required|string',
+            'marca'             => 'required|string',
+            'modelo'            => 'required|string',
+            'devices_id'        => 'required|exists:devices,id',
+            'placa'             => 'required|string',
+            'observaciones'     => 'nullable|string',
         ]);
 
-        Asignaciones::create($request->all());
+        try {
+            Asignaciones::create($request->all());
 
-        return redirect()->route('assignements.index')->with('success', 'Asignación creada correctamente.');
+            return response()->json([
+                'ok' => true,
+                'message' => 'Asignación creada correctamente.',
+                'code' => 200,
+                'redirect' => route('assignements.index')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Error al crear el Dispositivo: ' . $e->getMessage(),
+            ]);
+        }
     }
 
 
@@ -85,9 +100,9 @@ class AssignementsController extends Controller
         $assignement = Asignaciones::findOrFail($id);
         $clientes    = Cliente::all();
         $tecnicos    = User::where('role', 'tecnico')->get();
-        $unidades    = Unidades::all();
+        $devices     = Devices::all();
 
-        return view($this->folder . 'edit', compact('assignement', 'clientes', 'tecnicos', 'unidades'));
+        return view($this->folder . 'edit', compact('assignement', 'clientes', 'tecnicos', 'devices'));
     }
     /**
      * Update the specified resource in storage.
@@ -98,24 +113,39 @@ class AssignementsController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'cliente_id'                  => 'required|exists:clientes,id',
-            'unidad_id'                   => 'required|exists:unidades,id',
-            'costo_plataforma'            => 'required|numeric|min:0',
-            'costo_sim'                   => 'required|numeric|min:0',
-            'pago_mensual'                => 'required|numeric|min:0',
-            'fecha_inicio'                => 'required|date',
-            'fecha_ultimo_mantenimiento'  => 'required|date',
-            'descuento'                   => 'nullable|numeric|min:0',
-            'cobro_adicional'             => 'nullable|numeric|min:0',
-            'ganancia'                    => 'nullable|numeric|min:0',
-            'observaciones'               => 'nullable|string',
-            'observaciones_mantenimiento' => 'nullable|string',
+            'cliente_id'        => 'required|exists:clientes,id',
+            'tecnico_id'        => 'nullable',
+            'tipo_servicio'     => 'required|string',
+            'tel_contact'       => 'required|string',
+            'encargado_recibir' => 'required|string',
+            'location'          => 'required|string',
+            'lat'               => 'required|string',
+            'lng'               => 'required|string',
+            'viaticos'          => 'required|string',
+            'tipo_vehiculo'     => 'required|string',
+            'marca'             => 'required|string',
+            'modelo'            => 'required|string',
+            'devices_id'        => 'required|exists:devices,id',
+            'placa'             => 'required|string',
+            'observaciones'     => 'nullable|string',
         ]);
 
-        $assignement = Asignaciones::findOrFail($id);
-        $assignement->update($request->all());
+        try {
+            $assignement = Asignaciones::findOrFail($id);
+            $assignement->update($request->all());
 
-        return redirect()->route('assignements.index')->with('success', 'Asignación actualizada correctamente.');
+            return response()->json([
+                'ok' => true,
+                'message' => 'Asignación actualizada correctamente.',
+                'code' => 200,
+                'redirect' => route('assignements.index')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Error al crear el Dispositivo: ' . $e->getMessage(),
+            ]);
+        }
     }
 
     /**

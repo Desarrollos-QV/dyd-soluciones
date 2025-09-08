@@ -1,54 +1,73 @@
 @extends('layouts.app')
 @section('title')
-    Listado de Asignaciones
+    Listado de Servicios
 @endsection
 @section('content')
     <nav class="page-breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ url('./') }}">Inicio</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Listado de Asignaciones</li>
+            <li class="breadcrumb-item active" aria-current="page">Listado de Servicios</li>
         </ol>
     </nav>
     <div class="row">
         <div class="col-lg-12">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="mb-0">Asignaciones</h4>
+                <h4 class="mb-0">Servicios</h4>
                 <a href="{{ route('assignements.create') }}" class="btn btn-primary btn-sm">
-                    <i data-feather="plus"></i>Generar Asiganción
+                    <i data-feather="plus"></i>Alta de nuevo servicio
                 </a>
             </div>
         </div>
 
+      
         <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table id="dataTableExample" class="table">
+                        <table id="dataTableExample" class="w-100 table table-bordered table-hover">
                             <thead>
                                 <tr>
                                     <td>Cliente</td>
+                                    <td>Tecnico</td>
+                                    <td>Tipo de servicio</td>
+                                    <td>Telefono de contacto</td>
+                                    <td>Encargado de recibir</td>
+                                    <td>Ubicación</td>
+                                    <td>Viaticos</td>
+                                    <td>Tipo de vehiculo</td>
+                                    <td>Marca / Modelo</td>
                                     <td>Dispositivo</td>
-                                    <td>Economico</td>
                                     <td>Placa</td>
-                                    <td>Coban o DVR</td>
-                                    <td>Fecha de inicio</td>
-                                    <td>Tecnico</td> 
                                     <td>Observaciones</td>
-                                    <td>Número de motor</td>
+                                    <td>Opciones</td>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody> 
+                                
                                 @foreach ($assignements as $assign)
-                                    <tr>
-                                        <td>{{ $assign->cliente->nombre }}</td>
-                                        <td>{{ $assign->unidad->vin }}</td>
-                                        <td>{{ $assign->unidad->economico }}</td>
-                                        <td>{{ $assign->unidad->placa }}</td>
-                                        <td>{{ $assign->coban_dvr }}</td>
-                                        <td>{{ $assign->fecha_inicio }}</td>
-                                        <td>{{ $assign->tecnico ? $assign->tecnico->name : 'Sin Asignar' }}</td>
+                                    <tr> 
+                                        <td>
+                                            <span class="badge bg-success text-white text-capitalize">{{ $assign->cliente ? $assign->cliente->nombre : 'Sin Asignar' }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary text-white text-capitalize">{{ $assign->tecnico ? $assign->tecnico->nombre : 'Sin Asignar' }}</span>
+                                        </td>
+                                        <td>{{ $assign->tipo_servicio }}</td>
+                                        <td>{{ $assign->tel_contact }}</td>
+                                        <td>{{ $assign->encargado_recibir }}</td>
+                                        <td>
+                                            <a href="https://google.com/maps?q={{$assign->lat}},{{$assign->lng}}" target="_blank">{{ substr($assign->location,0,10) }}...</a>
+                                        </td>
+                                        <td>{{ $assign->viaticos }}</td>
+                                        <td>{{ $assign->tipo_vehiculo }}</td>
+                                        <td>
+                                            <span class="badge bg-info text-white">{{ $assign->marca }}</span> / <span class="badge bg-warning text-white">{{ $assign->modelo }}</span> 
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-primary text-white">{{ $assign->device ? $assign->device->dispositivo : 'Sin asignar' }}</span>
+                                        </td>
+                                        <td>{{ $assign->placa }}</td>                                        
                                         <td>{{ $assign->observaciones ?? 'Sin Observaciones' }}</td>
-                                        <td>{{ $assign->unidad->numero_de_motor }}</td>
                                         <td>
                                             <div class="btn-group">
                                                 <button type="button" class="btn btn-primary dropdown-toggle"
@@ -58,15 +77,12 @@
                                                     <a class="dropdown-item"
                                                         href="{{ route('assignements.edit', $assign->id) }}">Editar</a>
                                                     <hr />
-                                                    <a class="dropdown-item" href="#">
-                                                        <form action="{{ route('assignements.destroy', $assign) }}" method="POST"
-                                                            style="display:inline-block;">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <span type="submit"
-                                                                onclick="return confirm('¿Estás seguro?')">Eliminar</span>
-                                                        </form>
-                                                    </a>
+                                                    <form action="{{ route('assignements.destroy', $assign) }}" method="POST"
+                                                        style="display:inline-block;">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="dropdown-item btn btn-sm">Eliminar</button>
+                                                    </form>
                                                 </div>
                                             </div>
                                         </td>

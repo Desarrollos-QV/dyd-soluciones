@@ -28,7 +28,7 @@
         <div class="card">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table id="dataTableExample" class="table">
+                    <table id="dataTableExample" class="w-100 table table-bordered table-hover">
                         <thead>
                             <tr>
                                 <th>Fecha</th>
@@ -45,9 +45,9 @@
                             <tr>
                                 <td>{{ $gasto->fecha }}</td>
                                 <td>{{ $gasto->hora }}</td>
-                                <td>{{ $gasto->autoriza->name }}</td>
+                                <td>{{ $gasto->autoriza ? $gasto->autoriza->name : 'Sin autorizacion' }}</td>
                                 <td>${{ number_format($gasto->monto, 2) }}</td>
-                                <td>{{ $gasto->solicita->name }}</td>
+                                <td>{{ $gasto->solicita ? $gasto->solicita->name : "Sin Nombre" }}</td>
                                 <td>{{ $gasto->motivo }}</td>
                                 <td>
                                     <a href="{{ route('gastos.edit', $gasto) }}" class="btn btn-sm btn-warning">Editar</a>

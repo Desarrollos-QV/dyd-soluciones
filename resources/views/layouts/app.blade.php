@@ -20,7 +20,7 @@
     <!-- end plugin css for this page -->
     <!-- inject:css -->
     <link rel="stylesheet" href="{{ asset('assets/fonts/feather-font/css/iconfont.css') }}">
-    <link rel="stylesheet" href="{{ asset('assets/vendors/flag-icon-css/css/flag-icon.min.css') }}"> 
+    <link rel="stylesheet" href="{{ asset('assets/vendors/flag-icon-css/css/flag-icon.min.css') }}">
     <!-- endinject -->
     <!-- Layout styles -->
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
@@ -34,19 +34,29 @@
 
 <body class="sidebar-dark">
     <div class="main-wrapper">
-        @if (!Route::is('login') && 
-            !Route::is('register') && 
-            !Route::is('password.request') && 
-            !Route::is('password.reset') &&
-            !Route::is('servicios_agendados.firmar'))
+        @if (
+            !Route::is('login') &&
+                !Route::is('register') &&
+                !Route::is('password.request') &&
+                !Route::is('password.reset') &&
+                !Route::is('servicios_agendados.firmar'))
             <!-- _sidebar -->
             @include('includes.sidebar')
             <!-- _sidebar -->
         @endif
 
-        <div class="page-wrapper @if (Route::is('login') || Route::is('register') || Route::is('password.request') || Route::is('password.reset') || Route::is('servicios_agendados.firmar')) full-page @endif">
+        <div class="page-wrapper @if (Route::is('login') ||
+                Route::is('register') ||
+                Route::is('password.request') ||
+                Route::is('password.reset') ||
+                Route::is('servicios_agendados.firmar')) full-page @endif">
 
-            @if (!Route::is('login') && !Route::is('register') && !Route::is('password.request') && !Route::is('password.reset') && !Route::is('servicios_agendados.firmar'))
+            @if (
+                !Route::is('login') &&
+                    !Route::is('register') &&
+                    !Route::is('password.request') &&
+                    !Route::is('password.reset') &&
+                    !Route::is('servicios_agendados.firmar'))
                 <!-- _navbar -->
                 @include('includes.navbar')
                 <!-- _navbar -->
@@ -55,12 +65,14 @@
             <div class="page-content">
                 <main class="py-4">
                     @if (session('success') || request()->has('success'))
-                        <div class="alert alert-success">{{ (session('success')) ? session('success') : request('success') }}</div>
+                        <div class="alert alert-success">
+                            {{ session('success') ? session('success') : request('success') }}</div>
                     @endif
                     @if (session('error') || request()->has('error'))
-                        <div class="alert alert-danger">{{ (session('error')) ? session('error') : request('error') }}</div>
+                        <div class="alert alert-danger">{{ session('error') ? session('error') : request('error') }}
+                        </div>
                     @endif
- 
+
                     @yield('content')
                 </main>
             </div>
@@ -92,7 +104,7 @@
     <script src="{{ asset('assets/vendors/feather-icons/feather.min.js') }}"></script>
     <script src="{{ asset('assets/js/template.js') }}"></script>
     <script src="{{ asset('assets/vendors/sweetalert2/sweetalert2.min.js') }}"></script>
-    <script src="{{ asset('assets/vendors/promise-polyfill/polyfill.min.js') }}"></script> 
+    <script src="{{ asset('assets/vendors/promise-polyfill/polyfill.min.js') }}"></script>
     <!-- endinject -->
     <!-- custom js for this page -->
     <script src="{{ asset('assets/js/dashboard.js') }}"></script>
@@ -100,6 +112,23 @@
     <!-- end custom js for this page -->
 
     @yield('js')
+
+    <script>
+        function alertSwwet(title, msg) {
+            Swal.fire({
+                title: title,
+                text: msg
+            });
+        }
+
+        function alertSweetImage(title, image) {
+            Swal.fire({
+                title: title,
+                imageUrl: image,
+                imageHeight: 250,
+            });
+        }
+    </script>
 </body>
 
 </html>

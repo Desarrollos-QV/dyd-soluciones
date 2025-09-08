@@ -1,67 +1,73 @@
-@extends('layouts.app')
-@section('title')
-    Agregando nuevo Cliente
+@extends('layouts.app') 
+@section('title', 'Registrar nuevo Cliente')
+@section('css')
+<link rel="stylesheet" href="{{ asset('assets/vendors/dropify/dist/dropify.min.css') }}">
 @endsection
 @section('content')
-    <nav class="page-breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ url('./') }}">Inicio</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Nuevo Cliente</li>
-        </ol>
-    </nav>
+<nav class="page-breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url('./') }}">Inicio</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Registrar nuevo Cliente</li>
+    </ol>
+</nav>
 
-    <div class="row">
-        <div class="col-lg-10 mx-auto grid-margin stretch-card">
-            <div class="card">
-                <div class="card-header"><h4>Nuevo Cliente</h4></div>
-                <div class="card-body">
-                    <form action="{{ route('clientes.store') }}" method="POST">
-                        @csrf
+<form action="{{ route('clientes.store') }}" method="POST" id="clientes_form" class="row" enctype="multipart/form-data">
+    @csrf
+    @include('admin.clientes.form')
+</form> 
+@endsection
 
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label>Nombre</label>
-                                <input type="text" name="nombre" class="form-control" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label>Dirección</label>
-                                <input type="text" name="direccion" class="form-control">
-                            </div>
-                        </div>
+@section('js')
 
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label>Teléfono</label>
-                                <input type="text" name="numero_contacto" class="form-control" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label>Teléfono Emergencia</label>
-                                <input type="text" name="numero_alterno" class="form-control">
-                            </div>
-                        </div>
+<script src="{{ asset('assets/vendors/dropify/dist/dropify.min.js') }}"></script>
+<script src="{{ asset('assets/js/dropify.js') }}"></script>
+<script src="{{ asset('assets/vendors/bootstrap-maxlength/bootstrap-maxlength.min.js') }}"></script>
+<script src="{{ asset('assets/vendors/inputmask/jquery.inputmask.min.js') }}"></script>
+<script src="{{ asset('assets/js/inputmask.js') }}"></script>
 
-                        <div class="mb-3">
-                            <label>Ruta / Zona</label>
-                            <select name="pertenece_ruta" class="form-select">
-                                <option value="transporte_publico">Transporte publico</option>
-                                <option value="sindicato">Sindicato</option>
-                                <option value="particular">particular</option>
-                                <option value="empresarial">Empresarial</option>
-                                <option value="otros">Otros</option>
-                            </select>
-                        </div>
-                        <hr />
-                        <div class="mb-3 mt-6">
-                            <h6>Recordatorios</h6>
-                            <label>Mensaje Personalizado</label>
-                            <textarea name="mensaje_personalizado" class="form-control" rows="8" placeholder="Mensaje personalizado para los recordatorios"></textarea>
-                        </div>
-   
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('clientes_form');
 
-                        <button class="btn btn-success">Guardar Cliente</button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
+        form.addEventListener('submit', async function (event) {
+            event.preventDefault(); 
+            const formData = new FormData(form);
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log(data);
+                    window.location.href = `${data.redirect}?success=${encodeURIComponent(data.message)}`;
+                } else {
+                    const errorData = await response.json();
+                    console.error('Errores:', errorData); 
+                    Swal.fire({
+                        type: 'error',
+                        title: 'Oops... Hubo un error al enviar el formulario.',
+                        text: errorData.message
+                    }).then(() => {
+                        window.location.reload();
+                    });
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire({
+                    type: 'error',
+                    title: 'Oops...',
+                    text: "Ocurrió un error inesperado."
+                }).then(() => {
+                    window.location.reload();
+                });
+            }
+        });
+    });
+</script>
 @endsection

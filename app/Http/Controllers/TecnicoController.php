@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-
-use App\Models\Tecnico;
+ 
 use App\Models\User;
 
 class TecnicoController extends Controller
 {
+
+    
+
     public function index()
     {
         $tecnicos =  User::where('role', 'tecnico')->get();
@@ -26,9 +28,17 @@ class TecnicoController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'telefono' => 'required|string|max:20',
+            'lastname'  => 'nullable|string|max:20',
+            'telefono' => 'nullable|string|max:20',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
+            'schooling'  => 'required|string|max:100',
+            'experience'  => 'required|string|max:200',
+            'licence'  => 'required|string|max:100',
+            'vehicle'  => 'required|string|max:100',
+            'tools'  => 'required|array',
+            'skills'  => 'required|string',
+            'uniform'  => 'required|string|max:100',
         ]);
 
         try {
@@ -43,11 +53,21 @@ class TecnicoController extends Controller
             $data['permissions'] = $permission;
             $data['is_active'] = 1;
 
+            $data['tools'] = json_encode($data['tools']);
+
             User::create($data);
 
-            return redirect()->route('tecnicos.index')->with('success', 'Técnico creado exitosamente.');
+            return response()->json([
+                'ok' => true,
+                'message' => 'Técnico creado exitosamente.',
+                'code' => 200,
+                'redirect' => route('tecnicos.index')
+            ]);
         } catch (\Exception $e) {
-            return redirect()->route('tecnicos.index')->with('error', $e->getMessage());
+            return response()->json([
+                'ok' => false,
+                'message' => 'Error al crear la unidad: ' . $e->getMessage(),
+            ]);
         }
     }
 
