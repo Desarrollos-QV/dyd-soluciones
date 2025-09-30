@@ -13,6 +13,7 @@ class Sellers extends Model
         'name',
         'address',
         'phone',
-        'level_education'
+        'level_education',
+        'picture',
     ];
 }

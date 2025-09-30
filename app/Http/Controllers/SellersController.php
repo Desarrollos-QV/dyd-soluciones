@@ -41,10 +41,21 @@ class SellersController extends Controller
             'address' => 'required|string',
             'phone' => 'required|string|max:20',
             'level_education' => 'required|string|max:100',
+            'picture' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         try {
-            Sellers::create($request->all());
+            $data = $request->all();
+            // Manejo de la imagen avatar
+            if ($request->hasFile('picture')) {
+                // Subir el nuevo archivo
+                $file = $request->file('picture');
+                $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('uploads/identificaciones'), $filename); // Guardar en la carpeta 'uploads/ine_comprobantes'
+                $data['picture'] = 'uploads/identificaciones/' . $filename; // Ruta relativa para guardar en la base de datos
+            }
+
+            Sellers::create($data);
             return response()->json([
                 'ok' => true,
                 'message' => 'Vendedor creado exitosamente',
@@ -82,10 +93,27 @@ class SellersController extends Controller
             'address' => 'required|string',
             'phone' => 'required|string|max:20',
             'level_education' => 'required|string|max:100',
+            'picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         try {
-            $seller->update($request->all());
+            $data = $request->all();
+
+            // Manejo de la imagen avatar
+            if ($request->hasFile('picture')) {
+                // Eliminar el archivo anterior si existe
+                if ($seller->picture && file_exists(public_path($seller->picture))) {
+                    unlink(public_path($seller->picture));
+                }
+
+                // Subir el nuevo archivo
+                $file = $request->file('picture');
+                $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('uploads/identificaciones'), $filename); // Guardar en la carpeta 'uploads/ine_comprobantes'
+                $data['picture'] = 'uploads/identificaciones/' . $filename; // Ruta relativa para guardar en la base de datos
+            }
+
+            $seller->update($data);
            return response()->json([
                 'ok' => true,
                 'message' => 'Vendedor actualizado exitosamente',

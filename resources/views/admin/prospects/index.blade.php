@@ -21,8 +21,6 @@
         </div>
 
         <div class="col-lg-12">
-            
-
             <div class="card">
                 <div class="card-body">
                     <div class="table-responsive">
@@ -33,6 +31,7 @@
                                     <th>Prospecto</th>
                                     <th>Empresa</th>
                                     <th>Potencial</th>
+                                    <th>Estatus</th>
                                     <th>Vendedor asignado</th>
                                     <th>Ubicación</th>
                                     <th>Contacto</th>
@@ -44,7 +43,8 @@
                                 @foreach ($prospects as $prosp)
                                     <tr>
                                         <td>
-                                            <span class="badge bg-success text-white text-capitalize">{{ $prosp->name_company }}</span>
+                                            <span
+                                                class="badge bg-success text-white text-capitalize">{{ $prosp->name_company }}</span>
                                         </td>
                                         <td>
                                             <span
@@ -70,10 +70,94 @@
                                             <span
                                                 class="{{ $badgeClass }} text-dark text-uppercase">{{ $prosp->potencial }}</span>
                                         </td>
-                                        <td>{{ $prosp->seller ? $prosp->seller->name : 'Sin Asignar' }}</td>
+                                        <td>
+                                            @php
+                                                /**
+                                                 *
+                                                 * 0 = rojo (sin atender),
+                                                 * 1 = amarillo (en proceso y se puedan visualizar las observaciones del estatus),
+                                                 * 2 = verde (proyecto concretado),
+                                                 * 3 = morado (competencia o instaladores),
+                                                 * 4 = gris (no funcional).
+                                                 *
+                                                 * */
+                                                $statusOptions = [
+                                                    0 => ['class' => 'danger', 'text' => 'Sin Atender'],
+                                                    1 => ['class' => 'warning text-dark', 'text' => 'En Proceso'],
+                                                    2 => ['class' => 'success', 'text' => 'Concretado'],
+                                                    3 => ['class' => 'purple', 'text' => 'Competencia/Instaladores'],
+                                                    4 => ['class' => 'secondary', 'text' => 'No Funcional'],
+                                                ];
+
+                                                switch ($prosp->status) {
+                                                    case 0:
+                                                        $statusClass = 'danger';
+                                                        $statusText = 'Sin Atender';
+                                                        break;
+                                                    case 1:
+                                                        $statusClass = 'warning text-dark';
+                                                        $statusText = 'En Proceso';
+                                                        break;
+                                                    case 2:
+                                                        $statusClass = 'success';
+                                                        $statusText = 'Concretado';
+                                                        break;
+                                                    case 3:
+                                                        $statusClass = 'purple';
+                                                        $statusText = 'Competencia/Instaladores';
+                                                        break;
+                                                    case 4:
+                                                        $statusClass = 'secondary';
+                                                        $statusText = 'No Funcional';
+                                                        break;
+                                                    default:
+                                                        $statusClass = 'secondary';
+                                                        $statusText = 'Desconocido';
+                                                }
+                                            @endphp
+                                            <div class="btn-group">
+                                                <button type="button"
+                                                    class="btn btn-{{ $statusOptions[$prosp->status]['class'] ?? 'secondary' }} dropdown-toggle"
+                                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    {{ $statusOptions[$prosp->status]['text'] ?? 'Desconocido' }}
+                                                </button>
+                                                <div class="dropdown-menu">
+                                                    @foreach ($statusOptions as $key => $option)
+                                                        @if ($key !== $prosp->status)
+                                                            <a class="dropdown-item py-2" href="{{ route('prospects.status', ['id' => $prosp->id, 'status' => $key]) }}">
+                                                                {{ $option['text'] }}
+                                                            </a>
+                                                        @endif
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    {{ $prosp->seller ? $prosp->seller->name : 'Sin Asignar' }}
+                                                </button>
+                                                <div class="dropdown-menu">
+                                                    @foreach ($sellers as $sells)
+                                                        @if ($sells['id'] !== $prosp->sellers_id)
+                                                            <a class="dropdown-item py-2" href="{{ route('prospects.assign', ['id' => $prosp->id, 'seller' => $sells['id']]) }}">
+                                                                {{ $sells['name'] }}
+                                                            </a>
+                                                        @endif
+                                                    @endforeach
+                                                    <a class="dropdown-item py-2" href="{{ route('prospects.assign', ['id' => $prosp->id, 'seller' => 0]) }}">
+                                                        Dejar sin asignar
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </td>
                                         <td>{{ $prosp->location }}</td>
                                         <td>{{ $prosp->contacts }}</td>
-                                        <td>{{ $prosp->observations }}</td>
+                                        <td>
+                                            <a href="javascript:void(0)" class="btn-sm btn-secondary text-white"
+                                                        onclick="alertSwwet('Observaciones', '{{ $prosp->observations ?? 'Sin Obersaciones' }}')">Ver
+                                                        observaciones</a>
+                                        </td>
                                         <td>
                                             <div class="btn-group">
                                                 <button type="button" class="btn btn-primary dropdown-toggle"
@@ -82,13 +166,17 @@
                                                 <div class="dropdown-menu">
                                                     <a class="dropdown-item"
                                                         href="{{ route('prospects.edit', $prosp->id) }}">Editar</a>
-                                                    <hr /> 
-                                                    <form action="{{ route('prospects.destroy', $prosp) }}"
-                                                        method="POST" style="display:inline-block;">
+                                                    <a href="javascript:void(0)" class="dropdown-item"
+                                                        onclick="alertSwwet('Observaciones', '{{ $prosp->observations ?? 'Sin Obersaciones' }}')">Ver
+                                                        observaciones</a>
+                                                    <hr />
+                                                    <form action="{{ route('prospects.destroy', $prosp) }}" method="POST"
+                                                        style="display:inline-block;">
                                                         @csrf
                                                         @method('DELETE')
-                                                        <button class="btn btn-sm dropdown-item" type="submit">Eliminar</button>
-                                                    </form> 
+                                                        <button class="btn btn-sm dropdown-item"
+                                                            type="submit">Eliminar</button>
+                                                    </form>
                                                 </div>
                                             </div>
                                         </td>

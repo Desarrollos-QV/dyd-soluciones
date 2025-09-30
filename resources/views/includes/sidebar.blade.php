@@ -31,14 +31,14 @@
             @if(Auth::user()->hasPermission('clientes.index') || Auth::user()->hasPermission('tecnicos.index') ||  Auth::user()->hasPermission('inventario.index'))
                 <li class="nav-item nav-category">Páginas</li>
                 
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="collapse" href="#prospects" role="button" aria-expanded="false"
-                        aria-controls="prospects">
+                <li class="nav-item @if(Route::is('prospects.index') || Route::is('prospects.edit') || Route::is('prospects.create')) active @endif">
+                    <a class="nav-link" href="{{ route('prospects.index') }}">
+                        {{-- role="button" data-toggle="collapse" aria-expanded="false" aria-controls="prospects" --}}
                         <i class="link-icon" data-feather="user-plus"></i>
                         <span class="link-title">Prospectos</span>
-                        <i class="link-arrow" data-feather="chevron-down"></i>
+                        <i class="link-arrow" data-feather="chevron-right"></i>
                     </a>
-                    <div class="collapse @if(Route::is('prospects.index') || Route::is('prospects.edit') || Route::is('prospects.create')) show @endif" id="prospects">
+                    {{-- <div class="collapse @if(Route::is('prospects.index') || Route::is('prospects.edit') || Route::is('prospects.create')) show @endif" id="prospects">
                         <ul class="nav sub-menu">
                             <li class="nav-item">
                                 <a href="{{ route('prospects.index') }}" class="nav-link @if(Route::is('prospects.index')) active @endif">Listado</a>
@@ -47,17 +47,17 @@
                                 <a href="{{ route('prospects.create') }}" class="nav-link @if( Route::is('prospects.create')) active @endif">Agregar Elemento</a>
                             </li>
                         </ul>
-                    </div>
+                    </div> --}}
                 </li>
                 
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="collapse" href="#sellers" role="button" aria-expanded="false"
-                        aria-controls="sellers">
+                <li class="nav-item @if(Route::is('sellers.index') || Route::is('sellers.edit') || Route::is('sellers.create')) active @endif">
+                    <a class="nav-link" href="{{ route('sellers.index') }}">
+                        {{-- data-toggle="collapse" role="button" aria-expanded="false" aria-controls="sellers" --}}
                         <i class="link-icon" data-feather="shopping-bag"></i>
                         <span class="link-title">Vendedores</span>
-                        <i class="link-arrow" data-feather="chevron-down"></i>
+                        <i class="link-arrow" data-feather="chevron-right"></i>
                     </a>
-                    <div class="collapse @if(Route::is('sellers.index') || Route::is('sellers.edit') || Route::is('sellers.create')) show @endif" id="sellers">
+                    {{-- <div class="collapse @if(Route::is('sellers.index') || Route::is('sellers.edit') || Route::is('sellers.create')) show @endif" id="sellers">
                         <ul class="nav sub-menu">
                             <li class="nav-item">
                                 <a href="{{ route('sellers.index') }}" class="nav-link @if(Route::is('sellers.index')) active @endif">Listado</a>
@@ -66,18 +66,18 @@
                                 <a href="{{ route('sellers.create') }}" class="nav-link @if( Route::is('sellers.create')) active @endif">Agregar Elemento</a>
                             </li>
                         </ul>
-                    </div>
+                    </div> --}}
                 </li>
 
                 @if(Auth::user()->hasPermission('clientes.index'))
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="collapse" href="#clientes" role="button" aria-expanded="false"
-                        aria-controls="clientes">
+                <li class="nav-item @if(Route::is('clientes.index') || Route::is('clientes.edit') || Route::is('clientes.create')) active @endif">
+                    <a class="nav-link" href="{{ route('clientes.index') }}">
+                        {{-- role="button" aria-expanded="false" data-toggle="collapse"  aria-controls="clientes" --}}
                         <i class="link-icon" data-feather="user-check"></i>
                         <span class="link-title">Clientes</span>
-                        <i class="link-arrow" data-feather="chevron-down"></i>
+                        <i class="link-arrow" data-feather="chevron-right"></i>
                     </a>
-                    <div class="collapse @if(Route::is('clientes.index') || Route::is('clientes.edit') || Route::is('clientes.create')) show @endif" id="clientes">
+                    {{-- <div class="collapse @if(Route::is('clientes.index') || Route::is('clientes.edit') || Route::is('clientes.create')) show @endif" id="clientes">
                         <ul class="nav sub-menu">
                             <li class="nav-item">
                                 <a href="{{ route('clientes.index') }}" class="nav-link @if(Route::is('clientes.index')) active @endif">Listado</a>
@@ -86,16 +86,16 @@
                                 <a href="{{ route('clientes.create') }}" class="nav-link @if( Route::is('clientes.create')) active @endif">Agregar Elemento</a>
                             </li>
                         </ul>
-                    </div>
+                    </div> --}}
                 </li>
-                 <li class="nav-item">
-                    <a class="nav-link" data-toggle="collapse" href="#devices" role="button" aria-expanded="false"
-                        aria-controls="devices">
+                 <li class="nav-item @if(Route::is('devices.index') || Route::is('devices.edit') || Route::is('devices.create')) active @endif">
+                    <a class="nav-link" href="{{ route('devices.index') }}">
+                        {{-- role="button" aria-expanded="false" data-toggle="collapse" aria-controls="devices" --}}
                         <i class="link-icon" data-feather="shopping-bag"></i>
-                        <span class="link-title">Disp. y Materiales</span>
-                        <i class="link-arrow" data-feather="chevron-down"></i>
+                        <span class="link-title">Control de Inventario</span>
+                        <i class="link-arrow" data-feather="chevron-right"></i>
                     </a>
-                    <div class="collapse @if(Route::is('devices.index') || Route::is('devices.edit') || Route::is('devices.create')) show @endif" id="devices">
+                    {{-- <div class="collapse @if(Route::is('devices.index') || Route::is('devices.edit') || Route::is('devices.create')) show @endif" id="devices">
                         <ul class="nav sub-menu">
                             <li class="nav-item">
                                 <a href="{{ route('devices.index') }}" class="nav-link @if(Route::is('devices.index')) active @endif">Listado</a>
@@ -104,16 +104,16 @@
                                 <a href="{{ route('devices.create') }}" class="nav-link @if( Route::is('devices.create')) active @endif">Agregar Elemento</a>
                             </li>
                         </ul>
-                    </div>
+                    </div> --}}
                 </li>
-                <li class="nav-item mb-1">
-                    <a class="nav-link" data-toggle="collapse" href="#unidades" role="button" aria-expanded="false"
-                        aria-controls="unidades">
+                <li class="nav-item mb-1 @if(Route::is('unidades.index') || Route::is('unidades.edit') || Route::is('unidades.create')) active @endif">
+                    <a class="nav-link" href="{{ route('unidades.index') }}">
+                        {{-- role="button" aria-expanded="false" data-toggle="collapse" aria-controls="unidades" --}}
                         <i class="link-icon" data-feather="truck"></i>
                         <span class="link-title">Unidades</span>
-                        <i class="link-arrow" data-feather="chevron-down"></i>
+                        <i class="link-arrow" data-feather="chevron-right"></i>
                     </a>
-                    <div class="collapse @if(Route::is('unidades.index') || Route::is('unidades.edit') || Route::is('unidades.create')) show @endif" id="unidades">
+                    {{-- <div class="collapse @if(Route::is('unidades.index') || Route::is('unidades.edit') || Route::is('unidades.create')) show @endif" id="unidades">
                         <ul class="nav sub-menu">
                             <li class="nav-item">
                                 <a href="{{ route('unidades.index') }}" class="nav-link @if(Route::is('unidades.index')) active @endif">Listado</a>
@@ -122,20 +122,20 @@
                                 <a href="{{ route('unidades.create') }}" class="nav-link @if( Route::is('unidades.create')) active @endif">Agregar Elemento</a>
                             </li>
                         </ul>
-                    </div>
+                    </div> --}}
                 </li>
                 @endif
 
                 @if(Auth::user()->hasPermission('tecnicos.index'))
                 <li class="nav-item nav-category">Técnicos</li>
-                <li class="nav-item mt-1">
-                    <a class="nav-link" data-toggle="collapse" href="#tecnicos" role="button" aria-expanded="false"
-                        aria-controls="tecnicos">
+                <li class="nav-item mt-1 @if(Route::is('tecnicos.index') || Route::is('tecnicos.edit') || Route::is('tecnicos.create')) active @endif">
+                    <a class="nav-link" href="{{ route('tecnicos.index') }}">
+                        {{-- role="button" aria-expanded="false" data-toggle="collapse" aria-controls="tecnicos" --}}
                         <i class="link-icon" data-feather="briefcase"></i>
                         <span class="link-title">Técnicos</span>
-                        <i class="link-arrow" data-feather="chevron-down"></i>
+                        <i class="link-arrow" data-feather="chevron-right"></i>
                     </a>
-                    <div class="collapse @if(Route::is('tecnicos.index') || Route::is('tecnicos.edit') || Route::is('tecnicos.create')) show @endif" id="tecnicos">
+                    {{-- <div class="collapse @if(Route::is('tecnicos.index') || Route::is('tecnicos.edit') || Route::is('tecnicos.create')) show @endif" id="tecnicos">
                         <ul class="nav sub-menu">
                             <li class="nav-item">
                                 <a href="{{ route('tecnicos.index') }}" class="nav-link @if(Route::is('tecnicos.index')) active @endif">Listado</a>
@@ -144,7 +144,7 @@
                                 <a href="{{ route('tecnicos.create') }}" class="nav-link @if( Route::is('tecnicos.create')) active @endif">Agregar Elemento</a>
                             </li>
                         </ul>
-                    </div>
+                    </div> --}}
                 </li>
                 @endif
 

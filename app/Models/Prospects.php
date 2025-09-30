@@ -17,7 +17,8 @@ class Prospects extends Model
         'sellers_id',
         'location',
         'contacts',
-        'observations'
+        'observations',
+        'status' // 0 = rojo (sin atender), 1 = amarillo (en proceso y se puedan visualizar las observaciones del estatus), 2 = verde (proyecto concretado), 3 = morado (competencia o instaladores), 4 = gris (no funcional).
     ];
 
     public function seller()

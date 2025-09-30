@@ -1,10 +1,10 @@
 @extends('layouts.app') 
-@section('title', 'Registrar nuevo Dispositivo')
+@section('title', 'Registrar Control de Inventario')
 @section('content')
 <nav class="page-breadcrumb">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{ url('./') }}">Inicio</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Registrar nuevo Dispositivo</li>
+        <li class="breadcrumb-item active" aria-current="page">Registrar Control de Inventario</li>
     </ol>
 </nav>
 

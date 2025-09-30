@@ -29,6 +29,7 @@
                         <thead>
                             <tr>
                                 <th>ID</th>
+                                <th>Imagen</th>
                                 <th>Nombre</th>
                                 <th>Dirección</th>
                                 <th>Telefono</th>
@@ -39,6 +40,9 @@
                             @foreach($sellers as $sell)
                             <tr>
                                 <td>#{{ $sell->id }}</td>
+                                <td>
+                                    <img src="{{ asset($sell->picture) }}" alt="Imagen de {{ $sell->name }}" width="50" height="50" class="rounded-circle">
+                                </td>
                                 <td>{{ $sell->name }}</td>
                                 <td>{{ $sell->address }}</td>
                                 <td>{{ $sell->phone }}</td> 

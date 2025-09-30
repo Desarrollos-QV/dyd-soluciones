@@ -1,5 +1,8 @@
 @extends('layouts.app') 
 @section('title', 'Registrar nuevo vendedor')
+@section('css')
+<link rel="stylesheet" href="{{ asset('assets/vendors/dropify/dist/dropify.min.css') }}">
+@endsection
 @section('content')
 <nav class="page-breadcrumb">
     <ol class="breadcrumb">
@@ -15,6 +18,8 @@
 @endsection
 
 @section('js')
+<script src="{{ asset('assets/vendors/dropify/dist/dropify.min.js') }}"></script>
+<script src="{{ asset('assets/js/dropify.js') }}"></script>
 <script src="{{ asset('assets/vendors/bootstrap-maxlength/bootstrap-maxlength.min.js') }}"></script>
 <script src="{{ asset('assets/vendors/inputmask/jquery.inputmask.min.js') }}"></script>
 <script src="{{ asset('assets/js/inputmask.js') }}"></script>

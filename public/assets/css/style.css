@@ -12805,6 +12805,9 @@ a.close.disabled {
 .bg-primary {
   background-color: #727cf5 !important; }
 
+.btn-purple {
+  background-color: rgb(108, 13, 174) !important;color:#fff; }
+
 a.bg-primary:hover, a.bg-primary:focus,
 button.bg-primary:hover,
 button.bg-primary:focus {

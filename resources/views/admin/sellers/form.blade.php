@@ -1,6 +1,6 @@
 
 
-<div class="col-lg-10 mx-auto grid-margin stretch-card">
+<div class="col-lg-8 mx-auto grid-margin stretch-card">
     <div class="card">
         <div class="card-header">
             <h4 class="card-title">
@@ -58,3 +58,47 @@
     </div>
 </div>
  
+<div class="col-lg-4">
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">
+                <h5>Información de Cuenta/Accesos</h5>
+            </h4>
+        </div>
+
+        <div class="card-body">
+            <div class="form-group">
+                <div class="row">                   
+                    <div class="col-lg-12 mt-4">
+                        @if(isset($seller->id))
+                            <label for="identificacion">Sube una Identificación Oficial</label>
+                            <div class="row">
+                                <div class="col-lg-8">
+                                    <input type="file" name="picture" id="myDropify" class="form-control" value="{{$seller->picture}}">
+                                </div>
+                                <div class="col-lg-4" style="display: flex;justify-content: center;align-items: center;">
+                                    <img src="{{ asset($seller->picture) }}" alt="picture" style="width:100px;height: 100px;border-radius: 25px;">
+                                </div>
+                            </div>
+                        @else
+                            <label for="picture">Sube una Identificación Oficial</label>
+                            <input type="file" name="picture" id="myDropify" class="form-control" value="">
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer">
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-lg-12 d-flex justify-content-end">
+                        <button type="submit"
+                            class="btn btn-primary mr-4">{{ isset($seller->id) ? 'Actualizar' : 'Guardar' }}</button>
+                        <a href="{{ route('sellers.index') }}" class="btn btn-secondary">Cancelar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

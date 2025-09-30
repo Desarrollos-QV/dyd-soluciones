@@ -55,6 +55,8 @@ Route::group(['middleware' => 'isAdmin'], function () {
      * Prospectos
      */
     Route::resource('prospects', ProspectsController::class);
+    Route::get('prospects/status/{status}', [ProspectsController::class, 'ChangeStatus'])->name('prospects.status');  
+    Route::get('prospects/assign/{id}/{seller}', [ProspectsController::class, 'AssignSeller'])->name('prospects.assign');
 
     /**
      * Vendedores

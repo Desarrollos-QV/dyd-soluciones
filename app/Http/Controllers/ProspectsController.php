@@ -16,9 +16,14 @@ class ProspectsController extends Controller
     public function index()
     {
         $prospects = Prospects::with('seller')->get();
+        $sellers = Sellers::all();
 
-      
-        return view($this->folder . '.index', compact('prospects'));
+        // return response()->json([
+        //     'prospects' => $prospects,
+        //     'sellers' => $sellers
+        // ]);
+
+        return view($this->folder . '.index', compact('prospects','sellers'));
     }
 
     /**
@@ -110,6 +115,36 @@ class ProspectsController extends Controller
             ]);
         }
     }
+    
+    /**
+     * Summary of ChangeStatus
+     * @param int $id
+     * @param int $status
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function ChangeStatus($status)
+    {
+        $prospect = Prospects::findOrFail($_GET['id']);
+        $prospect->status = $status;
+        $prospect->save();
+
+        return redirect()->route('prospects.index')->with('success', 'Estado del prospecto actualizado exitosamente');
+    }
+
+    /**
+     * Summary of AssignSeller
+     * @param int $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function AssignSeller($id , $seller)
+    {
+        $prospect = Prospects::findOrFail($id);
+        $prospect->sellers_id = $seller;
+        $prospect->save();
+
+        return redirect()->route('prospects.index')->with('success', 'Vendedor asignado al prospecto exitosamente');
+    }
+
 
     /**
      * Summary of destroy
