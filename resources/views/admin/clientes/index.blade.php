@@ -22,6 +22,8 @@
                     <table id="dataTableExample" class="w-100 table table-bordered table-hover">
                         <thead class="table-light">
                             <tr>
+                                <th>Imagen</th>
+                                <th>Identificación</th>
                                 <th>Nombre</th>
                                 <th>Dirección</th>
                                 <th>Contácto</th>
@@ -34,6 +36,16 @@
                         <tbody>
                         @foreach ($clientes as $cliente)
                             <tr>
+                                <td>
+                                    <a href="{{ asset($cliente->avatar) }}" target="_blank">
+                                        <img src="{{ asset($cliente->avatar) }}" alt="Imagen de {{ $cliente->nombre }}" >
+                                    </a>
+                                </td>
+                                <td>
+                                    <a href="{{ asset($cliente->identificacion) }}" target="_blank">
+                                        <img src="{{ asset($cliente->identificacion) }}" alt="Imagen de {{ $cliente->nombre }}" style="border-radius: 12px !important"> 
+                                    </a>
+                                </td>
                                 <td>{{ ucwords($cliente->nombre) }}</td>
                                 <td>{{ $cliente->direccion }}</td>
                                 <td>{{ $cliente->numero_contacto ?? 'Indefinido' }}</td>

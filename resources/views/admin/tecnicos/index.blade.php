@@ -27,6 +27,8 @@
                         <table id="dataTableExample" class="w-100 table table-bordered table-hover">
                             <thead>
                                 <tr>
+                                    <th>Imagen</th>
+                                    <th>Identificación</th>
                                     <th>Nombre</th>
                                     <th>Email</th>
                                     <th>Escolaridad</th>
@@ -43,6 +45,16 @@
 
                                 @foreach ($tecnicos as $tecnico)
                                     <tr>
+                                        <td>
+                                            <a href="{{ asset($tecnico->avatar) }}" target="_blank">
+                                                <img src="{{ asset($tecnico->avatar) }}" alt="Sin Imagen" >
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <a href="{{ asset($tecnico->identificacion) }}" target="_blank">
+                                                <img src="{{ asset($tecnico->identificacion) }}" alt="Sin Imagen" style="border-radius: 12px !important"> 
+                                            </a>
+                                        </td>
                                         <td>
                                             <span class="text-capitalize">{{ $tecnico->name . ' ' . $tecnico->lastname }}</span>
                                         </td>

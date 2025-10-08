@@ -13,7 +13,8 @@ class UnidadesController extends Controller
     public function index()
     {
         $unidades = Unidades::with('cliente')->get();
-        return view('admin.unidades.index', compact('unidades'));
+        $clientes = Cliente::all();
+        return view('admin.unidades.index', compact('unidades','clientes'));
     }
 
     public function create()
@@ -118,7 +119,6 @@ class UnidadesController extends Controller
                 $data['foto_unidad'] = 'uploads/fotos_unidades/' . $filename; // Ruta relativa para guardar en la base de datos
             }
 
-           
             $data['fecha_instalacion'] = \Carbon\Carbon::parse($request->garantia)->format('Y-m-d');
 
             $unidade->update($data);
@@ -145,5 +145,14 @@ class UnidadesController extends Controller
         } catch (\Exception $e) {
             return redirect()->route('unidades.index')->with('error', 'Error al eliminar la unidad: ' . $e->getMessage());
         }
+    }
+
+    public function AssignClient($id , $client)
+    {
+        $prospect = Unidades::findOrFail($id);
+        $prospect->cliente_id = $client;
+        $prospect->save();
+
+        return redirect()->route('unidades.index')->with('success', 'Cliente asignado a la Unidad exitosamente');
     }
 }

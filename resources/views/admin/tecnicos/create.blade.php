@@ -2,6 +2,9 @@
 @section('title')
     Nuevo tecnico
 @endsection
+@section('css')
+<link rel="stylesheet" href="{{ asset('assets/vendors/dropify/dist/dropify.min.css') }}">
+@endsection
 @section('content')
     <nav class="page-breadcrumb">
         <ol class="breadcrumb">
@@ -17,6 +20,8 @@
     </form>
 @endsection
 @section('js')
+<script src="{{ asset('assets/vendors/dropify/dist/dropify.min.js') }}"></script>
+<script src="{{ asset('assets/js/dropify.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('create_tecnico');

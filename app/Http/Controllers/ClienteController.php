@@ -84,14 +84,12 @@ class ClienteController extends Controller
     {
         try {
             $request->validate([
-                'nombre' => 'required',
-                'avatar' => 'required',
+                'nombre' => 'required', 
                 'direccion' => 'required',
                 'numero_contacto' => 'required',
                 'numero_alterno' => 'required',
                 'tipo_empresa' => 'required',
-                'empresa' => 'required',
-                'identificacion' => 'required',
+                'empresa' => 'required', 
                 'direccion_empresa' => 'required',
                 'usuario' => 'required',
                 'password' => 'required'

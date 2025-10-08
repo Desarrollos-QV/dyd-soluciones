@@ -21,7 +21,7 @@
                     <input type="text" name="numero_contacto" value="{{$cliente->numero_contacto}}" class="form-control" required>
                 </div>
                 <div class="col-md-6">
-                    <label>Teléfono Emergencia</label>
+                    <label>Número de Emergencias o cliente</label>
                     <input type="text" name="numero_alterno" value="{{$cliente->numero_alterno}}" class="form-control">
                 </div>
             </div>
@@ -72,7 +72,7 @@
                         <label id="avatar">Imagen de perfil</label>
                         <div class="row">
                             <div class="col-lg-8">
-                                <input type="file" name="avatar" id="myDropify" class="form-control" value="{{$cliente->avatar}}" required>
+                                <input type="file" name="avatar" id="myDropify" class="form-control" value="{{$cliente->avatar}}">
                             </div>
                             <div class="col-lg-4" style="display: flex;justify-content: center;align-items: center;">
                                 <img src="{{ asset($cliente->avatar) }}" alt="avatar" style="width:100px;height: 100px;border-radius: 25px;">
@@ -88,7 +88,7 @@
                         <label for="identificacion">Sube una Identificación Oficial</label>
                         <div class="row">
                             <div class="col-lg-8">
-                                <input type="file" name="identificacion" id="myDropify2" class="form-control" value="{{$cliente->identificacion}}" required>
+                                <input type="file" name="identificacion" id="myDropify2" class="form-control" value="{{$cliente->identificacion}}">
                             </div>
                             <div class="col-lg-4" style="display: flex;justify-content: center;align-items: center;">
                                 <img src="{{ asset($cliente->identificacion) }}" alt="identificacion" style="width:100px;height: 100px;border-radius: 25px;">

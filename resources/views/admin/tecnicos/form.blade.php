@@ -70,6 +70,70 @@
                     </div>
                 </div>
             </div>
+
+             <div class="form-group">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <label for="tools" class="d-flex align-items-center justify-content-between">
+                            ¿Cuenta con herramientas?
+
+                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="addTools()">+
+                                Añadir
+                                herramienta</button>
+                        </label>
+                        <div id="repuestos-list">
+                            @php
+                                $ref = old('tools', json_decode($tecnico->tools, true) ?? null);
+                            @endphp
+                            <table class="table-secondary w-100 border">
+                                <tbody id="rows-container">
+                                    <tr>
+                                        <td>
+                                            <input type="text" name="tools[]"
+                                                placeholder="Agrega nueva herramienta"
+                                                style="padding: 5px 0 5px 5px;" />
+                                        </td>
+                                    </tr>
+                                     
+                                    @foreach ($ref as $i => $r)
+                                        <tr>
+                                            <td>
+                                                <input type="text" name="tools[]" value="{{ $r }}"
+                                                    placeholder="Agrega nueva herramienta"
+                                                    style="padding: 5px 0 5px 5px;" />
+                                            </td>
+                                            <td>
+                                                <button type="button"
+                                                    class="btn btn-outline-primary d-flex justify-content-center align-items-center"
+                                                    onclick="removeRow(this)">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" style="cursor:pointer;"
+                                                        width="24" height="24" viewBox="0 0 24 24"
+                                                        fill="none" stroke="currentColor" stroke-width="2"
+                                                        stroke-linecap="round" stroke-linejoin="round"
+                                                        class="feather feather-trash-2">
+                                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                                        <path
+                                                            d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                                        </path>
+                                                        <line x1="10" y1="11" x2="10"
+                                                            y2="17"></line>
+                                                        <line x1="14" y1="11" x2="14"
+                                                            y2="17"></line>
+                                                    </svg>
+                                                    &nbsp;<span class="mt-1">Eliminar</span>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
@@ -118,59 +182,46 @@
             </div>
 
             <div class="form-group">
-                <div class="row">
-                    <div class="col-lg-12">
-                        <label for="tools" class="d-flex align-items-center justify-content-between">
-                            ¿Cuenta con herramientas?
-
-                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="addTools()">+ Añadir
-                                herramienta</button>
-                        </label>
-                        <div id="repuestos-list">
-                            @php
-                                $ref = old('tools', $tecnico->tools ?? []);
-                            @endphp
-                            <table class="table-secondary w-100 border">
-                                <tbody id="rows-container">
-                                    <tr>
-                                        <td>
-                                            <input type="text" name="tools[]"
-                                                placeholder="Agrega nueva herramienta" style="padding: 5px 0 5px 5px;" />
-                                        </td>
-                                    </tr>
-                                    @foreach ($ref as $i => $r)
-                                        <tr>
-                                            <td>
-                                                <input type="text" name="tools[]" value="{{ $r }}"
-                                                    placeholder="Agrega nueva herramienta"
-                                                    style="padding: 5px 0 5px 5px;" />
-                                            </td>
-                                            <td>
-                                                <button type="button"
-                                                    class="btn btn-outline-primary d-flex justify-content-center align-items-center"
-                                                    onclick="removeRow(this)">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" style="cursor:pointer;"
-                                                        width="24" height="24" viewBox="0 0 24 24" fill="none"
-                                                        stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                                        stroke-linejoin="round" class="feather feather-trash-2">
-                                                        <polyline points="3 6 5 6 21 6"></polyline>
-                                                        <path
-                                                            d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
-                                                        </path>
-                                                        <line x1="10" y1="11" x2="10"
-                                                            y2="17"></line>
-                                                        <line x1="14" y1="11" x2="14"
-                                                            y2="17"></line>
-                                                    </svg>
-                                                    &nbsp;<span class="mt-1">Eliminar</span>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-
+                <div class="row mb-3 mt-4">
+                    <div class="col-md-12 mt-4">
+                        @if (isset($tecnico->id))
+                            <label id="avatar">Imagen de perfil</label>
+                            <div class="row">
+                                <div class="col-lg-8">
+                                    <input type="file" name="avatar" id="myDropify" class="form-control"
+                                        value="{{ $tecnico->avatar }}" required>
+                                </div>
+                                <div class="col-lg-4"
+                                    style="display: flex;justify-content: center;align-items: center;">
+                                    <img src="{{ asset($tecnico->avatar) }}" alt="avatar"
+                                        style="width:100px;height: 100px;border-radius: 25px;">
+                                </div>
+                            </div>
+                        @else
+                            <label id="avatar">Imagen de perfil</label>
+                            <input type="file" name="avatar" id="myDropify" class="form-control"
+                                value="{{ $tecnico->avatar }}" required>
+                        @endif
+                    </div>
+                    <div class="col-md-12 mt-4">
+                        @if (isset($tecnico->id))
+                            <label for="identificacion">Sube una Identificación Oficial</label>
+                            <div class="row">
+                                <div class="col-lg-8">
+                                    <input type="file" name="identificacion" id="myDropify2" class="form-control"
+                                        value="{{ $tecnico->identificacion }}" required>
+                                </div>
+                                <div class="col-lg-4"
+                                    style="display: flex;justify-content: center;align-items: center;">
+                                    <img src="{{ asset($tecnico->identificacion) }}" alt="identificacion"
+                                        style="width:100px;height: 100px;border-radius: 25px;">
+                                </div>
+                            </div>
+                        @else
+                            <label for="identificacion">Sube una Identificación Oficial</label>
+                            <input type="file" name="identificacion" id="myDropify2" class="form-control"
+                                value="{{ $tecnico->identificacion }}">
+                        @endif
                     </div>
                 </div>
             </div>

@@ -35,9 +35,20 @@
 
                 <div class="row mt-4">
                     <div class="col-lg-6">
-                        <label for="np_sim">N.P. SIM</label>
-                        <input type="text" name="np_sim" id="np_sim" class="form-control"
-                            value="{{ $unidad->np_sim }}">
+                        <label for="np_sim">Dispositivo instalado</label>
+                        <select name="dispositivo_instalado" id="dispositivo_instalado" class="form-select" required>
+                            <option value="DVR" @if($unidad->dispositivo_instalado == 'DVR') selected @endif>DVR</option>
+                            <option value="GPS" @if($unidad->dispositivo_instalado == 'GPS') selected @endif>GPS</option>
+                            <option value="DASHCAM" @if($unidad->dispositivo_instalado == 'DASHCAM') selected @endif>DASHCAM</option>
+                            <option value="SENSOR" @if($unidad->dispositivo_instalado == 'SENSOR') selected @endif>SENSOR</option>
+                            <option value="Otro" @if($unidad->dispositivo_instalado == 'Otro') selected @endif>Otro</option>
+                        </select>
+                        <div class="row" id="other_dispositivo_instalado" style="display: none;">
+                            <div class="col-md-12 mt-2" id="inner_other_disp">
+                                 <input type="text" id="input_dispositivo_instalado" class="form-control"
+                                    value="{{ $unidad->dispositivo_instalado }}" placeholder="Ingrese el nombre de la plataforma">
+                            </div>
+                        </div>
                     </div>
 
                     <div class="col-lg-6">
@@ -156,3 +167,45 @@
         </div>
     </div>
 </div>
+
+@section('js')
+
+<script>
+
+    const dispositivo_instalado = document.getElementById('dispositivo_instalado');
+    const other_dispositivo_instalado = document.getElementById('other_dispositivo_instalado');
+    const inner_other_disp = document.getElementById('inner_other_disp');
+    const NewInput = document.getElementById('input_dispositivo_instalado');
+    const Unity    = "{{ (isset($unidad->id)) ? 1 : 0; }}";
+    
+    if(Unity == 1) {
+        if(dispositivo_instalado.selectedIndex == 0) // No coincide ninguna opcion y no esta seleccionado
+        {
+            other_dispositivo_instalado.style.display = "block";
+            NewInput.setAttribute('name','dispositivo_instalado');
+            NewInput.focus();
+            dispositivo_instalado.removeAttribute('name');
+        }
+    }
+
+
+    dispositivo_instalado.addEventListener('change', (ev) => {
+        let value = ev.target.value;
+        if(value == 'Otro')
+        {
+            other_dispositivo_instalado.style.display = "block";
+            NewInput.setAttribute('name','dispositivo_instalado');
+            NewInput.value = "";
+            NewInput.focus();
+            dispositivo_instalado.removeAttribute('name');
+        }else {
+            
+            other_dispositivo_instalado.style.display = "none";
+            dispositivo_instalado.setAttribute('name','dispositivo_instalado');
+            NewInput.removeAttribute('name');
+        }
+    });
+
+</script>
+
+@endsection

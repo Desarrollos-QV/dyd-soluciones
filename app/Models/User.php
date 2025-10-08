@@ -30,6 +30,8 @@ class User extends Authenticatable
         'is_active',
     
         // Datos para Tecnico
+        'avatar',
+        'identificacion',
         'lastname',
         'schooling',
         'experience',

@@ -83,6 +83,7 @@ Route::group(['middleware' => 'isAdmin'], function () {
      * * Unidades Routes
      */
     Route::resource('unidades', UnidadesController::class);
+    Route::get('unidades/assign/{id}/{client}', [UnidadesController::class, 'AssignClient'])->name('unidades.assign');
 
     /**
      * Asignaciones
@@ -127,7 +128,9 @@ Route::group(['middleware' => 'isAdmin'], function () {
     Route::resource('gastos', GastoController::class);
     Route::get('reportes', [ReporteIngresoEgresoController::class, 'index'])->name('reportes.index');
     Route::get('reportes/exportar-excel', [ReporteIngresoEgresoController::class, 'exportarExcel'])->name('reportes.exportarExcel');
-
+    
+    Route::get('reportes/clientes', [ReporteIngresoEgresoController::class, 'ReportClients'])->name('reportes.clientes');
+    Route::get('reportes/exportar-clients', [ReporteIngresoEgresoController::class, 'exportarExcelClients'])->name('reportes.exportarExcelClients');
     /**
      * Servicios Agendados
      * Reportes
@@ -137,11 +140,12 @@ Route::group(['middleware' => 'isAdmin'], function () {
     Route::get('servicios_agendados/generarPDF/{id}', [ServicioAgendadoController::class, 'generarPDF'])->name('servicios_agendados.generarPDF');
 });
 
+
 /**
  * Servicios Agendados
  * Ligas Externas que no requieren autenticación
  */
+
 Route::get('servicios_agendados/generarPDF/{id}', [ServicioAgendadoController::class, 'generarPDF'])->name('servicios_agendados.generarPDF');
 Route::get('firmar/{id}', [ServicioAgendadoController::class, 'firmar'])->name('servicios_agendados.firmar');
 Route::post('/firmar-conformidad', [ServicioAgendadoController::class, 'guardar'])->name('firmar.conformidad.guardar');
-

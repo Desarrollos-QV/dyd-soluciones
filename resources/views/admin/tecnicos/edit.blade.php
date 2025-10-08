@@ -2,6 +2,9 @@
 @section('title')
     Editando tecnico - "{{$tecnico->name}}"
 @endsection
+@section('css')
+<link rel="stylesheet" href="{{ asset('assets/vendors/dropify/dist/dropify.min.css') }}">
+@endsection
 @section('content')
 
 <nav class="page-breadcrumb">
@@ -21,6 +24,8 @@
 </div>
 @endsection
 @section('js')
+<script src="{{ asset('assets/vendors/dropify/dist/dropify.min.js') }}"></script>
+<script src="{{ asset('assets/js/dropify.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('edit_tecnico');

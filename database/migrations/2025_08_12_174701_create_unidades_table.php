@@ -17,6 +17,7 @@ return new class extends Migration
             $table->id();
             $table->text('tipo_unidad');
             $table->date('fecha_instalacion')->nullable();
+            $table->text('dispositivo_instalado')->nullable();
             $table->integer('precio')->nullable();
             $table->string('economico')->nullable();
             $table->string('placa')->nullable();

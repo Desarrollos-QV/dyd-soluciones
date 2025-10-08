@@ -30,6 +30,7 @@
                                     <td>Economico/Placas</td>
                                     <td>Tipo de unidad</td>
                                     <td>Instalacion</td>
+                                    <td>Disp. Instalado</td>
                                     <td>Año/Marca/Submarca</td>
                                     <td>Número de motor</td>
                                     <td>VIN / IMEI</td>
@@ -42,12 +43,30 @@
                             <tbody>
                                 @foreach ($unidades as $unit)
                                     <tr>
+                                        
                                         <td>
-                                            <span class="text-uppercase">{{ $unit->cliente->nombre }}</span>
+                                            <div class="btn-group">
+                                                <button type="button" class="btn @if($unit->cliente_id == 0) btn-danger @else btn-primary @endif dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    {{ $unit->cliente ? $unit->cliente->nombre : 'Sin Asignar' }}
+                                                </button>
+                                                <div class="dropdown-menu">
+                                                    @foreach ($clientes as $client)
+                                                        @if ($client['id'] !== $unit->cliente_id)
+                                                            <a class="dropdown-item py-2" href="{{ route('unidades.assign', ['id' => $unit->id, 'client' => $client['id']]) }}">
+                                                                {{ $client['nombre'] }}
+                                                            </a>
+                                                        @endif
+                                                    @endforeach
+                                                    <a class="dropdown-item py-2" href="{{ route('unidades.assign', ['id' => $unit->id, 'client' => 0]) }}">
+                                                        Dejar sin asignar
+                                                    </a>
+                                                </div>
+                                            </div>
                                         </td>
                                         <td>{{ $unit->economico }} / {{ $unit->placa }}</td>
                                         <td>{{ $unit->tipo_unidad }}</td> 
                                         <td>{{ \Carbon\Carbon::parse($unit->fecha_instalacion)->format('Y-m-d') }}</td>
+                                        <td>{{ $unit->dispositivo_instalado ?? 'Sin Asignar' }}</td>
                                         <td>
                                             <span class="badge bg-info text-white">{{ $unit->anio_unidad }}</span> / <span class="badge bg-warning">{{ $unit->marca }}</span> / <span class="badge bg-success">{{ $unit->submarca }}</span></td>
                                         <td>

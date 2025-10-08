@@ -15,6 +15,7 @@ class Unidades extends Model
         'placa',
         'tipo_unidad',
         'fecha_instalacion',
+        'dispositivo_instalado',
         'anio_unidad',
         'marca',
         'submarca',

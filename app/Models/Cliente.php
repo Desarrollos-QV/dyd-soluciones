@@ -27,4 +27,9 @@ class Cliente extends Model
     {
         return $this->hasMany(ServiciosAgendado::class);
     }
+
+    public function unidades()
+    {
+        return $this->hasMany(Unidades::class, 'cliente_id');
+    }
 }
