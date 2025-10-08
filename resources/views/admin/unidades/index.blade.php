@@ -66,7 +66,41 @@
                                         <td>{{ $unit->economico }} / {{ $unit->placa }}</td>
                                         <td>{{ $unit->tipo_unidad }}</td> 
                                         <td>{{ \Carbon\Carbon::parse($unit->fecha_instalacion)->format('Y-m-d') }}</td>
-                                        <td>{{ $unit->dispositivo_instalado ?? 'Sin Asignar' }}</td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button type="button" class="btn @if($unit->dispositivo_instalado == 'null') btn-danger @else btn-primary @endif dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    {{ ($unit->dispositivo_instalado != 'null' || !isset($unit->dispositivo_instalado)) ? $unit->dispositivo_instalado : 'Sin Asignar' }}
+                                                </button>
+                                                <div class="dropdown-menu">
+                                                    @if ($unit->dispositivo_instalado !== 'DVR')
+                                                    <a class="dropdown-item py-2" href="{{ route('unidades.assignDisp', ['id' => $unit->id, 'disp' => 'DVR']) }}">
+                                                        DVR
+                                                    </a>
+                                                    @endif
+                                                    
+                                                    @if ($unit->dispositivo_instalado !== 'GPS')
+                                                    <a class="dropdown-item py-2" href="{{ route('unidades.assignDisp', ['id' => $unit->id, 'disp' => 'GPS']) }}">
+                                                        GPS
+                                                    </a>
+                                                    @endif
+                                                    @if ($unit->dispositivo_instalado !== 'DASHCAM')
+                                                    <a class="dropdown-item py-2" href="{{ route('unidades.assignDisp', ['id' => $unit->id, 'disp' => 'DASHCAM']) }}">
+                                                        DASHCAM
+                                                    </a>
+                                                    @endif
+                                                    @if ($unit->dispositivo_instalado !== 'SENSOR')
+                                                    <a class="dropdown-item py-2" href="{{ route('unidades.assignDisp', ['id' => $unit->id, 'disp' => 'SENSOR']) }}">
+                                                        SENSOR
+                                                    </a>
+                                                    @endif
+                                                     
+                                                    <a class="dropdown-item py-2" href="{{ route('unidades.assignDisp', ['id' => $unit->id, 'disp' => 'null']) }}">
+                                                        Dejar sin asignar
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </td>
+
                                         <td>
                                             <span class="badge bg-info text-white">{{ $unit->anio_unidad }}</span> / <span class="badge bg-warning">{{ $unit->marca }}</span> / <span class="badge bg-success">{{ $unit->submarca }}</span></td>
                                         <td>

@@ -155,4 +155,13 @@ class UnidadesController extends Controller
 
         return redirect()->route('unidades.index')->with('success', 'Cliente asignado a la Unidad exitosamente');
     }
+
+    public function AssignDisp($id , $disp)
+    {
+        $prospect = Unidades::findOrFail($id);
+        $prospect->dispositivo_instalado = $disp;
+        $prospect->save();
+
+        return redirect()->route('unidades.index')->with('success', 'Dispositivo asignado a la Unidad exitosamente');
+    }
 }

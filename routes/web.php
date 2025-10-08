@@ -84,6 +84,7 @@ Route::group(['middleware' => 'isAdmin'], function () {
      */
     Route::resource('unidades', UnidadesController::class);
     Route::get('unidades/assign/{id}/{client}', [UnidadesController::class, 'AssignClient'])->name('unidades.assign');
+    Route::get('unidades/assigndisp/{id}/{disp}', [UnidadesController::class, 'AssignDisp'])->name('unidades.assignDisp');
 
     /**
      * Asignaciones
