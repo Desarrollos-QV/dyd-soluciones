@@ -72,5 +72,10 @@
                 }
             });
         });
+
+        function removeRow(btn) {
+            // Elimina la fila (tr) que contiene el botón presionado
+            btn.closest('tr').remove();
+        }
     </script>
 @endsection
