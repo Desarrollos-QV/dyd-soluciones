@@ -142,13 +142,12 @@
                                                     <a href="javascript:void(0)" class="dropdown-item" onclick="alertSwwet('Observaciones', '{{$unit->observaciones ?? 'Sin Obersaciones'}}')">Ver observaciones</a>
                                                     <a href="javascript:void(0)" class="dropdown-item" onclick="alertSweetImage('Foto de la unidad', '{{ asset($unit->foto_unidad)  }}')">Ver Foto de la unidad</a>
                                                     <hr />
-                                                    <a class="dropdown-item" href="#">
-                                                        <form action="{{ route('unidades.destroy', $unit) }}" method="POST"
+                                                    <a  href="{{ route('unidades.destroy', $unit) }}" class="dropdown-item" onclick="event.preventDefault(); if(confirm('¿Estás seguro de que deseas eliminar esta unidad? Esta acción no se puede deshacer.')) { this.querySelector('form').submit(); }">
+                                                        <form action="{{ route('unidades.destroy', $unit) }}" class="dropdown-item" method="POST"
                                                             style="display:inline-block;">
                                                             @csrf
                                                             @method('DELETE')
-                                                            <span type="submit"
-                                                                onclick="return confirm('¿Estás seguro?')">Eliminar</span>
+                                                            <span type="submit" >Eliminar</span>
                                                         </form>
                                                     </a>
                                                 </div>

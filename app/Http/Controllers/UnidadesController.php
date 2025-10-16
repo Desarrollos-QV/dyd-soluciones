@@ -28,19 +28,18 @@ class UnidadesController extends Controller
     {
         $request->validate([
             'cliente_id'            => 'required|string|max:100', 
-            'economico'             => 'required|numeric|min:0',
+            'economico'             => 'required|string|max:50',
             'placa'                 => 'required|string|max:50',
             'tipo_unidad'           => 'required|string|max:20',
-            'fecha_instalacion'     => 'required|digits:4|integer|min:1900|max:' . date('Y-m-d'),
-            'anio_unidad'           => 'nullable|numeric|max:50',
+            'fecha_instalacion'     => 'required|string',
+            'anio_unidad'           => 'nullable|string|max:50',
             'marca'                 => 'nullable|string|max:30',
             'submarca'              => 'nullable|string|max:30',
             'numero_de_motor'       => 'nullable|string|max:100',
             'vin'                   => 'nullable|string|max:50',
             'imei'                  => 'nullable|string|max:100',
             'np_sim'                => 'nullable|string|max:100',
-            'cuenta_con_apagado'    => 'nullable|string',
-            'foto_unidad'           => 'nullable|string|max:20',
+            'cuenta_con_apagado'    => 'nullable|string', 
             'numero_de_emergencia'  =>  'nullable|string',
             'observaciones'         =>  'nullable|string',
         ]);
@@ -85,10 +84,10 @@ class UnidadesController extends Controller
     {
          $request->validate([
             'cliente_id'            => 'required|string|max:100', 
-            'economico'             => 'required|numeric|min:0',
+            'economico'             => 'required|string|max:50',
             'placa'                 => 'required|string|max:50',
-            'tipo_unidad'           => 'required|string|max:200',
-            'fecha_instalacion'     => 'required|string|max:100',
+            'tipo_unidad'           => 'required|string|max:20',
+            'fecha_instalacion'     => 'required|string',
             'anio_unidad'           => 'nullable|string|max:50',
             'marca'                 => 'nullable|string|max:30',
             'submarca'              => 'nullable|string|max:30',
@@ -96,10 +95,9 @@ class UnidadesController extends Controller
             'vin'                   => 'nullable|string|max:50',
             'imei'                  => 'nullable|string|max:100',
             'np_sim'                => 'nullable|string|max:100',
-            'cuenta_con_apagado'    => 'nullable|string',
-            'foto_unidad'           => 'file',
-            'numero_de_emergencia'  => 'nullable|string',
-            'observaciones'         => 'nullable|string',
+            'cuenta_con_apagado'    => 'nullable|string', 
+            'numero_de_emergencia'  =>  'nullable|string',
+            'observaciones'         =>  'nullable|string',
         ]);
 
         try {
@@ -137,9 +135,11 @@ class UnidadesController extends Controller
         }
     }
 
-    public function destroy(Unidades $unidades)
+    public function destroy(Unidades $unidades, $id)
     {
         try {
+            $unidades = Unidades::findOrFail($id);
+            // Eliminar el archivo anterior si existe
             $unidades->delete();
             return redirect()->route('unidades.index')->with('success', 'unidad eliminada exitosamente.');
         } catch (\Exception $e) {

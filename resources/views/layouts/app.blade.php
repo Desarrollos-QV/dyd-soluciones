@@ -118,6 +118,8 @@
             Swal.fire({
                 title: title,
                 text: msg
+            }).then((result) => {
+                return true;
             });
         }
 
