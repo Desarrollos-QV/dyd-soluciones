@@ -100,7 +100,10 @@ class TecnicoController extends Controller
         ]);
 
         $data = $request->all();
-            
+         
+
+       
+
         // Manejo de la imagen avatar
         if ($request->hasFile('avatar')) {
             // Eliminar el archivo anterior si existe
@@ -113,6 +116,8 @@ class TecnicoController extends Controller
             $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('uploads/avatars'), $filename); // Guardar en la carpeta 'uploads/ine_comprobantes'
             $data['avatar'] = 'uploads/avatars/' . $filename; // Ruta relativa para guardar en la base de datos
+        }else {
+            $data['avatar'] = $tecnico->avatar; // Mantener la ruta actual si no se sube una nueva imagen
         }
 
         // Manejo de la imagen avatar
@@ -127,6 +132,8 @@ class TecnicoController extends Controller
             $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
             $file->move(public_path('uploads/identificaciones'), $filename); // Guardar en la carpeta 'uploads/ine_comprobantes'
             $data['identificacion'] = 'uploads/identificaciones/' . $filename; // Ruta relativa para guardar en la base de datos
+        }else {
+            $data['identificacion'] = $tecnico->identificacion; // Mantener la ruta actual si no se sube una nueva imagen
         }
         
         if ($request->password != null && !Hash::check($request->password, $tecnico->password)) {
@@ -142,6 +149,7 @@ class TecnicoController extends Controller
                 'is_active' => $request->is_active,
                 'avatar' => $data['avatar'],
                 'identificacion' => $data['identificacion'],
+                'tools' => json_encode($data['tools'])
             ]);
         } else {
             $tecnico->update([
@@ -150,7 +158,8 @@ class TecnicoController extends Controller
                 'telefono' => $request->telefono,
                 'is_active' => $request->is_active,
                 'avatar' => $data['avatar'],
-                'identificacion' => $data['identificacion']
+                'identificacion' => $data['identificacion'],
+                'tools' => json_encode($data['tools'])
             ]);
         }
 

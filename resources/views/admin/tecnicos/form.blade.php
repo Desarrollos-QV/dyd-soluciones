@@ -87,13 +87,6 @@
                             @endphp
                             <table class="table-secondary w-100 border">
                                 <tbody id="rows-container">
-                                    <tr>
-                                        <td>
-                                            <input type="text" name="tools[]"
-                                                placeholder="Agrega nueva herramienta"
-                                                style="padding: 5px 0 5px 5px;" />
-                                        </td>
-                                    </tr>
                                     @if($ref != null)
                                         @foreach ($ref as $i => $r)
                                             <tr>
@@ -125,6 +118,14 @@
                                                 </td>
                                             </tr>
                                         @endforeach
+                                    @else
+                                        <tr>
+                                            <td>
+                                                <input type="text" name="tools[]"
+                                                    placeholder="Agrega nueva herramienta"
+                                                    style="padding: 5px 0 5px 5px;" />
+                                            </td>
+                                        </tr>
                                     @endif
                                 </tbody>
                             </table>
@@ -230,7 +231,7 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <button type="submit" class="btn btn-primary">
-                            @if (!isset($tecnico))
+                            @if (!isset($tecnico->id))
                                 Crear Tecnico
                             @else
                                 Actualizar
