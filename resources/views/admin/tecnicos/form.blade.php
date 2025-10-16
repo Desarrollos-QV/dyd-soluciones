@@ -189,7 +189,7 @@
                             <div class="row">
                                 <div class="col-lg-8">
                                     <input type="file" name="avatar" id="myDropify" class="form-control"
-                                        value="{{ $tecnico->avatar }}" required>
+                                        value="{{ $tecnico->avatar }}">
                                 </div>
                                 <div class="col-lg-4"
                                     style="display: flex;justify-content: center;align-items: center;">
@@ -209,7 +209,7 @@
                             <div class="row">
                                 <div class="col-lg-8">
                                     <input type="file" name="identificacion" id="myDropify2" class="form-control"
-                                        value="{{ $tecnico->identificacion }}" required>
+                                        value="{{ $tecnico->identificacion }}" >
                                 </div>
                                 <div class="col-lg-4"
                                     style="display: flex;justify-content: center;align-items: center;">
@@ -230,7 +230,7 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <button type="submit" class="btn btn-primary">
-                            @if (isset($tecnico))
+                            @if (!isset($tecnico))
                                 Crear Tecnico
                             @else
                                 Actualizar
