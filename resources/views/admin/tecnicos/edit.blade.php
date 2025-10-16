@@ -60,7 +60,7 @@
                         });
                     }
                 } catch (error) {
-                    console.error('Error:', error);
+                    console.log('Error:', error);
                     Swal.fire({
                         type: 'error',
                         title: 'Oops...',

@@ -100,9 +100,6 @@ class TecnicoController extends Controller
         ]);
 
         $data = $request->all();
-         
-
-       
 
         // Manejo de la imagen avatar
         if ($request->hasFile('avatar')) {
@@ -163,7 +160,13 @@ class TecnicoController extends Controller
             ]);
         }
 
-        return redirect()->route('tecnicos.index')->with('success', 'Técnico actualizado exitosamente.');
+        return response()->json([
+            'ok' => true,
+            'message' => 'Técnico actualizado exitosamente.',
+            'code' => 200,
+            'redirect' => route('tecnicos.index')
+        ]);
+        // return redirect()->route('tecnicos.index')->with('success', 'Técnico actualizado exitosamente.');
     }
 
     public function destroy(User $tecnico)
