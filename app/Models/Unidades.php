@@ -20,9 +20,14 @@ class Unidades extends Model
         'marca',
         'submarca',
         'numero_de_motor',
+        'costo_plataforma',
+        'costo_sim',
+        'pago_mensual',
+        'name_empresa',
+        'credenciales',
         'vin',
         'imei',
-        'np_sim', //<-'sim_dvr',
+        'np_sim',
         'cuenta_con_apagado',
         'foto_unidad',
         'numero_de_emergencia',
@@ -32,5 +37,15 @@ class Unidades extends Model
     public function cliente()
     {
         return $this->belongsTo(Cliente::class,'cliente_id');
+    }
+
+    public function getMediaAttribute($value)
+    {
+        return json_decode($value, true);
+    }
+
+    public function setMediaAttribute($value)
+    {
+        $this->attributes['media'] = json_encode($value);
     }
 }

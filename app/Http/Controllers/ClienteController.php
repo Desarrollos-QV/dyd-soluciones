@@ -28,16 +28,12 @@ class ClienteController extends Controller
         try{
             $request->validate([
                 'nombre' => 'required',
-                'avatar' => 'required',
                 'direccion' => 'required',
                 'numero_contacto' => 'required',
                 'numero_alterno' => 'required',
                 'tipo_empresa' => 'required',
                 'empresa' => 'required',
-                'identificacion' => 'required',
                 'direccion_empresa' => 'required',
-                'usuario' => 'required',
-                'password' => 'required'
             ]);
 
             $data = $request->all();
@@ -91,8 +87,6 @@ class ClienteController extends Controller
                 'tipo_empresa' => 'required',
                 'empresa' => 'required', 
                 'direccion_empresa' => 'required',
-                'usuario' => 'required',
-                'password' => 'required'
             ]);
 
             $data = $request->all();

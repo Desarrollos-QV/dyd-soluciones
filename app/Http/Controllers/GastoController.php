@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Gasto;
-use App\Models\User;
+use App\Models\{
+    User,
+    Gasto,
+    HistorialCaja
+};
 use Illuminate\Http\Request;
 
 class GastoController extends Controller
@@ -40,7 +43,21 @@ class GastoController extends Controller
             $monto = floatval(str_replace(',', '', $request->get('monto')));
             $data['monto'] = $monto;
 
-            Gasto::create($data);
+            $gasto = Gasto::create($data);
+
+
+            // Registrar en el historial de caja
+            HistorialCaja::create([
+                'fecha' => $gasto->fecha,
+                'tipo' => 'egreso',
+                'concepto' => $gasto->descripcion,
+                'monto' => $gasto->monto,
+                'autorizado_por' => $gasto->autorizado_por,
+                'descripcion' => $gasto->motivo,
+                'user_id' => auth()->id(),
+            ]);
+
+
             return response()->json([
                 'data' => $data,
                 'ok' => true,

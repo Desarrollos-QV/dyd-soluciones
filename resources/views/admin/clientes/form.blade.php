@@ -54,18 +54,7 @@
 <div class="col-lg-5 grid-margin stretch-card">
     <div class="card">
         <div class="card-body">
-            <div class="row">
-                <div class="col-lg-6">
-                    <label for="usuario">usuario</label>
-                    <input type="text" name="usuario" id="usuario" class="form-control"
-                        value="{{ $cliente->usuario }}" required>
-                </div>
-                <div class="col-lg-6 ">
-                    <label for="password">Contraseña</label>
-                    <input type="password" name="password" class="form-control"
-                        value="{{ $cliente->password ?? old('password') }}" required>
-                </div>
-            </div>
+           
             <div class="row mb-3 mt-4">
                 <div class="col-md-12 mt-4">
                     @if(isset($cliente->id))
@@ -80,7 +69,7 @@
                         </div>
                     @else
                         <label id="avatar">Imagen de perfil</label>
-                        <input type="file" name="avatar" id="myDropify" class="form-control" value="{{$cliente->avatar}}" required>
+                        <input type="file" name="avatar" id="myDropify" class="form-control" value="{{$cliente->avatar}}">
                     @endif
                 </div>
                 <div class="col-md-12 mt-4">

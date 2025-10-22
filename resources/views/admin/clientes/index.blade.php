@@ -38,12 +38,21 @@
                             <tr>
                                 <td>
                                     <a href="{{ asset($cliente->avatar) }}" target="_blank">
+                                        @if($cliente->avatar != null)
                                         <img src="{{ asset($cliente->avatar) }}" alt="Imagen de {{ $cliente->nombre }}" >
+                                        @else
+                                        <img src="{{ asset('assets/images/placeholder.jpg') }}" alt="Sin Imagen" >
+                                        @endif
                                     </a>
                                 </td>
                                 <td>
                                     <a href="{{ asset($cliente->identificacion) }}" target="_blank">
+                                        
+                                        @if($cliente->identificacion != null)
                                         <img src="{{ asset($cliente->identificacion) }}" alt="Imagen de {{ $cliente->nombre }}" style="border-radius: 12px !important"> 
+                                        @else
+                                        <img src="{{ asset('assets/images/placeholder.jpg') }}" alt="Sin Imagen" >
+                                        @endif
                                     </a>
                                 </td>
                                 <td>{{ ucwords($cliente->nombre) }}</td>

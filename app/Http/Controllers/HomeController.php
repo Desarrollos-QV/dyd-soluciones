@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Cliente;
 use App\Models\Tecnico;
+use App\Models\Asignaciones;
 use App\Models\ServiciosAgendado;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -42,8 +43,8 @@ class HomeController extends Controller
 
         if(Auth::user()->isAdmin()) {
             // 🛠 Servicios
-            $serviciosEsteMes = ServiciosAgendado::whereBetween('created_at', [$startOfMonth, $now])->count();
-            $serviciosMesPasado = ServiciosAgendado::whereBetween('created_at', [$startOfLastMonth, $endOfLastMonth])->count();
+            $serviciosEsteMes = Asignaciones::whereBetween('created_at', [$startOfMonth, $now])->count();
+            $serviciosMesPasado = Asignaciones::whereBetween('created_at', [$startOfLastMonth, $endOfLastMonth])->count();
             $serviciosCambioPorcentaje = $this->getPercentageChange($serviciosMesPasado, $serviciosEsteMes);
 
             // 🟡 Servicios en curso
@@ -51,17 +52,17 @@ class HomeController extends Controller
     
         }else {
             // 🛠 Servicios
-            $serviciosEsteMes = ServiciosAgendado::whereUserId(Auth::user()->id)->whereBetween('created_at', [$startOfMonth, $now])->count();
-            $serviciosMesPasado = ServiciosAgendado::whereUserId(Auth::user()->id)->whereBetween('created_at', [$startOfLastMonth, $endOfLastMonth])->count();
+            $serviciosEsteMes = Asignaciones::whereTecnicoId(Auth::user()->id)->whereBetween('created_at', [$startOfMonth, $now])->count();
+            $serviciosMesPasado = Asignaciones::whereTecnicoId(Auth::user()->id)->whereBetween('created_at', [$startOfLastMonth, $endOfLastMonth])->count();
             $serviciosCambioPorcentaje = $this->getPercentageChange($serviciosMesPasado, $serviciosEsteMes);
     
             // 🟡 Servicios en curso
-            $serviciosEnCurso = ServiciosAgendado::whereUserId(Auth::user()->id)->where('firma_cliente', null)->with(['cliente', 'tecnico'])->latest()->limit(10)->get();
+            $serviciosEnCurso = Asignaciones::whereTecnicoId(Auth::user()->id)->with(['cliente', 'tecnico'])->latest()->limit(10)->get();
         
         }
 
         // 📅 Servicios últimos 3 meses
-        $servicios3Meses = ServiciosAgendado::where('created_at', '>=', now()->subMonths(3))->get();
+        $servicios3Meses = Asignaciones::where('created_at', '>=', now()->subMonths(3))->get();
         $serviciosFinalizados = $servicios3Meses->where('firma_cliente', '!=', null)->count();
         $serviciosTotales3Meses = $servicios3Meses->count();
 

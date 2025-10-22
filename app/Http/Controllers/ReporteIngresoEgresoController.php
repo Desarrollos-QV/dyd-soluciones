@@ -42,10 +42,10 @@ class ReporteIngresoEgresoController extends Controller
         return Excel::download(new ReporteExport($fechaInicio, $fechaFin), 'reporte-ingresos-gastos.xlsx');
     }
 
-    public function ReportClients()
+    public function ReportUnits()
     {
         $clientes = Cliente::all();
-        return view('admin.clientes.reports' , compact('clientes'));
+        return view('admin.unidades.reports' , compact('clientes'));
     }
 
     public function exportarExcelClients(Request $request)

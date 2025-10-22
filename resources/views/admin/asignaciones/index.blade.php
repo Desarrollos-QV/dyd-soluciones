@@ -50,7 +50,23 @@
                                             <span class="badge bg-success text-white text-capitalize">{{ $assign->cliente ? $assign->cliente->nombre : 'Sin Asignar' }}</span>
                                         </td>
                                         <td>
-                                            <span class="badge bg-secondary text-white text-capitalize">{{ $assign->tecnico ? $assign->tecnico->nombre : 'Sin Asignar' }}</span>
+                                             <div class="btn-group">
+                                                <button type="button" class="btn @if($assign->tecnico_id == 0) btn-danger @else btn-primary @endif dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    {{ $assign->tecnico ? ucwords($assign->tecnico->name.' '.$assign->tecnico->lastname) : 'Sin Asignar' }}
+                                                </button>
+                                                <div class="dropdown-menu">
+                                                    @foreach ($tecnicos as $tecnico)
+                                                        @if ($tecnico['id'] !== $assign->tecnico_id)
+                                                            <a class="dropdown-item py-2" href="{{ route('assignements.assign', ['id' => $assign->id, 'tecnico' => $tecnico['id']]) }}">
+                                                                {{ ucwords($tecnico['name'].' '.$tecnico['lastname']) }}
+                                                            </a>
+                                                        @endif
+                                                    @endforeach
+                                                    <a class="dropdown-item py-2" href="{{ route('assignements.assign', ['id' => $assign->id, 'tecnico' => 0]) }}">
+                                                        Dejar sin asignar
+                                                    </a>
+                                                </div>
+                                            </div>
                                         </td>
                                         <td>{{ $assign->tipo_servicio }}</td>
                                         <td>{{ $assign->tel_contact }}</td>

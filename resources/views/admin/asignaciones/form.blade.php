@@ -18,7 +18,7 @@
                     <select name="tecnico_id" id="tecnico_id" class="form-control" required>
                         <option value="0">Sin asignar aún</option>
                         @foreach ($tecnicos as $tec)
-                            <option value="{{ $tec->id }}"> {{ $tec->name }} </option>
+                            <option value="{{ $tec->id }}" @if($tec->id == $assignement->tecnico_id) selected @endif > {{ $tec->name }} </option>
                         @endforeach
                     </select>
                 </div>

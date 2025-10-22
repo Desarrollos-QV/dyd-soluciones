@@ -24,12 +24,12 @@ class AssignementsController extends Controller
     public function index()
     {
         $assignements = Asignaciones::with('cliente','device','tecnico')->get();
-
+        $tecnicos    = User::where('role', 'tecnico')->get();
         // return response()->json([
         //     'assignements' => $assignements
         // ]);
 
-        return view($this->folder . 'index', compact('assignements'));
+        return view($this->folder . 'index', compact('assignements', 'tecnicos'));
     }
 
     /**
@@ -157,5 +157,18 @@ class AssignementsController extends Controller
     {
         $assignement->delete();
         return redirect()->route('assignements.index')->with('success', 'Asignación Eliminada con éxito.');
+    }
+
+    /**
+     * Assign Tecnico to Asignacion
+     * @param  int  $id , $tecnico
+     */
+    public function AssignTecn($id, $tecnico)
+    {
+        $assignement = Asignaciones::findOrFail($id);
+        $assignement->tecnico_id = $tecnico;
+        $assignement->save();
+
+        return redirect()->route('assignements.index')->with('success', 'Técnico asignado con éxito.');
     }
 }

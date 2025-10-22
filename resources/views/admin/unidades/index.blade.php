@@ -34,7 +34,6 @@
                                     <td>Año/Marca/Submarca</td>
                                     <td>Número de motor</td>
                                     <td>VIN / IMEI</td>
-                                    <td>N.P. SIM</td>
                                     <td>¿Cuenta con apagado?</td>
                                     <td>Número de emergencias</td>
                                     <td class="d-flex justify-content-end">Opciones</td>
@@ -43,58 +42,68 @@
                             <tbody>
                                 @foreach ($unidades as $unit)
                                     <tr>
-                                        
                                         <td>
                                             <div class="btn-group">
-                                                <button type="button" class="btn @if($unit->cliente_id == 0) btn-danger @else btn-primary @endif dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                    {{ $unit->cliente ? $unit->cliente->nombre : 'Sin Asignar' }}
+                                                <button type="button"
+                                                    class="btn @if ($unit->cliente_id == 0) btn-danger @else btn-primary @endif dropdown-toggle"
+                                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    {{ $unit->cliente ? ucwords($unit->cliente->nombre) : 'Sin Asignar' }}
                                                 </button>
                                                 <div class="dropdown-menu">
                                                     @foreach ($clientes as $client)
                                                         @if ($client['id'] !== $unit->cliente_id)
-                                                            <a class="dropdown-item py-2" href="{{ route('unidades.assign', ['id' => $unit->id, 'client' => $client['id']]) }}">
-                                                                {{ $client['nombre'] }}
+                                                            <a class="dropdown-item py-2"
+                                                                href="{{ route('unidades.assign', ['id' => $unit->id, 'client' => $client['id']]) }}">
+                                                                {{ ucwords($client['nombre']) }}
                                                             </a>
                                                         @endif
                                                     @endforeach
-                                                    <a class="dropdown-item py-2" href="{{ route('unidades.assign', ['id' => $unit->id, 'client' => 0]) }}">
+                                                    <a class="dropdown-item py-2"
+                                                        href="{{ route('unidades.assign', ['id' => $unit->id, 'client' => 0]) }}">
                                                         Dejar sin asignar
                                                     </a>
                                                 </div>
                                             </div>
                                         </td>
                                         <td>{{ $unit->economico }} / {{ $unit->placa }}</td>
-                                        <td>{{ $unit->tipo_unidad }}</td> 
+                                        <td>{{ $unit->tipo_unidad }}</td>
                                         <td>{{ \Carbon\Carbon::parse($unit->fecha_instalacion)->format('Y-m-d') }}</td>
                                         <td>
                                             <div class="btn-group">
-                                                <button type="button" class="btn @if($unit->dispositivo_instalado == 'null') btn-danger @else btn-primary @endif dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                    {{ ($unit->dispositivo_instalado != 'null' || !isset($unit->dispositivo_instalado)) ? $unit->dispositivo_instalado : 'Sin Asignar' }}
+                                                <button type="button"
+                                                    class="btn @if ($unit->dispositivo_instalado == 'null') btn-danger @else btn-primary @endif dropdown-toggle"
+                                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    {{ $unit->dispositivo_instalado != 'null' || !isset($unit->dispositivo_instalado) ? $unit->dispositivo_instalado : 'Sin Asignar' }}
                                                 </button>
                                                 <div class="dropdown-menu">
                                                     @if ($unit->dispositivo_instalado !== 'DVR')
-                                                    <a class="dropdown-item py-2" href="{{ route('unidades.assignDisp', ['id' => $unit->id, 'disp' => 'DVR']) }}">
-                                                        DVR
-                                                    </a>
+                                                        <a class="dropdown-item py-2"
+                                                            href="{{ route('unidades.assignDisp', ['id' => $unit->id, 'disp' => 'DVR']) }}">
+                                                            DVR
+                                                        </a>
                                                     @endif
-                                                    
+
                                                     @if ($unit->dispositivo_instalado !== 'GPS')
-                                                    <a class="dropdown-item py-2" href="{{ route('unidades.assignDisp', ['id' => $unit->id, 'disp' => 'GPS']) }}">
-                                                        GPS
-                                                    </a>
+                                                        <a class="dropdown-item py-2"
+                                                            href="{{ route('unidades.assignDisp', ['id' => $unit->id, 'disp' => 'GPS']) }}">
+                                                            GPS
+                                                        </a>
                                                     @endif
                                                     @if ($unit->dispositivo_instalado !== 'DASHCAM')
-                                                    <a class="dropdown-item py-2" href="{{ route('unidades.assignDisp', ['id' => $unit->id, 'disp' => 'DASHCAM']) }}">
-                                                        DASHCAM
-                                                    </a>
+                                                        <a class="dropdown-item py-2"
+                                                            href="{{ route('unidades.assignDisp', ['id' => $unit->id, 'disp' => 'DASHCAM']) }}">
+                                                            DASHCAM
+                                                        </a>
                                                     @endif
                                                     @if ($unit->dispositivo_instalado !== 'SENSOR')
-                                                    <a class="dropdown-item py-2" href="{{ route('unidades.assignDisp', ['id' => $unit->id, 'disp' => 'SENSOR']) }}">
-                                                        SENSOR
-                                                    </a>
+                                                        <a class="dropdown-item py-2"
+                                                            href="{{ route('unidades.assignDisp', ['id' => $unit->id, 'disp' => 'SENSOR']) }}">
+                                                            SENSOR
+                                                        </a>
                                                     @endif
-                                                     
-                                                    <a class="dropdown-item py-2" href="{{ route('unidades.assignDisp', ['id' => $unit->id, 'disp' => 'null']) }}">
+
+                                                    <a class="dropdown-item py-2"
+                                                        href="{{ route('unidades.assignDisp', ['id' => $unit->id, 'disp' => 'null']) }}">
                                                         Dejar sin asignar
                                                     </a>
                                                 </div>
@@ -102,35 +111,39 @@
                                         </td>
 
                                         <td>
-                                            <span class="badge bg-info text-white">{{ $unit->anio_unidad }}</span> / <span class="badge bg-warning">{{ $unit->marca }}</span> / <span class="badge bg-success">{{ $unit->submarca }}</span></td>
+                                            <span class="badge bg-info text-white">{{ $unit->anio_unidad }}</span> / <span
+                                                class="badge bg-warning">{{ $unit->marca }}</span> / <span
+                                                class="badge bg-success">{{ $unit->submarca }}</span>
+                                        </td>
                                         <td>
                                             <span class="badge bg-primary text-white">{{ $unit->numero_de_motor }}</span>
                                         </td>
-                                        <td><span class="badge bg-secondary text-white">{{ $unit->vin }}</span> / <span class="badge bg-primary text-white">{{ $unit->imei }}</span></td>
-                                        <td>
-                                            <span class="badge bg-success text-white">{{ $unit->np_sim }}</span>
+                                        <td><span class="badge bg-secondary text-white">{{ $unit->vin }}</span> / <span
+                                                class="badge bg-primary text-white">{{ $unit->imei }}</span>
                                         </td>
+                                                
                                         <td class="d-flex justify-content-center">
                                             @php
-                                            switch ($unit->cuenta_con_apagado) {
-                                                case 'si':
-                                                    $badgeClass = 'badge bg-success';
-                                                    break;
-                                                case 'no':
-                                                    $badgeClass = 'badge bg-danger';
-                                                    break;
-                                                default:
-                                                    $badgeClass = 'badge bg-warning';
-                                            }
-                                        @endphp
-                                        <span class="{{ $badgeClass }} text-white text-uppercase"> {{ $unit->cuenta_con_apagado }}</span>
+                                                switch ($unit->cuenta_con_apagado) {
+                                                    case 'si':
+                                                        $badgeClass = 'badge bg-success';
+                                                        break;
+                                                    case 'no':
+                                                        $badgeClass = 'badge bg-danger';
+                                                        break;
+                                                    default:
+                                                        $badgeClass = 'badge bg-warning';
+                                                }
+                                            @endphp
+                                            <span class="{{ $badgeClass }} text-white text-uppercase">
+                                                {{ $unit->cuenta_con_apagado }}</span>
                                         </td>
                                         <td>
                                             <a href="tel:{{ $unit->numero_de_emergencia }}" target="_blank">
-                                               <i class="link-icon icon-sm" data-feather="phone"></i>
+                                                <i class="link-icon icon-sm" data-feather="phone"></i>
                                                 {{ $unit->numero_de_emergencia }}
                                             </a>
-                                        </td> 
+                                        </td>
                                         <td>
                                             <div class="btn-group">
                                                 <button type="button" class="btn btn-primary dropdown-toggle"
@@ -139,15 +152,21 @@
                                                 <div class="dropdown-menu">
                                                     <a class="dropdown-item"
                                                         href="{{ route('unidades.edit', $unit->id) }}">Editar</a>
-                                                    <a href="javascript:void(0)" class="dropdown-item" onclick="alertSwwet('Observaciones', '{{$unit->observaciones ?? 'Sin Obersaciones'}}')">Ver observaciones</a>
-                                                    <a href="javascript:void(0)" class="dropdown-item" onclick="alertSweetImage('Foto de la unidad', '{{ asset($unit->foto_unidad)  }}')">Ver Foto de la unidad</a>
+                                                    <a href="javascript:void(0)" class="dropdown-item"
+                                                        onclick="alertSwwet('Observaciones', '{{ $unit->observaciones ?? 'Sin Obersaciones' }}')">Ver
+                                                        observaciones</a>
+                                                    <a href="javascript:void(0)" class="dropdown-item"
+                                                        onclick="viewImages('Foto de la unidad', '{{ $unit->foto_unidad }}' ,'{{ asset('uploads/fotos_unidades') }}')">Ver
+                                                        Fotos de la unidad</a>
                                                     <hr />
-                                                    <a  href="{{ route('unidades.destroy', $unit) }}" class="dropdown-item" onclick="event.preventDefault(); if(confirm('¿Estás seguro de que deseas eliminar esta unidad? Esta acción no se puede deshacer.')) { this.querySelector('form').submit(); }">
-                                                        <form action="{{ route('unidades.destroy', $unit) }}" class="dropdown-item" method="POST"
+                                                    <a href="{{ route('unidades.destroy', $unit) }}" class="dropdown-item"
+                                                        onclick="event.preventDefault(); if(confirm('¿Estás seguro de que deseas eliminar esta unidad? Esta acción no se puede deshacer.')) { this.querySelector('form').submit(); }">
+                                                        <form action="{{ route('unidades.destroy', $unit) }}"
+                                                            class="dropdown-item" method="POST"
                                                             style="display:inline-block;">
                                                             @csrf
                                                             @method('DELETE')
-                                                            <span type="submit" >Eliminar</span>
+                                                            <span type="submit">Eliminar</span>
                                                         </form>
                                                     </a>
                                                 </div>
@@ -162,6 +181,36 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade bd-carousel-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Listado de Fotos de la unidad</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <div id="carouselExampleFade" class="carousel slide carousel-fade" data-ride="carousel">
+                        <div class="carousel-inner" id="inner-carousel">
+
+                        </div>
+                        <a class="carousel-control-prev" href="#carouselExampleFade" role="button" data-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="carousel-control-next" href="#carouselExampleFade" role="button" data-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('js')
@@ -170,4 +219,44 @@
     <!-- custom js for this page -->
     <script src="{{ asset('assets/js/data-table.js') }}"></script>
     <!-- end custom js for this page -->
+    <script src="{{ asset('assets/js/carousel.js') }}"></script>
+
+    <script>
+        function viewImages(title, images, path) {
+            const Images = JSON.parse(images);
+            const modal = $('.bd-carousel-modal-lg');
+            const innerCarousel = document.querySelector('#inner-carousel');
+
+            let imageHtml = `
+                <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+                    <div class="carousel-inner">
+                        `;
+            Images.forEach((img, index) => {
+                if (index === 0) {
+                    imageHtml += `
+                                    <div class="carousel-item active">
+                                        <img src="${path}/${img}" class="d-block w-100" alt="...">
+                                    </div>`;
+                } else {
+                    imageHtml += `
+                                    <div class="carousel-item">
+                                        <img src="${path}/${img}" class="d-block w-100" alt="...">
+                                    </div>`;
+                }
+            });
+            `</div>
+                    <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </div>`;
+
+            innerCarousel.innerHTML = imageHtml;
+            modal.modal('show');
+        }
+    </script>
 @endsection

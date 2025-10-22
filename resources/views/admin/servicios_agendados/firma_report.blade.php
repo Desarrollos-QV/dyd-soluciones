@@ -86,7 +86,7 @@
 
                             <div class="form-group mb-3">
                                 <label>Nombre del usuario</label>
-                                <input type="text" name="nombre_usuario" class="form-control" required value="{{ $service->titular }}">
+                                <input type="text" name="nombre_usuario" class="form-control" required value="{{ ucwords($service->cliente->nombre) }}">
                             </div>
 
                             <label for="firma">Firma digital</label>

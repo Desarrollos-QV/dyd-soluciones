@@ -10,6 +10,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\{
     Tecnico,
     User,
+    Asignaciones,
     ServiciosAgendado,
     FirmaServicio
 };
@@ -20,10 +21,10 @@ class ServicioAgendadoController extends Controller
 
     public function index(Request $r)
     {
-        $query = ServiciosAgendado::with('tecnico');
+        $query = Asignaciones::with(['cliente','tecnico','device']);
         if ($r->filled('search')) {
             $q = $r->search;
-            $query->where('titular', 'like', "%$q%")
+            $query->where('cliente', 'like', "%$q%")
                 ->orWhereHas('tecnico', fn($q2) => $q2->where('name', 'like', "%$q%"));
         }
         $servicios = $query->paginate(10);
@@ -213,7 +214,7 @@ class ServicioAgendadoController extends Controller
     {
 
         $req = base64_decode($id);
-        $service = ServiciosAgendado::with('tecnico')->find($req);
+        $service = Asignaciones::with(['cliente','tecnico','device'])->find($req);
         return view($this->folder . 'firma_report', compact('service'));
     }
 

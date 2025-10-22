@@ -21,6 +21,7 @@ use App\Http\Controllers\ServicioAgendadoController;
 use App\Http\Controllers\ProspectsController;
 use App\Http\Controllers\SellersController;
 use App\Http\Controllers\DevicesController;
+use App\Http\Controllers\HistorialCajaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -83,6 +84,10 @@ Route::group(['middleware' => 'isAdmin'], function () {
      * * Unidades Routes
      */
     Route::resource('unidades', UnidadesController::class);
+    Route::post('unidades/uploads', [UnidadesController::class, 'uploads'])->name('unidades.uploads');
+    Route::get('unidades/fetchUploads/{unidad}', [UnidadesController::class, 'fetchUploads'])->name('unidades.fetchUploads');
+    Route::get('unidades/deleteUploads/{unidad}', [UnidadesController::class, 'deleteUploads'])->name('unidades.deleteUploads');
+
     Route::get('unidades/assign/{id}/{client}', [UnidadesController::class, 'AssignClient'])->name('unidades.assign');
     Route::get('unidades/assigndisp/{id}/{disp}', [UnidadesController::class, 'AssignDisp'])->name('unidades.assignDisp');
 
@@ -90,6 +95,7 @@ Route::group(['middleware' => 'isAdmin'], function () {
      * Asignaciones
      */
     Route::resource('assignements', AssignementsController::class);
+    Route::get('assignements/assign/{id}/{tecnico}', [AssignementsController::class, 'AssignTecn'])->name('assignements.assign');
 
     /**
      * Tecnicos
@@ -130,7 +136,7 @@ Route::group(['middleware' => 'isAdmin'], function () {
     Route::get('reportes', [ReporteIngresoEgresoController::class, 'index'])->name('reportes.index');
     Route::get('reportes/exportar-excel', [ReporteIngresoEgresoController::class, 'exportarExcel'])->name('reportes.exportarExcel');
     
-    Route::get('reportes/clientes', [ReporteIngresoEgresoController::class, 'ReportClients'])->name('reportes.clientes');
+    Route::get('reportes/units', [ReporteIngresoEgresoController::class, 'ReportUnits'])->name('reportes.units');
     Route::get('reportes/exportar-clients', [ReporteIngresoEgresoController::class, 'exportarExcelClients'])->name('reportes.exportarExcelClients');
     /**
      * Servicios Agendados
@@ -139,6 +145,12 @@ Route::group(['middleware' => 'isAdmin'], function () {
     Route::resource('servicios_agendados', ServicioAgendadoController::class);
     Route::post('delete-file', [ServicioAgendadoController::class, 'deleteFile'])->name('servicios_agendados.delete-file');
     Route::get('servicios_agendados/generarPDF/{id}', [ServicioAgendadoController::class, 'generarPDF'])->name('servicios_agendados.generarPDF');
+
+
+    /**
+     * Gestion de Historial de Caja
+     */
+    Route::resource('historial-caja', HistorialCajaController::class)->names('historial-caja');
 });
 
 

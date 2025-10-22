@@ -10,12 +10,12 @@
                 <div class="row">
                     <div class="col-lg-6">
                         <label for="economico">Economico</label>
-                        <input type="text" name="economico" id="economico" class="form-control"
+                        <input type="text" name="economico" id="economico" class="form-control" required
                             value="{{ $unidad->economico }}">
                     </div>
                     <div class="col-lg-6">
                         <label for="placa">Placa</label>
-                        <input type="text" name="placa" id="placa" class="form-control"
+                        <input type="text" name="placa" id="placa" class="form-control" required
                             value="{{ $unidad->placa }}">
                     </div>
                 </div>
@@ -23,7 +23,7 @@
                 <div class="row mt-4">
                     <div class="col-lg-6">
                         <label for="tipo_unidad">Tipo de unidad</label>
-                        <input type="text" name="tipo_unidad" id="tipo_unidad" class="form-control"
+                        <input type="text" name="tipo_unidad" id="tipo_unidad" class="form-control" required max="20"
                             value="{{ $unidad->tipo_unidad }}" required>
                     </div>
                     <div class="col-lg-6">
@@ -53,7 +53,7 @@
 
                     <div class="col-lg-6">
                         <label for="numero_de_motor">Número de motor</label>
-                        <input type="text" name="numero_de_motor" id="numero_de_motor" class="form-control"
+                        <input type="text" name="numero_de_motor" id="numero_de_motor" class="form-control" required
                             value="{{ $unidad->numero_de_motor }}">
                     </div>
                 </div>
@@ -67,17 +67,17 @@
                     </div>
                     <div class="col-lg-3">
                         <label for="marca">Marca</label>
-                        <input type="text" name="marca" id="marca" class="form-control"
+                        <input type="text" name="marca" id="marca" class="form-control" required
                             value="{{ $unidad->marca }}">
                     </div>
                     <div class="col-lg-3">
                         <label for="submarca">Submarca</label>
-                        <input type="text" name="submarca" id="submarca" class="form-control"
+                        <input type="text" name="submarca" id="submarca" class="form-control" required
                             value="{{ $unidad->submarca }}">
                     </div>
                     <div class="col-lg-3">
                         <label for="vin">Número VIN</label>
-                        <input type="text" name="vin" id="vin" class="form-control"
+                        <input type="text" name="vin" id="vin" class="form-control" required
                             value="{{ $unidad->vin }}">
                     </div>
                 </div>
@@ -85,7 +85,7 @@
                 <div class="row mt-4">
                     <div class="col-lg-6">
                         <label for="imei">IMEI</label>
-                        <input type="text" name="imei" id="imei" class="form-control"
+                        <input type="text" name="imei" id="imei" class="form-control" required
                             value="{{ $unidad->imei }}">
                     </div>
                     <div class="col-lg-6">
@@ -106,8 +106,46 @@
             </div>
         </div>
     </div>
+
+    <div class="card mt-4">
+        <div class="card-header">
+            <h4 class="card-title">
+                <h5>Información de la plataforma y sus costos</h5>
+            </h4>
+        </div>
+
+        <div class="card-body">
+            <div class="form-group">
+            
+                <div class="row mt-4">
+                    <div class="col-lg-6">
+                        <label for="costo_plataforma">Costo de la Plataforma</label>
+                        <input name="costo_plataforma" id="costo_plataforma" class="form-control" required step="0.01" data-inputmask="'alias': 'currency'"
+                            value="{{ $unidad->costo_plataforma }}">
+                    </div>
+                    <div class="col-lg-6">
+                        <label for="costo_sim">Costo del SIM</label>
+                        <input name="costo_sim" id="costo_sim" class="form-control" required step="0.01" data-inputmask="'alias': 'currency'"
+                            value="{{ $unidad->costo_sim }}">
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-lg-6">
+                        <label for="pago_mensual">Pago Mensual</label>
+                        <input  name="pago_mensual" id="pago_mensual" class="form-control" required step="0.01" data-inputmask="'alias': 'currency'"
+                            value="{{ $unidad->pago_mensual }}">
+                    </div>
+                </div>
+
+               
+            </div>
+        </div>
+    </div>
+
 </div>
 <div class="col-lg-4">
+
     <div class="card">
         <div class="card-header">
             <h4 class="card-title">
@@ -117,10 +155,54 @@
 
         <div class="card-body">
             <div class="form-group">
+                <div class="row mt-4">
+                    <div class="col-lg-12">
+                        <label for="name_empresa">Nombre de la empresa</label>
+                        <input type="text" name="name_empresa" id="name_empresa" class="form-control"
+                            value="{{ $unidad->name_empresa }}">
+                    </div>
+                </div>
+                
+                @php
+                    $credenciales = json_decode($unidad->credenciales ?? '[]', true); 
+                @endphp
+                <div class="row mt-4">
+                    <div class="col-lg-6">
+                        <label for="credenciales_user[]">Nombre usuario</label>
+                        <input type="text" name="credenciales_user[]" id="credenciales_user[]" class="form-control" value="{{ $credenciales['user'][0] ?? '' }}">
+                    </div>
+                    <div class="col-lg-6">
+                        <label for="credenciales_pass[]">Contraseña</label>
+                        <input type="text" name="credenciales_pass[]" id="credenciales_pass[]" class="form-control" value="{{ $credenciales['pass'][0] ?? '' }}">
+                    </div>
+                </div>
+                <div class="row mt-4">
+                    <div class="col-lg-6">
+                        <label for="credenciales_user[]">Nombre usuario</label>
+                        <input type="text" name="credenciales_user[]" id="credenciales_user[]" class="form-control" value="{{ $credenciales['user'][1] ?? '' }}">
+                    </div>
+                    <div class="col-lg-6">
+                        <label for="credenciales_pass[]">Contraseña</label>
+                        <input type="text" name="credenciales_pass[]" id="credenciales_pass[]" class="form-control" value="{{ $credenciales['user'][1] ?? '' }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">
+                <h5>Asignaciónes y Fotografias</h5>
+            </h4>
+        </div>
+
+        <div class="card-body">
+            <div class="form-group">
                 <div class="row">
                     <div class="col-lg-12">
                         <label for="cliente_id">Asignado a cliente:</label>
-                        <select name="cliente_id" id="cliente_id" class="form-select mb-4">
+                        <select name="cliente_id" id="cliente_id" class="form-select mb-4" required>
                             @foreach($clientes as $client)
                             <option value="{{ $client->id }}"> {{$client->nombre}} </option>
                             @endforeach
@@ -134,21 +216,8 @@
                     </div>
 
                     <div class="col-lg-12 mt-4">
-                        <label for="foto_unidad">Fotografia de la unidad</label>
-                        @if(isset($unidad->id))
-                            <label for="identificacion">Sube una Identificación Oficial</label>
-                            <div class="row">
-                                <div class="col-lg-8">
-                                    <input type="file" name="foto_unidad" id="myDropify" class="form-control" value="{{$unidad->foto_unidad}}">
-                                </div>
-                                <div class="col-lg-4" style="display: flex;justify-content: center;align-items: center;">
-                                    <img src="{{ asset($unidad->foto_unidad) }}" alt="foto_unidad" style="width:100px;height: 100px;border-radius: 25px;">
-                                </div>
-                            </div>
-                        @else
-                            <label for="foto_unidad">Sube una Identificación Oficial</label>
-                            <input type="file" name="foto_unidad" id="myDropify" class="form-control" value="{{$unidad->foto_unidad}}">
-                        @endif
+                        <label for="foto_unidad">Fotografias de la unidad</label>
+                        <div id="dropzoneForm" class="dropzone"></div> 
                     </div>
                 </div>
             </div>
@@ -158,7 +227,7 @@
             <div class="form-group">
                 <div class="row">
                     <div class="col-lg-12 d-flex justify-content-end">
-                        <button type="submit"
+                        <button type="submit" id="submit-all"
                             class="btn btn-primary mr-4">{{ isset($unidad->id) ? 'Actualizar' : 'Guardar' }}</button>
                         <a href="{{ route('unidades.index') }}" class="btn btn-secondary">Cancelar</a>
                     </div>

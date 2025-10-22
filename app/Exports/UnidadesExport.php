@@ -27,7 +27,7 @@ class UnidadesExport implements FromView, WithTitle, ShouldAutoSize
     {
         $cliente  = Cliente::with('unidades')->find($this->ClienteId);
         
-        return view('admin.clientes.ExportClient', [
+        return view('admin.unidades.ExportClient', [
             'cliente' => $cliente
         ]);
     }

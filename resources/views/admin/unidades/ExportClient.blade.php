@@ -1,7 +1,7 @@
 <table>
     <thead>
-        <tr style="background:#000000;color:#ffffff;">
-            <th colspan="4" style="text-align: center;"><strong>Datos del Cliente</strong></th>
+        <tr>
+            <th colspan="4" style="text-align: center;background:#000000;color:#ffffff;"><strong>Datos del Cliente</strong></th>
         </tr>
     </thead>
     <tbody> 
@@ -46,7 +46,7 @@
 <table border="1" cellpadding="5" cellspacing="0" width="100%">
     <thead>
         <tr>
-            <th colspan="14" style="text-align: center;"><strong>Unidades Asignadas</strong></th>
+            <th colspan="14" style="text-align: center;background:#000000;color:#ffffff;"><strong>Unidades Asignadas</strong></th>
         </tr>
         <tr>
             <th>Económico</th>

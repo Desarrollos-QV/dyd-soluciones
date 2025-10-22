@@ -187,8 +187,8 @@
                                     <td><span class="badge badge-danger">
                                         {{$serv->created_at	}}    
                                     </span></td>
-                                    <td>{{ $serv->tecnico->name}}</td>
-                                    <td>{{$serv->titular}}</td>
+                                    <td>{{ ucwords($serv->tecnico->name)}}</td>
+                                    <td>{{ ucwords($serv->cliente->nombre) }}</td>
                                     <td><span class="badge badge-success">{{ number_format($serv->costo_instalador,2) }}</span></td>
                                     
                                 </tr> 

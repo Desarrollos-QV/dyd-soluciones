@@ -14,9 +14,7 @@
         <div class="col-lg-12">
             <div class="d-flex justify-content-between mb-3">
                 <h4>Servicios Agendados</h4>
-                <a href="{{ route('servicios_agendados.create') }}" class="btn btn-primary btn-sm">
-                    <i data-feather="plus"></i>Agendar Nuevo Servicio
-                </a>
+                 
             </div>
         </div>
 
@@ -46,12 +44,14 @@
                             <tbody>
                                 @foreach ($servicios as $s)
                                     <tr>
-                                        <td>{{ $s->fecha }}</td>
+                                        <td>{{ 
+                                            \Carbon\Carbon::parse($s->fecha_servicio)->format('d/m/Y')
+                                            }}</td>
                                         <td>{{ $s->tipo_servicio }}</td>
-                                        <td>{{ $s->tecnico->name }}</td>
-                                        <td>{{ $s->titular }}</td>
-                                        <td>{{ $s->contacto }}</td>
-                                        <td>{{ $s->unidad }}</td>
+                                        <td>{{ ucwords($s->tecnico->name) }}</td>
+                                        <td>{{ ucwords($s->cliente->nombre) }}</td>
+                                        <td>{{ $s->cliente->numero_contacto.' | '.$s->cliente->numero_alterno }}</td>
+                                        <td>{{ $s->device->dispositivo }}</td>
                                         <td>
                                             @if ($s->firma_cliente != null)
                                                 <span class="badge badge-success">Firmado</span>
@@ -66,8 +66,8 @@
                                                     data-toggle="dropdown" aria-haspopup="true"
                                                     aria-expanded="false">Opciones</button>
                                                 <div class="dropdown-menu">
-                                                    <a class="dropdown-item"
-                                                        href="{{ route('servicios_agendados.edit', $s->id) }}">Editar</a>
+                                                    <!-- <a class="dropdown-item"
+                                                        href="{{ route('servicios_agendados.edit', $s->id) }}">Editar</a>-->
                                                     @if ($s->firma_cliente != null)
                                                         <a class="dropdown-item" target="_blank"
                                                             href="{{ route('servicios_agendados.generarPDF', ['id' => base64_encode($s->id)]) }}">Descargar
@@ -79,7 +79,7 @@
                                                             href="{{ route('servicios_agendados.firmar', ['id' => base64_encode($s->id)]) }}">Solicitar
                                                             Firma</a>
                                                     @endif
-                                                    <a class="dropdown-item" href="#">
+                                                    <!-- <a class="dropdown-item" href="#">
                                                         <form action="{{ route('servicios_agendados.destroy', $s) }}"
                                                             method="POST">
                                                             @csrf @method('DELETE')
@@ -87,7 +87,7 @@
                                                                 style="background: none;border:none;margin:0 !important;padding;padding: 0 !important;"
                                                                 onclick="return confirm('¿Eliminar Servicio?')">Eliminar</button>
                                                         </form>
-                                                    </a>
+                                                    </a>-->
                                                 </div>
                                             </div>
                                         </td>
@@ -111,7 +111,7 @@
     <!-- end custom js for this page -->
     <script>
         function ShareLink() {
-            let route = "{{ route('servicios_agendados.generarPDF', ['id' => base64_encode($s->id)]) }}";
+            let route = ""; 
 
             Swal.fire({
                 title: "<strong>Descarga tu <u>Reporte</u></strong>",
