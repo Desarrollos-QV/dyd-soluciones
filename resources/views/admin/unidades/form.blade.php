@@ -34,8 +34,8 @@
                 </div>
 
                 <div class="row mt-4">
-                    <div class="col-lg-6">
-                        <label for="np_sim">Dispositivo instalado</label>
+                    <div class="col-lg-3">
+                        <label for="dispositivo_instalado">Dispositivo instalado</label>
                         <select name="dispositivo_instalado" id="dispositivo_instalado" class="form-select" required>
                             <option value="DVR" @if($unidad->dispositivo_instalado == 'DVR') selected @endif>DVR</option>
                             <option value="GPS" @if($unidad->dispositivo_instalado == 'GPS') selected @endif>GPS</option>
@@ -51,7 +51,29 @@
                         </div>
                     </div>
 
-                    <div class="col-lg-6">
+                    <div class="col-lg-3">
+                        <label for="simcontrol_id">Vincular SIM</label>
+                        <select name="simcontrol_id" id="simcontrol_id" class="form-select" required>
+                            @foreach($simcontrols as $sim)
+                                <option value="{{ $sim->id }}" @if($unidad->simcontrol_id == $sim->id) selected @endif>
+                                    {{ $sim->compañia }} - {{ $sim->numero_publico }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="col-lg-3">
+                        <label for="devices_id">Vincular de Inventario</label>
+                        <select name="devices_id" id="devices_id" class="form-select" required>
+                            @foreach($devices as $device)
+                                <option value="{{ $device->id }}" @if($unidad->devices_id == $device->id) selected @endif>
+                                    {{ $device->dispositivo }} - {{ $device->marca }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    
+                    <div class="col-lg-3">
                         <label for="numero_de_motor">Número de motor</label>
                         <input type="text" name="numero_de_motor" id="numero_de_motor" class="form-control" required
                             value="{{ $unidad->numero_de_motor }}">

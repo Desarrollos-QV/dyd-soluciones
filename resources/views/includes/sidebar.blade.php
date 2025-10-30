@@ -185,9 +185,17 @@
                 @if (Auth::user()->hasPermission('devices.index'))
                     <li class="nav-item @if (Route::is('devices.index') || Route::is('devices.edit') || Route::is('devices.create')) active @endif">
                         <a class="nav-link" href="{{ route('devices.index') }}">
-                            {{-- role="button" aria-expanded="false" data-toggle="collapse" aria-controls="devices" --}}
                             <i class="link-icon" data-feather="shopping-bag"></i>
                             <span class="link-title">Control de Inventario</span>
+                            <i class="link-arrow" data-feather="chevron-right"></i>
+                        </a>
+                    </li>
+                @endif
+                @if (Auth::user()->hasPermission('simcontrol.index'))
+                    <li class="nav-item @if (Route::is('simcontrol.index') || Route::is('simcontrol.edit') || Route::is('simcontrol.create')) active @endif">
+                        <a class="nav-link" href="{{ route('simcontrol.index') }}">
+                            <i class="link-icon" data-feather="smartphone"></i>
+                            <span class="link-title">Control de SIM</span>
                             <i class="link-arrow" data-feather="chevron-right"></i>
                         </a>
                     </li>

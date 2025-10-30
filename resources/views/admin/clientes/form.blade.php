@@ -49,12 +49,98 @@
 
         </div>
     </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h4>Documentación del cliente</h4>
+        </div>
+
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label style="display: flex;align-items: center;">
+                        Comprobante domicilio &nbsp;
+                        @if($cliente->comprobante_domicilio != null)
+                            <a href="{{ url($cliente->comprobante_domicilio) }}" target="_blank">
+                                <i class="link-icon" data-feather="check-circle" style="color:green;width:16px;"></i>
+                                Ver Imagen
+                            </a>
+                        @endif
+                    </label>
+                    <input type="file" name="comprobante_domicilio" value="{{$cliente->comprobante_domicilio}}" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label style="display: flex;align-items: center;">
+                        Factura &nbsp;
+                        @if($cliente->copa_factura != null)
+                            <a href="{{ url($cliente->copa_factura) }}" target="_blank">
+                                <i class="link-icon" data-feather="check-circle" style="color:green;width:16px;"></i>
+                                Ver Imagen
+                            </a>
+                        @endif
+                    </label>
+                    <input type="file" name="copa_factura" value="{{$cliente->copa_factura}}" class="form-control">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label style="display: flex;align-items: center;">
+                        Tarjeta Circulacion &nbsp;
+                        @if($cliente->tarjeta_circulacion != null)
+                            <a href="{{ url($cliente->tarjeta_circulacion) }}" target="_blank">
+                                <i class="link-icon" data-feather="check-circle" style="color:green;width:16px;"></i>
+                                Ver Imagen
+                            </a>
+                        @endif
+                    </label>
+                    <input type="file" name="tarjeta_circulacion" value="{{$cliente->tarjeta_circulacion}}" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label style="display: flex;align-items: center;">
+                        Consesión &nbsp;
+                        @if($cliente->copia_consesion != null)
+                            <a href="{{ url($cliente->copia_consesion) }}" target="_blank">
+                                <i class="link-icon" data-feather="check-circle" style="color:green;width:16px;"></i>
+                                Ver Imagen
+                            </a>
+                        @endif
+                    </label>
+                    <input type="file" name="copia_consesion" value="{{$cliente->copia_consesion}}" class="form-control">
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label style="display: flex;align-items: center;">
+                        Contrato &nbsp;
+                        @if($cliente->contrato != null)
+                            <a href="{{ url($cliente->contrato) }}" target="_blank">
+                                <i class="link-icon" data-feather="check-circle" style="color:green;width:16px;"></i>
+                                Ver Imagen
+                            </a>
+                        @endif
+                    </label>
+                    <input type="file" name="contrato" value="{{$cliente->contrato}}" class="form-control" required>
+                </div>
+                <div class="col-md-6">
+                    <label style="display: flex;align-items: center;">
+                        Anexo &nbsp;
+                        @if($cliente->anexo != null)
+                            <a href="{{ url($cliente->anexo) }}" target="_blank">
+                                <i class="link-icon" data-feather="check-circle" style="color:green;width:16px;"></i>
+                                Ver Imagen
+                            </a>
+                        @endif
+                    </label>
+                    <input type="file" name="anexo" value="{{$cliente->anexo}}" class="form-control">
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div class="col-lg-5 grid-margin stretch-card">
     <div class="card">
         <div class="card-body">
-           
             <div class="row mb-3 mt-4">
                 <div class="col-md-12 mt-4">
                     @if(isset($cliente->id))

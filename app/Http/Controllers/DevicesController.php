@@ -48,9 +48,9 @@ class DevicesController extends Controller
             'garantia' => 'required|string|max:100',
             'accesorios' => 'nullable|string',
             'ia' => 'nullable|string',
-            'cliente_id' => 'nullable|exists:clientes,id',
-            'unidad_id' => 'nullable|exists:unidades,id',
-            'otra_empresa' => 'nullable|string'
+            'otra_empresa' => 'nullable|string',
+            'stock_min_alert' => 'required|integer',
+            'stock' => 'required|integer'
         ]);
 
         $data = $request->all();
@@ -101,9 +101,9 @@ class DevicesController extends Controller
             'garantia' => 'required|string|max:100',
             'accesorios' => 'nullable|string',
             'ia' => 'nullable|string',
-            'cliente_id' => 'nullable|exists:clientes,id',
-            'unidad_id' => 'nullable|exists:unidades,id',
-            'otra_empresa' => 'nullable|string'
+            'otra_empresa' => 'nullable|string',
+            'stock_min_alert' => 'required|integer',
+            'stock' => 'required|integer'
         ]);
 
         $data = $request->all();

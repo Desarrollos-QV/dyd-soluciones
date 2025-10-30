@@ -35,8 +35,6 @@
                                     <td>Ubicación</td>
                                     <td>Viaticos</td>
                                     <td>Tipo de vehiculo</td>
-                                    <td>Marca / Modelo</td>
-                                    <td>Dispositivo</td>
                                     <td>Placa</td>
                                     <td>Observaciones</td>
                                     <td>Opciones</td>
@@ -71,16 +69,18 @@
                                         <td>{{ $assign->tipo_servicio }}</td>
                                         <td>{{ $assign->tel_contact }}</td>
                                         <td>{{ $assign->encargado_recibir }}</td>
-                                        <td>
-                                            <a href="https://google.com/maps?q={{$assign->lat}},{{$assign->lng}}" target="_blank">{{ substr($assign->location,0,10) }}...</a>
+                                        <td class="text-center">
+                                            <a href="https://google.com/maps?q={{$assign->lat}},{{$assign->lng}}" target="_blank">
+                                               <i class="link-icon" data-feather="map-pin"></i>
+                                            </a>
                                         </td>
-                                        <td>{{ $assign->viaticos }}</td>
-                                        <td>{{ $assign->tipo_vehiculo }}</td>
+                                        <td>${{ $assign->viaticos }}</td>
                                         <td>
-                                            <span class="badge bg-info text-white">{{ $assign->marca }}</span> / <span class="badge bg-warning text-white">{{ $assign->modelo }}</span> 
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-primary text-white">{{ $assign->device ? $assign->device->dispositivo : 'Sin asignar' }}</span>
+                                            <span class="badge bg-secondary text-white">{{ $assign->tipo_vehiculo }}</span>
+                                            /
+                                            <span class="badge bg-info text-white">{{ $assign->marca }}</span> 
+                                            / 
+                                            <span class="badge bg-warning text-white">{{ $assign->modelo }}</span> 
                                         </td>
                                         <td>{{ $assign->placa }}</td>                                        
                                         <td>{{ $assign->observaciones ?? 'Sin Observaciones' }}</td>

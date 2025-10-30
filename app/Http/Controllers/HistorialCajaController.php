@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\HistorialCaja;
 use Illuminate\Http\Request;
+use App\Models\User;
 
 class HistorialCajaController extends Controller
 {
@@ -23,16 +24,9 @@ class HistorialCajaController extends Controller
         }
 
         $historial = $query->orderByDesc('fecha')->paginate(20);
+        $tecnicos = User::whereRole('tecnico')->whereIsActive('1')->get();
 
-        return view('admin.historial_caja.index', compact('historial'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('admin.historial_caja.create');
+        return view('admin.historial_caja.index', compact('historial','tecnicos'));
     }
 
     /**
@@ -43,16 +37,16 @@ class HistorialCajaController extends Controller
         $request->validate([
             'fecha' => 'required|date',
             'tipo' => 'required|in:ingreso,egreso',
-            'concepto' => 'required|string|max:255',
-            'monto' => 'required|numeric|min:0',
+            'descripcion' => 'required|string|max:255',
+            'monto' => 'required|string|min:0',
         ]);
 
         HistorialCaja::create([
             'user_id' => auth()->id(),
             'fecha' => $request->fecha,
-            'hora' => now()->format('H:i'),
+            'hora' => $request->hora,
             'tipo' => $request->tipo,
-            'concepto' => $request->concepto,
+            'concepto' => $request->descripcion,
             'monto' => $request->monto,
             'metodo_pago' => $request->metodo_pago,
             'descripcion' => $request->descripcion,
@@ -63,12 +57,13 @@ class HistorialCajaController extends Controller
         return redirect()->route('historial-caja.index')->with('success', 'Movimiento registrado correctamente.');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(HistorialCaja $historial_caja)
+    public function getElement($id)
     {
-        return view('admin.historial_caja.edit', compact('historial_caja'));
+        $element = HistorialCaja::findOrFail($id);
+        return response()->json([
+            'status' => 'success',
+            'data' => $element
+        ]);
     }
 
     /**
@@ -79,13 +74,31 @@ class HistorialCajaController extends Controller
         $request->validate([
             'fecha' => 'required|date',
             'tipo' => 'required|in:ingreso,egreso',
-            'concepto' => 'required|string|max:255',
-            'monto' => 'required|numeric|min:0',
+            'descripcion' => 'required|string|max:255',
+            'monto' => 'required|string|min:0',
         ]);
 
-        $historial_caja->update($request->all());
+        $historial_caja->update([
+            'user_id' => auth()->id(),
+            'fecha' => $request->fecha,
+            'hora' => $request->hora,
+            'tipo' => $request->tipo,
+            'concepto' => $request->descripcion,
+            'monto' => $request->monto,
+            'metodo_pago' => $request->metodo_pago,
+            'descripcion' => $request->descripcion,
+            'autorizado_por' => $request->autorizado_por,
+            'referencia' => $request->referencia,
+        ]);
 
-        return redirect()->route('historial-caja.index')->with('success', 'Movimiento actualizado correctamente.');
+        if($request->ajax()){
+            return response()->json([
+                'ok' => true,
+                'message' => 'Movimiento actualizado correctamente.'
+            ]);
+        }
+
+        // return redirect()->route('historial-caja.index')->with('success', 'Movimiento actualizado correctamente.');
     }
 
     public function destroy(HistorialCaja $historial_caja)

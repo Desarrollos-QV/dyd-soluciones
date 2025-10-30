@@ -35,7 +35,7 @@
                         </thead>
                         <tbody>
                         @foreach ($clientes as $cliente)
-                            <tr>
+                            <tr @if(!App\Models\Cliente::checkDocuments($cliente->id)) class="table-warning" @endif>
                                 <td>
                                     <a href="{{ asset($cliente->avatar) }}" target="_blank">
                                         @if($cliente->avatar != null)
@@ -69,6 +69,8 @@
                                         <div class="dropdown-menu">
                                             <a class="dropdown-item"
                                                 href="{{ route('clientes.edit', $cliente->id) }}">Editar</a>
+                                            <a class="dropdown-item"
+                                                href="{{ route('clientes.downloadDocs', $cliente->id) }}">Descargar Zip de Documentos</a>
                                             <hr /> 
                                             <form action="{{ route('clientes.destroy', $cliente) }}"
                                                 method="POST"  style="display:inline-block;">

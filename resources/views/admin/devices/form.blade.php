@@ -81,6 +81,7 @@
 
 
                 <div class="row">
+                   <!--
                     <div class="col-lg-4">
                         <div class="mb-3">
                             <label for="cliente_id">Se asigna a cliente</label>
@@ -100,8 +101,23 @@
                                 @endforeach
                             </select>
                         </div>
+                    </div>-->
+                    <div class="col-lg-3">
+                        <div class="mb-3">
+                            <label for="stock">Stock del dispositivo</label>
+                            <input type="number" name="stock" class="form-control mb-4 mb-md-0"
+                            value="{{ $device->stock ?? old('stock') }}" required/>
+                        </div>
                     </div>
-                    <div class="col-lg-4">
+                    <div class="col-lg-3">
+                        <div class="mb-3">
+                            <label for="stock_min_alert">Stock Minima para alerta</label>
+                            <input type="number" name="stock_min_alert" class="form-control mb-4 mb-md-0"
+                            value="{{ $device->stock_min_alert ?? old('stock_min_alert') }}" required/>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6">
                         <div class="mb-3">
                             <label for="otra_empresa">¿Pertenencio a otra empresa?</label>
                             <select name="otra_empresa" id="otra_empresa" class="form-select mb-4">

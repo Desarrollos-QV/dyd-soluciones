@@ -20,6 +20,9 @@
 
 
 @section('js')
+<script src="{{ asset('assets/vendors/bootstrap-maxlength/bootstrap-maxlength.min.js') }}"></script>
+<script src="{{ asset('assets/vendors/inputmask/jquery.inputmask.min.js') }}"></script>
+<script src="{{ asset('assets/js/inputmask.js') }}"></script>
 <script>
     /** Carga de form */
     document.addEventListener('DOMContentLoaded', function() {

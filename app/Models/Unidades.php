@@ -16,6 +16,8 @@ class Unidades extends Model
         'tipo_unidad',
         'fecha_instalacion',
         'dispositivo_instalado',
+        'simcontrol_id',
+        'devices_id',
         'anio_unidad',
         'marca',
         'submarca',
@@ -39,13 +41,13 @@ class Unidades extends Model
         return $this->belongsTo(Cliente::class,'cliente_id');
     }
 
-    public function getMediaAttribute($value)
+    public function simcontrol()
     {
-        return json_decode($value, true);
+        return $this->belongsTo(SimControl::class,'simcontrol_id');
     }
 
-    public function setMediaAttribute($value)
+    public function device()
     {
-        $this->attributes['media'] = json_encode($value);
+        return $this->belongsTo(Devices::class,'devices_id');
     }
 }

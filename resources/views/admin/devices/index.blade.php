@@ -21,9 +21,7 @@
     </div>
 
     <div class="col-lg-12">
-        @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
+        
 
         <div class="card">
             <div class="card-body">
@@ -40,10 +38,9 @@
                                 <th>Garantia</th>
                                 <th>Accesorios</th>
                                 <th>IA</th>
-                                <th>Cliente</th>
-                                <th>Unidad</th>
                                 <th>Otra_empresa</th>
-                                <th class="d-flex justify-content-end">Opciones</th>
+                                <th>Stock</th>
+                                <th class="w-100 d-flex justify-content-end align-items-center">Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -77,12 +74,6 @@
                                     <span class="{{ $badgeClass }} text-white text-uppercase"> {{ $dev->ia }}</span>
                                 </td>
                                 <td>
-                                    <span class="text-uppercase">{{ $dev->cliente->nombre }}</span>
-                                </td>
-                                <td>
-                                    <span class="text-uppercase">{{ $dev->unidad->tipo_unidad }}</span>
-                                </td>
-                                <td>
                                     @php
                                         switch ($dev->otra_empresa) {
                                             case 'si':
@@ -97,12 +88,26 @@
                                     @endphp
                                     <span class="{{ $badgeClass }} text-white text-uppercase"> {{ $dev->otra_empresa }}</span>
                                 </td>
-                                <td class="d-flex justify-content-end">
-                                    <a href="{{ route('devices.edit', $dev) }}" class="btn btn-sm btn-warning">Editar</a>
-                                    <form action="{{ route('devices.destroy', $dev) }}" method="POST" class="d-inline-block">
-                                        @csrf @method('DELETE')
-                                        <button class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar este Dispositivo?')">Eliminar</button>
-                                    </form>
+                                <td>
+                                    <span class="badge bg-secondary text-white"> Qty-{{ $dev->stock }}</span>
+                                </td>
+                                 <td class="d-flex justify-content-end">
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-primary dropdown-toggle"
+                                            data-toggle="dropdown" aria-haspopup="true"
+                                            aria-expanded="false">Opciones</button>
+                                        <div class="dropdown-menu">
+                                            <a class="dropdown-item"
+                                                href="{{ route('devices.edit', $dev->id) }}">Editar</a>
+                                            <hr /> 
+                                            <form action="{{ route('devices.destroy', $dev) }}"
+                                                method="POST"  style="display:inline-block;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button class="btn btn-sm dropdown-item" type="submit">Eliminar</button>
+                                            </form> 
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                             @endforeach

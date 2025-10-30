@@ -20,7 +20,9 @@ class Devices extends Model
         'ia',
         'cliente_id',
         'unidad_id',
-        'otra_empresa'
+        'otra_empresa',
+        'stock',
+        'stock_min_alert'
     ];
 
 

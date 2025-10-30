@@ -16,7 +16,8 @@ class Gasto extends Model
         'monto', 
         'descripcion', 
         'solicitado_por', 
-        'motivo'
+        'motivo',
+        'tipo'
     ];
 
     public function Autoriza()

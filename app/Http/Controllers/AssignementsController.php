@@ -63,11 +63,10 @@ class AssignementsController extends Controller
             'lat'               => 'required|string',
             'lng'               => 'required|string',
             'viaticos'          => 'required|string',
-            'tipo_vehiculo'     => 'required|string',
-            'marca'             => 'required|string',
-            'modelo'            => 'required|string',
-            'devices_id'        => 'required|exists:devices,id',
-            'placa'             => 'required|string',
+            'tipo_vehiculo'     => 'nullable|string',
+            'marca'             => 'nullable|string',
+            'modelo'            => 'nullable|string',
+            'placa'             => 'nullable|string',
             'observaciones'     => 'nullable|string',
         ]);
 
@@ -122,11 +121,10 @@ class AssignementsController extends Controller
             'lat'               => 'required|string',
             'lng'               => 'required|string',
             'viaticos'          => 'required|string',
-            'tipo_vehiculo'     => 'required|string',
-            'marca'             => 'required|string',
-            'modelo'            => 'required|string',
-            'devices_id'        => 'required|exists:devices,id',
-            'placa'             => 'required|string',
+            'tipo_vehiculo'     => 'nullable|string',
+            'marca'             => 'nullable|string',
+            'modelo'            => 'nullable|string',
+            'placa'             => 'nullable|string',
             'observaciones'     => 'nullable|string',
         ]);
 

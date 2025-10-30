@@ -27,14 +27,13 @@
                             <thead>
                                 <tr>
                                     <td>Cliente asignado</td>
-                                    <td>Economico/Placas</td>
-                                    <td>Tipo de unidad</td>
-                                    <td>Instalacion</td>
+                                    <td>Dispositivo Asignado</td>
+                                    <td>SIM Asignada</td>
                                     <td>Disp. Instalado</td>
+                                    <td>Instalacion</td>
                                     <td>Año/Marca/Submarca</td>
                                     <td>Número de motor</td>
                                     <td>VIN / IMEI</td>
-                                    <td>¿Cuenta con apagado?</td>
                                     <td>Número de emergencias</td>
                                     <td class="d-flex justify-content-end">Opciones</td>
                                 </tr>
@@ -65,9 +64,52 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td>{{ $unit->economico }} / {{ $unit->placa }}</td>
-                                        <td>{{ $unit->tipo_unidad }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($unit->fecha_instalacion)->format('Y-m-d') }}</td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button type="button"
+                                                    class="btn @if ($unit->devices_id == 0 || $unit->devices_id == null) btn-danger @else btn-primary @endif dropdown-toggle"
+                                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    {{ $unit->device ? ucwords($unit->device->dispositivo) : 'Sin Asignar' }}
+                                                </button>
+                                                <div class="dropdown-menu">
+                                                    @foreach ($devices as $device)
+                                                        @if ($device['id'] !== $unit->devices_id)
+                                                            <a class="dropdown-item py-2"
+                                                                href="{{ route('unidades.assignDevice', ['id' => $unit->id, 'device' => $device['id']]) }}">
+                                                                {{ ucwords($device['dispositivo']) }}
+                                                            </a>
+                                                        @endif
+                                                    @endforeach
+                                                    <a class="dropdown-item py-2"
+                                                        href="{{ route('unidades.assignDevice', ['id' => $unit->id, 'device' => 0]) }}">
+                                                        Dejar sin asignar
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button type="button"
+                                                    class="btn @if ($unit->simcontrol_id == 0 || $unit->simcontrol_id == null) btn-danger @else btn-primary @endif dropdown-toggle"
+                                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    {{ $unit->simcontrol ? ucwords($unit->simcontrol->compañia).' - '.$unit->simcontrol->numero_publico : 'Sin Asignar' }}
+                                                </button>
+                                                <div class="dropdown-menu">
+                                                    @foreach ($simcontrols as $sim)
+                                                        @if ($sim['id'] !== $unit->simcontrol_id)
+                                                            <a class="dropdown-item py-2"
+                                                                href="{{ route('unidades.assignSIM', ['id' => $unit->id, 'sim' => $sim['id']]) }}">
+                                                                {{ ucwords($sim['compañia']).' - '.$sim['numero_publico'] }}
+                                                            </a>
+                                                        @endif
+                                                    @endforeach
+                                                    <a class="dropdown-item py-2"
+                                                        href="{{ route('unidades.assignSIM', ['id' => $unit->id, 'sim' => 0]) }}">
+                                                        Dejar sin asignar
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </td>
                                         <td>
                                             <div class="btn-group">
                                                 <button type="button"
@@ -109,7 +151,10 @@
                                                 </div>
                                             </div>
                                         </td>
-
+                                        
+                                        <td>
+                                            <span class="badge bg-success text-white">{{ \Carbon\Carbon::parse($unit->fecha_instalacion)->format('Y-m-d') }}</span>
+                                        </td>
                                         <td>
                                             <span class="badge bg-info text-white">{{ $unit->anio_unidad }}</span> / <span
                                                 class="badge bg-warning">{{ $unit->marca }}</span> / <span
@@ -120,23 +165,6 @@
                                         </td>
                                         <td><span class="badge bg-secondary text-white">{{ $unit->vin }}</span> / <span
                                                 class="badge bg-primary text-white">{{ $unit->imei }}</span>
-                                        </td>
-                                                
-                                        <td class="d-flex justify-content-center">
-                                            @php
-                                                switch ($unit->cuenta_con_apagado) {
-                                                    case 'si':
-                                                        $badgeClass = 'badge bg-success';
-                                                        break;
-                                                    case 'no':
-                                                        $badgeClass = 'badge bg-danger';
-                                                        break;
-                                                    default:
-                                                        $badgeClass = 'badge bg-warning';
-                                                }
-                                            @endphp
-                                            <span class="{{ $badgeClass }} text-white text-uppercase">
-                                                {{ $unit->cuenta_con_apagado }}</span>
                                         </td>
                                         <td>
                                             <a href="tel:{{ $unit->numero_de_emergencia }}" target="_blank">

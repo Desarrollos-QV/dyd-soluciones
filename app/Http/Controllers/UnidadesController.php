@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\{
     Unidades,
-    Cliente
+    Cliente,
+    Devices,
+    SimControl
 };
 use Illuminate\Http\Request;
 
@@ -14,16 +16,35 @@ class UnidadesController extends Controller
 {
     public function index()
     {
-        $unidades = Unidades::with('cliente')->get();
+        $unidades = Unidades::with('cliente','simcontrol','device')->get();
         $clientes = Cliente::all();
-        return view('admin.unidades.index', compact('unidades','clientes'));
+        $simcontrols    = SimControl::all();
+        $devicesList    = Devices::all();
+        $devices        = [];
+        
+        foreach ($devicesList as $device) {
+            if ($device->stock >= $device->stock_min_alert) {
+                $devices[] = $device;
+            }
+        }
+
+        return view('admin.unidades.index', compact('unidades','clientes', 'simcontrols' ,'devices'));
     }
 
     public function create()
     {
-        $unidad = new Unidades;
-        $clientes = Cliente::all();
-        return view('admin.unidades.create', compact('unidad','clientes'));
+        $unidad     = new Unidades;
+        $clientes   = Cliente::all();
+        $simcontrols       = SimControl::all();
+        $devicesList    = Devices::all();
+        $devices        = [];
+        foreach ($devicesList as $device) {
+            if ($device->stock >= $device->stock_min_alert) {
+                $devices[] = $device;
+            }
+        }
+
+        return view('admin.unidades.create', compact('unidad', 'clientes', 'simcontrols' ,'devices'));
     }
 
     public function store(Request $request)
@@ -50,6 +71,8 @@ class UnidadesController extends Controller
             'name_empresa'          => 'nullable|string',
             'credenciales_user'     => 'nullable|array',
             'credenciales_pass'     => 'nullable|array',
+            'simcontrol_id'         => 'required|string',
+            'devices_id'            => 'required|string',
         ]);
 
         try {
@@ -65,6 +88,9 @@ class UnidadesController extends Controller
             $data['fecha_instalacion'] = \Carbon\Carbon::parse($request->garantia)->format('Y-m-d');
             
             Unidades::create($data);
+            // Quitamos del stock en caso de que se haya asignado un dispositivo
+            $data['devices_id'] != null && $data['devices_id'] != 0 ? Devices::find($data['devices_id'])->decrement('stock') : null;
+
             return response()->json([
                 'ok' => true,
                 'message' => 'Elemento creado con éxito.',
@@ -83,7 +109,16 @@ class UnidadesController extends Controller
     {
         $unidad = $unidade;
         $clientes = Cliente::all();
-        return view('admin.unidades.edit', compact('unidad','clientes'));
+        $simcontrols       = SimControl::all();
+        $devicesList    = Devices::all();
+        $devices        = [];
+        foreach ($devicesList as $device) {
+            if ($device->stock >= $device->stock_min_alert) {
+                $devices[] = $device;
+            }
+        }
+
+        return view('admin.unidades.edit', compact('unidad','clientes', 'simcontrols' ,'devices'));
     }
 
     public function update(Request $request, Unidades $unidade)
@@ -110,6 +145,8 @@ class UnidadesController extends Controller
             'name_empresa'          => 'nullable|string',
             'credenciales_user'     => 'nullable|array',
             'credenciales_pass'     => 'nullable|array',
+            'simcontrol_id'         => 'required|string',
+            'devices_id'            => 'required|string',
         ]);
 
         try {
@@ -166,6 +203,50 @@ class UnidadesController extends Controller
         $prospect->save();
 
         return redirect()->route('unidades.index')->with('success', 'Dispositivo asignado a la Unidad exitosamente');
+    }
+
+    public function assignDevice($id , $device)
+    {
+        $unidad = Unidades::findOrFail($id);
+
+        // Verificamos si el device = 0 para dejar sin asignar y devolver el stock
+        if($device == 0)
+        {
+            // Devolvemos el stock del dispositivo anterior si existía
+            if($unidad->devices_id != null && $unidad->devices_id != 0)
+            {
+                Devices::find($unidad->devices_id)->increment('stock');
+            }
+
+            $unidad->devices_id = null;
+            $unidad->save();
+
+            return redirect()->route('unidades.index')->with('success', 'Dispositivo desasignado de la Unidad exitosamente');
+        }else{
+            // Si se está asignando un nuevo dispositivo, decrementamos el stock
+            if($unidad->devices_id != null && $unidad->devices_id != 0)
+            {
+                // Devolvemos el stock del dispositivo anterior
+                Devices::find($unidad->devices_id)->increment('stock');
+            }
+
+            // Decrementamos el stock del nuevo dispositivo asignado
+            Devices::find($device)->decrement('stock');
+        }
+
+        $unidad->devices_id = $device;
+        $unidad->save();
+
+        return redirect()->route('unidades.index')->with('success', 'Dispositivo asignado a la Unidad exitosamente');
+    }
+
+    public function assignSIM($id , $sim)
+    {
+        $unidad = Unidades::findOrFail($id);
+        $unidad->simcontrol_id = $sim == 0 ? null : $sim;
+        $unidad->save();
+
+        return redirect()->route('unidades.index')->with('success', 'SIM asignada a la Unidad exitosamente');
     }
 
     public function uploads(Request $request)

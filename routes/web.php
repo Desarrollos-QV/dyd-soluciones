@@ -22,6 +22,8 @@ use App\Http\Controllers\ProspectsController;
 use App\Http\Controllers\SellersController;
 use App\Http\Controllers\DevicesController;
 use App\Http\Controllers\HistorialCajaController;
+use App\Http\Controllers\SimControlController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -73,6 +75,7 @@ Route::group(['middleware' => 'isAdmin'], function () {
      * * Clientes Routes
      */
     Route::resource('clientes', ClienteController::class);
+    Route::get('clientes/downloadDocs/{cliente}', [ClienteController::class, 'downloadDocs'])->name('clientes.downloadDocs');
 
     /**
      * Dispositivos y materiales
@@ -90,6 +93,8 @@ Route::group(['middleware' => 'isAdmin'], function () {
 
     Route::get('unidades/assign/{id}/{client}', [UnidadesController::class, 'AssignClient'])->name('unidades.assign');
     Route::get('unidades/assigndisp/{id}/{disp}', [UnidadesController::class, 'AssignDisp'])->name('unidades.assignDisp');
+    Route::get('unidades/assignDevice/{id}/{device}', [UnidadesController::class, 'assignDevice'])->name('unidades.assignDevice');
+    Route::get('unidades/assignSIM/{id}/{sim}', [UnidadesController::class, 'assignSIM'])->name('unidades.assignSIM');
 
     /**
      * Asignaciones
@@ -127,6 +132,11 @@ Route::group(['middleware' => 'isAdmin'], function () {
      * Inventarios
      */
     Route::resource('inventarios', InventarioController::class);
+
+    /**
+     * Control de SIM
+     */
+    Route::resource('simcontrol', SimControlController::class);
     
     /**
      * Ingresos/Gastos
@@ -151,6 +161,7 @@ Route::group(['middleware' => 'isAdmin'], function () {
      * Gestion de Historial de Caja
      */
     Route::resource('historial-caja', HistorialCajaController::class)->names('historial-caja');
+    Route::get('historial-caja/getElement/{id}', [HistorialCajaController::class, 'getElement'])->name('historial-caja.getElement');
 });
 
 

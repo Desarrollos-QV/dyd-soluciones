@@ -13,7 +13,7 @@ class GastoController extends Controller
 {
     public function index()
     {
-        $gastos = Gasto::orderBy('fecha', 'desc')->with(['Autoriza','Solicita'])->paginate(10);
+        $gastos = Gasto::orderBy('fecha', 'desc')->where('tipo','egreso')->with(['Autoriza','Solicita'])->paginate(10);
 
         return view('admin.gastos.index', compact('gastos'));
     }
@@ -32,11 +32,12 @@ class GastoController extends Controller
             $request->validate([
                 'fecha' => 'required|date',
                 'hora' => 'required',
-                'autorizado_por' => 'required|string|max:255',
+                'autorizado_por' => 'nullable|string|max:255',
                 'monto' => 'required|min:0',
                 'descripcion' => 'required|string',
-                'solicitado_por' => 'required|string|max:255',
+                'solicitado_por' => 'nullable|string|max:255',
                 'motivo' => 'required|string|max:255',
+                'tipo' => 'required|string|max:255',
             ]);
 
             $data  = $request->all();
@@ -45,11 +46,11 @@ class GastoController extends Controller
 
             $gasto = Gasto::create($data);
 
-
             // Registrar en el historial de caja
             HistorialCaja::create([
                 'fecha' => $gasto->fecha,
-                'tipo' => 'egreso',
+                'hora' => $gasto->hora,
+                'tipo' => $gasto->tipo,
                 'concepto' => $gasto->descripcion,
                 'monto' => $gasto->monto,
                 'autorizado_por' => $gasto->autorizado_por,
@@ -94,6 +95,7 @@ class GastoController extends Controller
                 'descripcion' => 'required|string',
                 'solicitado_por' => 'required|string|max:255',
                 'motivo' => 'required|string|max:255',
+                'tipo' => 'required|string|max:255',
             ]);
 
             $data  = $request->all();
@@ -102,6 +104,24 @@ class GastoController extends Controller
             
 
             $gasto->update($data);
+
+            // Actualizar en el historial de caja
+            $historial = HistorialCaja::where('concepto', $gasto->descripcion)
+                ->where('monto', $gasto->monto)
+                ->where('fecha', $gasto->fecha)
+                ->first();
+            if ($historial) {
+                $historial->update([
+                    'fecha' => $gasto->fecha,
+                    'hora' => $gasto->hora,
+                    'tipo' => $gasto->tipo,
+                    'concepto' => $gasto->descripcion,
+                    'monto' => $gasto->monto,
+                    'autorizado_por' => $gasto->autorizado_por,
+                    'descripcion' => $gasto->motivo,
+                ]);
+            }
+
 
             return response()->json([
                 'data' => $data,

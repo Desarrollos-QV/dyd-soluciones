@@ -1,4 +1,4 @@
-
+<input type="hidden" name="tipo" value="egreso">
 
 <div class="col-lg-4 grid-margin stretch-card">
     <div class="card">

@@ -45,7 +45,7 @@
                 </div>
                 <div class="col-lg-6">
                     <label for="viaticos">Viaticos</label>
-                    <input type="text" id="viaticos" name="viaticos" class="form-control" required
+                    <input type="text" id="viaticos" name="viaticos" class="form-control" required step="0.01" data-inputmask="'alias': 'currency'"
                         value="{{ $assignement->viaticos }}">
                 </div>
             </div>
@@ -53,27 +53,28 @@
             <div class="row mb-3">
                 <div class="col-lg-4">
                     <label for="tipo_vehiculo">Tipo de Vehiculo</label>
-                    <input type="text" id="tipo_vehiculo" name="tipo_vehiculo" class="form-control" required
+                    <input type="text" id="tipo_vehiculo" name="tipo_vehiculo" class="form-control"
                         value="{{ $assignement->tipo_vehiculo }}">
                 </div>
                 <div class="col-lg-3">
                     <label for="marca">Marca</label>
-                    <input type="text" id="marca" name="marca" class="form-control" required
+                    <input type="text" id="marca" name="marca" class="form-control"
                         value="{{ $assignement->marca }}">
                 </div>
                 <div class="col-lg-3">
                     <label for="modelo">Modelo</label>
-                    <input type="text" id="modelo" name="modelo" class="form-control" required
+                    <input type="text" id="modelo" name="modelo" class="form-control"
                         value="{{ $assignement->modelo }}">
                 </div>
                 <div class="col-lg-2">
                     <label for="placa">Placa</label>
-                    <input type="text" id="placa" name="placa" class="form-control" required
+                    <input type="text" id="placa" name="placa" class="form-control"
                         value="{{ $assignement->placa }}">
                 </div>
             </div>
 
-            <div class="row mb-3">
+           <!--
+         <div class="row mb-3">
                 <div class="col-md-6">
                     <label for="devices_id">Dispositivo a asignar</label>
                     <select name="devices_id" id="devices_id" class="form-control" required>
@@ -82,7 +83,7 @@
                         @endforeach
                     </select>
                 </div>
-            </div>
+            </div>-->
 
             <div class="row mb-3">
                 <div class="col-md-12">
