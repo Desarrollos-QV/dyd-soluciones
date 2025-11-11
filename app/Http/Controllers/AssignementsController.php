@@ -54,15 +54,15 @@ class AssignementsController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'cliente_id'        => 'required|exists:clientes,id',
+            'cliente_id'        => 'nullable|exists:clientes,id',
             'tecnico_id'        => 'nullable',
-            'tipo_servicio'     => 'required|string',
-            'tel_contact'       => 'required|string',
-            'encargado_recibir' => 'required|string',
-            'location'          => 'required|string',
-            'lat'               => 'required|string',
-            'lng'               => 'required|string',
-            'viaticos'          => 'required|string',
+            'tipo_servicio'     => 'nullable|string',
+            'tel_contact'       => 'nullable|string',
+            'encargado_recibir' => 'nullable|string',
+            'location'          => 'nullable|string',
+            'lat'               => 'nullable|string',
+            'lng'               => 'nullable|string',
+            'viaticos'          => 'nullable|string',
             'tipo_vehiculo'     => 'nullable|string',
             'marca'             => 'nullable|string',
             'modelo'            => 'nullable|string',
@@ -112,15 +112,15 @@ class AssignementsController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'cliente_id'        => 'required|exists:clientes,id',
+            'cliente_id'        => 'nullable|exists:clientes,id',
             'tecnico_id'        => 'nullable',
-            'tipo_servicio'     => 'required|string',
-            'tel_contact'       => 'required|string',
-            'encargado_recibir' => 'required|string',
-            'location'          => 'required|string',
-            'lat'               => 'required|string',
-            'lng'               => 'required|string',
-            'viaticos'          => 'required|string',
+            'tipo_servicio'     => 'nullable|string',
+            'tel_contact'       => 'nullable|string',
+            'encargado_recibir' => 'nullable|string',
+            'location'          => 'nullable|string',
+            'lat'               => 'nullable|string',
+            'lng'               => 'nullable|string',
+            'viaticos'          => 'nullable|string',
             'tipo_vehiculo'     => 'nullable|string',
             'marca'             => 'nullable|string',
             'modelo'            => 'nullable|string',
@@ -168,5 +168,34 @@ class AssignementsController extends Controller
         $assignement->save();
 
         return redirect()->route('assignements.index')->with('success', 'Técnico asignado con éxito.');
+    }
+
+    /**
+     * Bulk Delete Selected Assignements
+     */
+    public function deleteSelected(Request $request)
+    {
+        $ids = $request->input('ids', []);
+
+        if (empty($ids)) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'No se seleccionaron elementos para eliminar.',
+            ]);
+        }
+
+        try {
+            Asignaciones::whereIn('id', $ids)->delete();
+
+            return response()->json([
+                'ok' => true,
+                'message' => 'Elementos eliminados correctamente.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Error al eliminar los elementos: ' . $e->getMessage(),
+            ]);
+        }
     }
 }

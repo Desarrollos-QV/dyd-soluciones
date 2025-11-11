@@ -9,9 +9,6 @@ use App\Models\User;
 
 class TecnicoController extends Controller
 {
-
-    
-
     public function index()
     {
         $tecnicos =  User::where('role', 'tecnico')->get();
@@ -173,5 +170,26 @@ class TecnicoController extends Controller
     {
         $tecnico->delete();
         return redirect()->route('tecnicos.index')->with('success', 'Técnico eliminado exitosamente.');
+    }
+
+    public function deleteSelected(Request $request)
+    {
+        $ids = $request->input('ids');
+
+        if (!empty($ids)) {
+            User::whereIn('id', $ids)->delete();
+
+            return response()->json([
+                'ok' => true,
+                'message' => 'Técnicos eliminados exitosamente.',
+                'code' => 200,
+                'redirect' => route('tecnicos.index')
+            ]);
+        } else {
+            return response()->json([
+                'ok' => false,
+                'message' => 'No se proporcionaron IDs válidas.',
+            ]);
+        }
     }
 }

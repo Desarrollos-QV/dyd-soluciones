@@ -142,4 +142,29 @@ class SellersController extends Controller
             return back()->with('error', 'Error al eliminar el vendedor: ' . $e->getMessage());
         }
     }
+
+    /**
+     * Summary of deleteSelected
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function deleteSelected(Request $request)
+    {
+        $ids = $request->input('ids', []);
+
+        try {
+            Sellers::whereIn('id', $ids)->delete();
+            return response()->json([
+                'ok' => true,
+                'message' => 'Vendedores eliminados exitosamente',
+                'code' => 200,
+                'redirect' => route('sellers.index')
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Error al eliminar los vendedores: ' . $e->getMessage(),
+            ]);
+        }
+    }
 }

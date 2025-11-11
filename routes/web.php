@@ -60,11 +60,12 @@ Route::group(['middleware' => 'isAdmin'], function () {
     Route::resource('prospects', ProspectsController::class);
     Route::get('prospects/status/{status}', [ProspectsController::class, 'ChangeStatus'])->name('prospects.status');  
     Route::get('prospects/assign/{id}/{seller}', [ProspectsController::class, 'AssignSeller'])->name('prospects.assign');
-
+    Route::post('prospects/deleteSelected', [ProspectsController::class, 'deleteSelected'])->name('prospects.bulkDelete');
     /**
      * Vendedores
      */
     Route::resource('sellers', SellersController::class);
+    Route::post('sellers/deleteSelected', [SellersController::class, 'deleteSelected'])->name('sellers.bulkDelete');
 
     /**
      * * Subaccounts Routes
@@ -76,11 +77,13 @@ Route::group(['middleware' => 'isAdmin'], function () {
      */
     Route::resource('clientes', ClienteController::class);
     Route::get('clientes/downloadDocs/{cliente}', [ClienteController::class, 'downloadDocs'])->name('clientes.downloadDocs');
+    Route::post('clientes/deleteSelected', [ClienteController::class, 'deleteSelected'])->name('clientes.bulkDelete');
 
     /**
      * Dispositivos y materiales
      */
     Route::resource('devices', DevicesController::class);
+    Route::post('devices/deleteSelected', [DevicesController::class, 'deleteSelected'])->name('devices.bulkDelete');
 
 
     /**
@@ -95,17 +98,20 @@ Route::group(['middleware' => 'isAdmin'], function () {
     Route::get('unidades/assigndisp/{id}/{disp}', [UnidadesController::class, 'AssignDisp'])->name('unidades.assignDisp');
     Route::get('unidades/assignDevice/{id}/{device}', [UnidadesController::class, 'assignDevice'])->name('unidades.assignDevice');
     Route::get('unidades/assignSIM/{id}/{sim}', [UnidadesController::class, 'assignSIM'])->name('unidades.assignSIM');
+    Route::post('unidades/deleteSelected', [UnidadesController::class, 'deleteSelected'])->name('unidades.bulkDelete');
 
     /**
      * Asignaciones
      */
     Route::resource('assignements', AssignementsController::class);
     Route::get('assignements/assign/{id}/{tecnico}', [AssignementsController::class, 'AssignTecn'])->name('assignements.assign');
+    Route::post('assignements/deleteSelected', [AssignementsController::class, 'deleteSelected'])->name('assignements.bulkDelete');
 
     /**
      * Tecnicos
      */
     Route::resource('tecnicos', TecnicoController::class);
+    Route::post('tecnicos/deleteSelected', [TecnicoController::class, 'deleteSelected'])->name('tecnicos.bulkDelete');
     
     /**
      * Solicitudes
@@ -137,12 +143,14 @@ Route::group(['middleware' => 'isAdmin'], function () {
      * Control de SIM
      */
     Route::resource('simcontrol', SimControlController::class);
+    Route::post('simcontrol/deleteSelected', [SimControlController::class, 'deleteSelected'])->name('simcontrol.bulkDelete');
     
     /**
      * Ingresos/Gastos
      * Reportes
      */
     Route::resource('gastos', GastoController::class);
+    Route::post('gastos/deleteSelected', [GastoController::class, 'deleteSelected'])->name('gastos.bulkDelete');
     Route::get('reportes', [ReporteIngresoEgresoController::class, 'index'])->name('reportes.index');
     Route::get('reportes/exportar-excel', [ReporteIngresoEgresoController::class, 'exportarExcel'])->name('reportes.exportarExcel');
     

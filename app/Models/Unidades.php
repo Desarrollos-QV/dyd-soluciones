@@ -50,4 +50,37 @@ class Unidades extends Model
     {
         return $this->belongsTo(Devices::class,'devices_id');
     }
+
+    static function checkCompleteness($unidadId) {
+        $unidad = self::find($unidadId);
+        $requiredFields = [
+            'cliente_id',
+            'economico',
+            'placa',
+            'tipo_unidad',
+            'fecha_instalacion',
+            'dispositivo_instalado',
+            'simcontrol_id',
+            'anio_unidad',
+            'marca',
+            'submarca',
+            'numero_de_motor',
+            'costo_plataforma',
+            'costo_sim',
+            'pago_mensual',
+            'vin',
+            'imei',
+            'cuenta_con_apagado',
+            'foto_unidad',
+        ];
+
+        foreach ($requiredFields as $field) {
+            if (empty($unidad->$field) || $unidad->costo_plataforma == '0.0' || $unidad->costo_sim == '0.0' || $unidad->pago_mensual == '0.0' ) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
 }

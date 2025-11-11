@@ -7,7 +7,7 @@
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label for="cliente_id">Cliente</label>
-                    <select name="cliente_id" id="cliente_id" class="form-control" required>
+                    <select name="cliente_id" id="cliente_id" class="form-control" >
                         @foreach ($clientes as $cl)
                             <option value="{{ $cl->id }}"> {{ $cl->nombre }} </option>
                         @endforeach
@@ -15,7 +15,7 @@
                 </div>
                 <div class="col-md-6">
                     <label for="tecnico_id">Tecnico asignado</label>
-                    <select name="tecnico_id" id="tecnico_id" class="form-control" required>
+                    <select name="tecnico_id" id="tecnico_id" class="form-control" >
                         <option value="0">Sin asignar aún</option>
                         @foreach ($tecnicos as $tec)
                             <option value="{{ $tec->id }}" @if($tec->id == $assignement->tecnico_id) selected @endif > {{ $tec->name }} </option>
@@ -27,12 +27,12 @@
             <div class="row mb-3">
                 <div class="col-lg-6">
                     <label for="tipo_servicio">Tipo de servicio</label>
-                    <input type="text" id="tipo_servicio" name="tipo_servicio" class="form-control" required
+                    <input type="text" id="tipo_servicio" name="tipo_servicio" class="form-control" required 
                         value="{{ $assignement->tipo_servicio }}">
                 </div>
                 <div class="col-lg-6">
                     <label for="tel_contact">Telefono de contacto</label>
-                    <input type="text" id="tel_contact" name="tel_contact" class="form-control" required
+                    <input type="text" id="tel_contact" name="tel_contact" class="form-control" 
                         value="{{ $assignement->tel_contact }}">
                 </div>
             </div>
@@ -40,12 +40,12 @@
             <div class="row mb-3">
                 <div class="col-lg-6">
                     <label for="encargado_recibir">Encargado de recibir</label>
-                    <input type="text" id="encargado_recibir" name="encargado_recibir" class="form-control" required
+                    <input type="text" id="encargado_recibir" name="encargado_recibir" class="form-control" required 
                         value="{{ $assignement->encargado_recibir }}">
                 </div>
                 <div class="col-lg-6">
                     <label for="viaticos">Viaticos</label>
-                    <input type="text" id="viaticos" name="viaticos" class="form-control" required step="0.01" data-inputmask="'alias': 'currency'"
+                    <input type="text" id="viaticos" name="viaticos" class="form-control"  step="0.01" data-inputmask="'alias': 'currency'" required
                         value="{{ $assignement->viaticos }}">
                 </div>
             </div>
@@ -105,11 +105,11 @@
             <div class="row mb-3">
                 <div class="col-md-12">
                     <label for="cliente_id">Ubicación</label>
-                    <input id="pac-input" class="controls form-control" name="location" value="{{$assignement->location}}" type="text" placeholder="Ingresa una Ubicación">
+                    <input id="pac-input" class="controls form-control" name="location" value="{{$assignement->location}}" type="text" required placeholder="Ingresa una Ubicación">
                     
                     <div class="row">
-                        <div class="form-group col-md-6"><input type="hidden" name="lat" id="lat" class="form-control" required placeholder="Latitude" value="{{ $assignement->lat }}"></div>
-                        <div class="form-group col-md-6"><input type="hidden" name="lng" id="lng" class="form-control" required placeholder="Longitude" value="{{ $assignement->lng }}"></div>
+                        <div class="form-group col-md-6"><input type="hidden" name="lat" id="lat" class="form-control"  placeholder="Latitude" value="{{ $assignement->lat }}"></div>
+                        <div class="form-group col-md-6"><input type="hidden" name="lng" id="lng" class="form-control"  placeholder="Longitude" value="{{ $assignement->lng }}"></div>
                     </div>
 
                     <div id="map" style="width: 100%;height: 400px;"></div>

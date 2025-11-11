@@ -62,4 +62,27 @@ class Cliente extends Model
 
         return true;
     }
+
+    // Funcion para Eliminar las imagenes asociadas al cliente
+    public static function deleteClientDocuments($clientId)
+    {
+        $cliente = self::find($clientId);
+
+        $documents = [
+            'avatar',
+            'identificacion',
+            'comprobante_domicilio',
+            'copa_factura',
+            'tarjeta_circulacion',
+            'copia_consesion',
+            'contrato',
+            'anexo'
+        ];
+
+        foreach ($documents as $document) {
+            if (!empty($cliente->$document) && File::exists(public_path($cliente->$document))) {
+                File::delete(public_path($cliente->$document));
+            }
+        }
+    }
 }

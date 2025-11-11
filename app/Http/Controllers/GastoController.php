@@ -143,4 +143,30 @@ class GastoController extends Controller
         $gasto->delete();
         return redirect()->route('gastos.index')->with('success', 'Gasto eliminado correctamente.');
     }
+
+    public function deleteSelected(Request $request)
+    {
+        $ids = $request->input('ids', []);
+
+        if (empty($ids)) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'No hay elementos seleccionados para eliminar.',
+            ]);
+        }
+
+        try {
+            Gasto::whereIn('id', $ids)->delete();
+
+            return response()->json([
+                'ok' => true,
+                'message' => 'Elementos eliminados correctamente.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Error al eliminar los elementos: ' . $e->getMessage(),
+            ]);
+        }
+    }
 }

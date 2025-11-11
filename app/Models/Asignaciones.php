@@ -42,4 +42,27 @@ class Asignaciones extends Model
     {
         return $this->belongsTo(User::class, 'tecnico_id');
     }
+
+    static function checkCompleteService($clientId)
+    {
+        $assign = self::find($clientId);
+
+        $inputs = [
+            'cliente_id',
+            'tecnico_id',
+            'tel_contact',
+            'tipo_vehiculo',
+            'marca',
+            'modelo',
+            'placa',
+        ];
+
+        foreach ($inputs as $input) {
+            if (empty($assign->$input) || is_null($assign->$input) || $assign->$input == '') {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

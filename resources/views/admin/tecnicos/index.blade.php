@@ -14,9 +14,14 @@
         <div class="col-lg-12">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h4 class="mb-0">Técnicos</h4>
-                <a href="{{ route('tecnicos.create') }}" class="btn btn-primary btn-sm">
-                    <i data-feather="plus"></i> Nuevo Técnico
-                </a>
+                <div class="d-flex justify-content-between align-items-center">
+                    <button class="btn btn-danger btn-sm mr-3" id="delete_selected">
+                        <i data-feather="trash-2"></i> Eliminar Selección
+                    </button>
+                    <a href="{{ route('tecnicos.create') }}" class="btn btn-primary btn-sm">
+                        <i data-feather="plus"></i> Nuevo Técnico
+                    </a>
+                </div>
             </div>
         </div>
 
@@ -24,9 +29,10 @@
             <div class="card">
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table id="dataTableExample" class="w-100 table table-bordered table-hover">
+                        <table id="dataTableResponsive" class="w-100 table table-bordered table-hover">
                             <thead>
                                 <tr>
+                                    <th></th>
                                     <th>Imagen</th>
                                     <th>Identificación</th>
                                     <th>Nombre</th>
@@ -46,17 +52,23 @@
                                 @foreach ($tecnicos as $tecnico)
                                     <tr>
                                         <td>
+                                            <input type="checkbox" id="select_element_{{ $tecnico->id }}"
+                                                name="select_element_{{ $tecnico->id }}">
+                                        </td>
+                                        <td>
                                             <a href="{{ asset($tecnico->avatar) }}" target="_blank">
-                                                <img src="{{ asset($tecnico->avatar) }}" alt="Sin Imagen" >
+                                                <img src="{{ asset($tecnico->avatar) }}" alt="Sin Imagen">
                                             </a>
                                         </td>
                                         <td>
                                             <a href="{{ asset($tecnico->identificacion) }}" target="_blank">
-                                                <img src="{{ asset($tecnico->identificacion) }}" alt="Sin Imagen" style="border-radius: 12px !important"> 
+                                                <img src="{{ asset($tecnico->identificacion) }}" alt="Sin Imagen"
+                                                    style="border-radius: 12px !important">
                                             </a>
                                         </td>
                                         <td>
-                                            <span class="text-capitalize">{{ $tecnico->name . ' ' . $tecnico->lastname }}</span>
+                                            <span
+                                                class="text-capitalize">{{ $tecnico->name . ' ' . $tecnico->lastname }}</span>
                                         </td>
                                         <td>{{ $tecnico->email }}</td>
                                         <td>{{ $tecnico->schooling }}</td>
@@ -106,9 +118,64 @@
 @endsection
 
 @section('js')
-    <script src="{{ asset('assets/vendors/datatables.net/jquery.dataTables.js') }}"></script>
-    <script src="{{ asset('assets/vendors/datatables.net-bs4/dataTables.bootstrap4.js') }}"></script>
-    <!-- custom js for this page -->
-    <script src="{{ asset('assets/js/data-table.js') }}"></script>
-    <!-- end custom js for this page -->
+    <script>
+        $(document).ready(function() {
+            const table = $('#dataTableResponsive').DataTable({
+                responsive: true,
+            });
+
+            // Limpiamos todos los Checkbox al cargar la tabla
+            $("input[type='checkbox']").prop('checked', false);
+
+            // Detectamos el clic en cualquier fila de la tabla
+            table.on('click', 'input[type="checkbox"]', function(e) {
+                let classList = e.currentTarget.parentElement.parentElement.classList;
+                classList.toggle('selected');
+            });
+
+            // Manejar el clic en el botón de eliminar prospectos seleccionados
+            $('#delete_selected').on('click', function() {
+                let selectedProspectIds = [];
+                table.rows('.selected').every(function(rowIdx, tableLoop, rowLoop) {
+                    let prospectId = $(this.node()).find('input[type="checkbox"]').attr('id')
+                        .replace('select_element_', '');
+                    selectedProspectIds.push(prospectId);
+                });
+
+                if (selectedProspectIds.length === 0) {
+                    alertSwwet('Error', 'No hay Elementos seleccionados para eliminar.');
+                    return;
+                }
+
+                // Confirmar la eliminación
+                if (!confirm(
+                        `¿Estás seguro de que deseas eliminar ${selectedProspectIds.length} Elemento(s)?`
+                    )) {
+                    return;
+                }
+
+                // Enviar la solicitud AJAX para eliminar los prospectos seleccionados
+                $.ajax({
+                    url: '{{ route('tecnicos.bulkDelete') }}',
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        ids: selectedProspectIds
+                    },
+                    success: function(response) {
+                        if (response.ok) {
+                            alertSwwet('Éxito', response.message);
+                            // Recargar la página o eliminar las filas de la tabla
+                            location.reload();
+                        } else {
+                            alertSwwet('Error', response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        alertSwwet('Error', 'Ocurrió un error al eliminar los prospectos.');
+                    }
+                });
+            });
+        });
+    </script>
 @endsection

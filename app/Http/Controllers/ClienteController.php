@@ -265,4 +265,28 @@ class ClienteController extends Controller
             return redirect()->back()->with('error', 'No se pudo crear el archivo zip.');
         }
     }
+
+    public function deleteSelected(Request $request)
+    {
+        $ids = $request->input('ids', []);
+
+        try {
+            Cliente::whereIn('id', $ids)->delete();
+
+            // Mandamos llamar la función para eliminar los documentos asociados
+            foreach ($ids as $id) {
+                Cliente::deleteClientDocuments($id);
+            }
+
+            return response()->json([
+                'ok' => true,
+                'message' => 'Clientes eliminados con éxito.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Error al eliminar los clientes: ' . $e->getMessage(),
+            ]);
+        }
+    }
 }

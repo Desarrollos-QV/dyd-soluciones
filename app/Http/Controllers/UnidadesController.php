@@ -327,4 +327,37 @@ class UnidadesController extends Controller
         ]);
       
     }
+
+    public function deleteSelected(Request $request)
+    {
+        $ids = $request->input('ids', []);
+
+        try {
+            foreach ($ids as $id) {
+                $unidad = Unidades::findOrFail($id);
+                // Eliminamos las imagenes asociadas
+                if ($unidad->foto_unidad) {
+                    $fotos = json_decode($unidad->foto_unidad);
+                    foreach ($fotos as $foto) {
+                        $file_path = public_path('uploads/fotos_unidades/' . $foto);
+                        if (File::exists($file_path)) {
+                            File::delete($file_path);
+                        }
+                    }
+                }
+
+                $unidad->delete();
+            }
+
+            return response()->json([
+                'ok' => true,
+                'message' => 'Unidades eliminadas con éxito.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Error al eliminar las unidades: ' . $e->getMessage(),
+            ]);
+        }
+    }
 }

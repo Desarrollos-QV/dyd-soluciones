@@ -67,7 +67,7 @@
                             </a>
                         @endif
                     </label>
-                    <input type="file" name="comprobante_domicilio" value="{{$cliente->comprobante_domicilio}}" class="form-control" required>
+                    <input type="file" name="comprobante_domicilio" value="{{$cliente->comprobante_domicilio}}" class="form-control">
                 </div>
                 <div class="col-md-6">
                     <label style="display: flex;align-items: center;">
@@ -93,7 +93,7 @@
                             </a>
                         @endif
                     </label>
-                    <input type="file" name="tarjeta_circulacion" value="{{$cliente->tarjeta_circulacion}}" class="form-control" required>
+                    <input type="file" name="tarjeta_circulacion" value="{{$cliente->tarjeta_circulacion}}" class="form-control">
                 </div>
                 <div class="col-md-6">
                     <label style="display: flex;align-items: center;">
@@ -119,7 +119,7 @@
                             </a>
                         @endif
                     </label>
-                    <input type="file" name="contrato" value="{{$cliente->contrato}}" class="form-control" required>
+                    <input type="file" name="contrato" value="{{$cliente->contrato}}" class="form-control">
                 </div>
                 <div class="col-md-6">
                     <label style="display: flex;align-items: center;">

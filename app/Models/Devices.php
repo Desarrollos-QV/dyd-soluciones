@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\File;
 
 class Devices extends Model
 {
@@ -35,4 +36,6 @@ class Devices extends Model
     {
         return $this->belongsTo(Unidades::class, 'unidad_id');
     }
+
+ 
 }

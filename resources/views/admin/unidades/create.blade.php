@@ -124,10 +124,18 @@
             })
             .then(response => response.json())
             .then(data => {
+                console.log('Success:', data);
                 if (data.ok) {
-                    
                     window.location.href =
                         `${data.redirect}?success=${encodeURIComponent(data.message)}`;
+                }else {
+                    Swal.fire({
+                        type: 'error',
+                        title: 'Oops... Hubo un error al enviar el formulario.',
+                        text: data.message
+                    }).then(() => {
+                        window.location.reload();
+                    });
                 }
             })
             .catch(error => {

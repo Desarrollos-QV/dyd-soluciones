@@ -124,4 +124,23 @@ class SimControlController extends Controller
             ], 500);
         }
     }
+
+    public function deleteSelected(Request $request)
+    {
+        $ids = $request->input('ids', []);
+
+        try {
+            SimControl::whereIn('id', $ids)->delete();
+
+            return response()->json([
+                'ok' => true,
+                'message' => 'Selected SIMs deleted successfully.',
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Failed to delete selected SIMs.',
+            ], 500);
+        }
+    }
 }

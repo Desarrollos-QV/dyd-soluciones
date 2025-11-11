@@ -142,21 +142,21 @@
                 <div class="row mt-4">
                     <div class="col-lg-6">
                         <label for="costo_plataforma">Costo de la Plataforma</label>
-                        <input name="costo_plataforma" id="costo_plataforma" class="form-control" required step="0.01" data-inputmask="'alias': 'currency'"
-                            value="{{ $unidad->costo_plataforma }}">
+                        <input name="costo_plataforma" id="costo_plataforma" class="form-control" step="0.01" data-inputmask="'alias': 'currency'"
+                            value="{{ $unidad->costo_plataforma ?? 0 }}">
                     </div>
                     <div class="col-lg-6">
                         <label for="costo_sim">Costo del SIM</label>
-                        <input name="costo_sim" id="costo_sim" class="form-control" required step="0.01" data-inputmask="'alias': 'currency'"
-                            value="{{ $unidad->costo_sim }}">
+                        <input name="costo_sim" id="costo_sim" class="form-control" step="0.01" data-inputmask="'alias': 'currency'"
+                            value="{{ $unidad->costo_sim ?? 0 }}">
                     </div>
                 </div>
 
                 <div class="row mt-4">
                     <div class="col-lg-6">
                         <label for="pago_mensual">Pago Mensual</label>
-                        <input  name="pago_mensual" id="pago_mensual" class="form-control" required step="0.01" data-inputmask="'alias': 'currency'"
-                            value="{{ $unidad->pago_mensual }}">
+                        <input  name="pago_mensual" id="pago_mensual" class="form-control" step="0.01" data-inputmask="'alias': 'currency'"
+                            value="{{ $unidad->pago_mensual ?? 0 }}">
                     </div>
                 </div>
 
