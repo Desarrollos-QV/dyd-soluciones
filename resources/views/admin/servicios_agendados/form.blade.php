@@ -1,170 +1,349 @@
-<div class="col-lg-4 grid-margin stretch-card">
-    <div class="card">
-        <div class="card-header mt-1">
-            @if (isset($servicio->id))
-                <div class="media d-block d-sm-flex">
-                    <div class="media-body">
-                        <h5 class="mt-0"> @yield('title') </h5>
-                        <p>
-                            {{ $servicio->tipo_servicio }} | #{{$servicio->id}}
-                        </p>
+<div class="row">
+    <div class="col-lg-7 ">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label>Tipo de servicio</label>
+                    <input type="text" name="tipo_servicio" class="form-control" disabled value="{{ $servicio->tipo_servicio }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="encargado_recibir">Encargado de recibir</label>
+                        <input type="text" name="encargado_recibir" class="form-control" disabled value="{{ ucwords($servicio->cliente->nombre) }}">
                     </div>
                 </div>
-            @else
-                <h4 class="card-title">
-                    @yield('title')
-                </h4>
-            @endif
-        </div>
 
-        <div class="card-body">
-            <div class="row">
-                <div class="col-lg-12">
-                    <label for="fotos">Registro fotográfico</label>
- 
-                    <div class="dropzone" id="registro-fotografico-dropzone"></div>
-                </div>
-            </div>
-
-            <div class="row mt-3">
-                <div class="col-lg-12">
-                    <label for="costo_instalador">Costo Instalador</label>
-                    <input name="costo_instalador" step="0.01" class="form-control" data-inputmask="'alias': 'currency'"
-                        value="{{ old('costo_instalador', $servicio->costo_instalador ?? '') }}">
-                </div>
-
-                <div class="col-lg-12 mt-3">
-                    <label for="gasto_adicional">Gasto Adicional</label>
-                    <input name="gasto_adicional" step="0.01" class="form-control" data-inputmask="'alias': 'currency'"
-                        value="{{ old('gasto_adicional', $servicio->gasto_adicional ?? '') }}">
-                </div>
-
-                <div class="col-lg-12 mt-3">
-                    <label for="saldo_favor">Saldo a Favor</label>
-                    <input name="saldo_favor" step="0.01" class="form-control" data-inputmask="'alias': 'currency'"
-                        value="{{ old('saldo_favor', $servicio->saldo_favor ?? '') }}">
+                <div class="row mt-3">
+                    <div class="col-md-4">
+                        <label for="viaticos">Víaticos</label>
+                        <input type="text" name="viaticos" class="form-control" disabled value="{{ '$'.$servicio->viaticos }}">
+                    </div>
                 </div>
             </div>
         </div>
 
-
-        <div class="form-group">
-            <div class="row">
-                <div class="col-lg-12 d-flex justify-content-end">
-                    <button type="submit"
-                        class="btn btn-primary">{{ isset($servicio->id) ? 'Actualizar' : 'Guardar' }}</button>
-                    <a href="{{ route('servicios_agendados.index') }}" class="btn btn-secondary mr-4 ml-3">Cancelar</a>
+        <div class="card mt-3">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="tipo_vehiculo">Vehiculo</label>
+                        <input type="text" name="tipo_vehiculo" id="tipo_vehiculo" class="form-control" disabled value="{{ $servicio->tipo_vehiculo }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="marca">Marca</label>
+                        <input type="text" name="marca" class="form-control" id="marca" disabled value="{{ $servicio->marca }}">
+                    </div>
                 </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <label for="modelo">Modelo</label>
+                        <input type="text" name="modelo" class="form-control" id="modelo" disabled value="{{ $servicio->modelo }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="placa">Placas</label>
+                        <input type="text" name="placa" class="form-control" id="placa" disabled value="{{ $servicio->placa }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header">
+                <h4>Información del Cliente</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label for="nombre">Nombre</label>
+                        <input type="text" name="nombre" id="nombre" class="form-control" disabled value="{{ $servicio->cliente->nombre }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="direccion">Dirección</label>
+                        <input type="text" name="direccion" class="form-control" id="direccion" disabled value="{{ $servicio->cliente->direccion }}">
+                    </div>
+                </div>
+
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <label for="numero_contacto">Número de contacto</label>
+                        <input type="text" name="numero_contacto" class="form-control" id="numero_contacto" disabled value="{{ $servicio->cliente->numero_contacto }}">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="numero_alterno">Número Alterno</label>
+                        <input type="text" name="numero_alterno" class="form-control" id="numero_alterno" disabled value="{{ $servicio->cliente->numero_alterno }}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body border-top">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label style="display: flex;align-items: center;">
+                            Comprobante domicilio &nbsp;
+                            @if($servicio->cliente->comprobante_domicilio != null)
+                                <a href="{{ url($servicio->cliente->comprobante_domicilio) }}" target="_blank">
+                                    <i class="link-icon" data-feather="check-circle" style="color:green;width:16px;"></i>
+                                    Ver Imagen
+                                </a>
+                            @else
+                                <i class="link-icon" data-feather="x-circle" style="color:red;width:16px;"></i>
+                            @endif
+                        </label>
+                    </div>
+                    <div class="col-md-6">
+                        <label style="display: flex;align-items: center;">
+                            Factura &nbsp;
+                            @if($servicio->cliente->copa_factura != null)
+                                <a href="{{ url($servicio->cliente->copa_factura) }}" target="_blank">
+                                    <i class="link-icon" data-feather="check-circle" style="color:green;width:16px;"></i>
+                                    Ver Imagen
+                                </a>
+                            @else
+                                <i class="link-icon" data-feather="x-circle" style="color:red;width:16px;"></i>
+                            @endif
+                        </label>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label style="display: flex;align-items: center;">
+                            Tarjeta Circulacion &nbsp;
+                            @if($servicio->cliente->tarjeta_circulacion != null)
+                                <a href="{{ url($servicio->cliente->tarjeta_circulacion) }}" target="_blank">
+                                    <i class="link-icon" data-feather="check-circle" style="color:green;width:16px;"></i>
+                                    Ver Imagen
+                                </a>
+                            @else
+                                <i class="link-icon" data-feather="x-circle" style="color:red;width:16px;"></i>
+                            @endif
+                        </label>
+                    </div>
+                    <div class="col-md-6">
+                        <label style="display: flex;align-items: center;">
+                            Consesión &nbsp;
+                            @if($servicio->cliente->copia_consesion != null)
+                                <a href="{{ url($servicio->cliente->copia_consesion) }}" target="_blank">
+                                    <i class="link-icon" data-feather="check-circle" style="color:green;width:16px;"></i>
+                                    Ver Imagen
+                                </a>
+                            @else
+                                <i class="link-icon" data-feather="x-circle" style="color:red;width:16px;"></i>
+                            @endif
+                        </label>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label style="display: flex;align-items: center;">
+                            Contrato &nbsp;
+                            @if($servicio->cliente->contrato != null)
+                                <a href="{{ url($servicio->cliente->contrato) }}" target="_blank">
+                                    <i class="link-icon" data-feather="check-circle" style="color:green;width:16px;"></i>
+                                    Ver Imagen
+                                </a>
+                            @else
+                                <i class="link-icon" data-feather="x-circle" style="color:red;width:16px;"></i>
+                            @endif
+                        </label>
+                    </div>
+                    <div class="col-md-6">
+                        <label style="display: flex;align-items: center;">
+                            Anexo &nbsp;
+                            @if($servicio->cliente->anexo != null)
+                                <a href="{{ url($servicio->cliente->anexo) }}" target="_blank">
+                                    <i class="link-icon" data-feather="check-circle" style="color:green;width:16px;"></i>
+                                    Ver Imagen
+                                </a>
+                            @else
+                                <i class="link-icon" data-feather="x-circle" style="color:red;width:16px;"></i>
+                            @endif
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <label for="location">Ubicación del servicio</label>
+                        <input class="controls form-control" name="location" value="{{$servicio->location}}" type="text" disabled>
+                        <div class="row">
+                            <div class="form-group col-md-6"><input type="hidden" name="lat" id="lat" class="form-control"  placeholder="Latitude" value="{{ $servicio->coords['lat'] }}"></div>
+                            <div class="form-group col-md-6"><input type="hidden" name="lng" id="lng" class="form-control"  placeholder="Longitude" value="{{ $servicio->coords['lng'] }}"></div>
+                        </div>
+                        <div id="map" style="width: 100%;height: 300px;border-radius:25px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+       <div class="card mt-3">
+            <div class="card-header">
+                @if ($servicio->firma != null)
+                    <a class="dropdown-item" target="_blank"
+                        href="{{ route('servicios_agendados.generarPDF', ['id' => base64_encode($servicio->id)]) }}">Descargar
+                        Reporte</a>
+                    <a class="dropdown-item" href="javascript:void(0)"
+                        onclick="ShareLink()">Compartir Link</a>
+                @else
+                    <a class="btn btn-primary " target="_blank"
+                        href="{{ route('servicios_agendados.firmar', ['id' => base64_encode($servicio->id)]) }}">Solicitar
+                        Firma</a>
+                @endif
             </div>
         </div>
     </div>
 </div>
 
-<div class="col-lg-8">
-    <div class="card">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-4">
-                    <label>Tipo</label>
-                    <select name="tipo_servicio" class="form-select">
-                        @foreach (['Instalación', 'Reparación', 'Apoyo'] as $t)
-                            <option value="{{ $t }}" @selected(old('tipo', $servicio->tipo ?? '') == $t)>{{ $t }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <label for="fecha">Fecha</label>
-                    <input type="date" name="fecha" class="form-control"
-                        value="{{ old('fecha', $servicio->fecha ?? now()->format('Y-m-d')) }}">
-                </div>
-                <div class="col-md-4">
-                    <label for="user_id">Técnico</label>
-                    <select name="user_id" class="form-select">
-                        @foreach ($tecnicos as $tec)
-                            <option value="{{ $tec->id }}" @selected(old('user_id', $servicio->user_id ?? '') == $tec->id)>{{ $tec->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+<div class="row">
+    <div class="col-lg-4 grid-margin stretch-card">
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h4>Información de la Unidad</h4>
             </div>
+            <div class="card-body">
+                @foreach ($servicio->cliente->unidades as $unidad)
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="dispositivo_instalado">Dispositivo a instalar</label>
+                            <input type="text" name="dispositivo_instalado" id="dispositivo_instalado" class="form-control" disabled value="{{ $unidad->dispositivo_instalado }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="economico">Economico</label>
+                            <input type="text" name="economico" class="form-control" id="economico" disabled value="{{ $unidad->economico }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="placa">Placa</label>
+                            <input type="text" name="placa" class="form-control" id="placa" disabled value="{{ $unidad->placa }}">
+                        </div>
+                    </div>
 
-            <div class="row mt-3">
-                <div class="col-md-4">
-                    <label for="titular">Titular</label>
-                    <input type="text" name="titular" class="form-control"
-                        value="{{ old('titular', $servicio->titular ?? '') }}">
-                </div>
-                <div class="col-md-4">
-                    <label for="contacto">Contacto</label>
-                    <input type="text" name="contacto" class="form-control" data-inputmask-alias="(+999) 999-9999"
-                        value="{{ old('contacto', $servicio->contacto ?? '') }}">
-                </div>
-                <div class="col-md-4">
-                    <label for="unidad">Unidad</label>
-                    <input type="text" name="unidad" class="form-control"
-                        value="{{ old('unidad', $servicio->unidad ?? '') }}">
-                </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label for="tipo_unidad">Tipo de unidad</label>
+                            <input type="text" name="tipo_unidad" id="tipo_unidad" class="form-control" disabled value="{{ $unidad->tipo_unidad }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="anio_unidad">Año de la unidad</label>
+                            <input type="text" name="anio_unidad" class="form-control" id="anio_unidad" disabled value="{{ $unidad->anio_unidad }}">
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label for="marca">Marca</label>
+                            <input type="text" name="marca" id="marca" class="form-control" disabled value="{{ $unidad->marca }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="submarca">SubMarca</label>
+                            <input type="text" name="submarca" class="form-control" id="submarca" disabled value="{{ $unidad->submarca }}">
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label for="numero_de_motor">Número de motor</label>
+                            <input type="text" name="numero_de_motor" id="numero_de_motor" class="form-control" disabled value="{{ $unidad->numero_de_motor }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="vin">VIN</label>
+                            <input type="text" name="vin" class="form-control" id="vin" disabled value="{{ $unidad->vin }}">
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label for="imei">IMEI</label>
+                            <input type="text" name="imei" id="imei" class="form-control" disabled value="{{ $unidad->imei }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="cuenta_con_apagado">Cuenta con apagado</label>
+                            <input type="text" name="cuenta_con_apagado" class="form-control" id="cuenta_con_apagado" disabled value="{{ $unidad->cuenta_con_apagado }}">
+                        </div>
+                    </div>
+                @endforeach
             </div>
         </div>
     </div>
 
-    <div class="card">
-        <div class="card-body">
-            <div class="form-group mt-3">
-                <div class="row">
-                    <div class="col-lg-6">
-                        <label for="falla_reportada">Falla Reportada</label>
-                        <textarea name="falla_reportada" class="form-control" maxlength="50" rows="5" placeholder="Ingresa los detalles de la falla">{{ old('falla_reportada', $servicio->falla_reportada ?? '') }}</textarea>
+    <div class="col-lg-4 grid-margin stretch-card">
+        <div class="card mt-3">
+            <div class="card-header">
+                <h4>Información de la SIM</h4>
+            </div>
+            <div class="card-body">
+                @foreach ($servicio->cliente->unidades as $unidad)
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="compañia">Compañia</label>
+                            <input type="text" name="compañia" id="compañia" class="form-control" disabled value="{{ $unidad->simcontrol->compañia }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="numero_sim">Número de SIM</label>
+                            <input type="text" name="numero_sim" class="form-control" id="numero_sim" disabled value="{{ $unidad->simcontrol->numero_sim }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="numero_publico">Número público</label>
+                            <input type="text" name="numero_publico" class="form-control" id="numero_publico" disabled value="{{ $unidad->simcontrol->numero_publico }}">
+                        </div>
                     </div>
 
-                    <div class="col-lg-6">
-                        <label for="reparacion_realizada">Reparación Realizada</label>
-                        <textarea name="reparacion_realizada" class="form-control" maxlength="50" rows="5" placeholder="Ingresa los detalles de la reparación">{{ old('reparacion_realizada', $servicio->reparacion_realizada ?? '') }}</textarea>
+                    <div class="row mt-3">
+                        <div class="col-md-12">
+                            <label for="observaciones">Observaciones</label>
+                            <textarea name="observaciones" id="observaciones" class="form-control" disabled cols="30" rows="10">{!! $unidad->simcontrol->observaciones ?? "Sin Observaciones" !!}</textarea>
+                        </div>
                     </div>
-                </div>
+                @endforeach
             </div>
         </div>
     </div>
 
-    <div class="card mt-3">
-        <div class="card-body">
-            <div class="mt-3">
-                <label>Refacciones   </label>
-                <div id="repuestos-list">
-                    @php
-                        $ref = old('refacciones', $servicio->refacciones ?? []);
-                        $cant = old('refacciones_cantidad', $servicio->refacciones_cantidad ?? []);
-                    @endphp
+    <div class="col-lg-4 grid-margin stretch-card">
+        <div class="card mt-3">
+            <div class="card-header">
+                <h4>Información del Inventario</h4>
+            </div>
+            <div class="card-body">
+                @foreach ($servicio->cliente->unidades as $unidad)
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="dispositivo">Dispositivo</label>
+                            <input type="text" name="dispositivo" id="dispositivo" class="form-control" disabled value="{{ $unidad->inventario->dispositivo }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="marca">Marca</label>
+                            <input type="text" name="marca" class="form-control" id="marca" disabled value="{{ $unidad->inventario->marca }}">
+                        </div>
+                        
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label for="camaras">Camaras</label>
+                            <input type="text" name="camaras" class="form-control" id="camaras" disabled value="{{ $unidad->inventario->camaras }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="generacion">Generacion</label>
+                            <input type="text" name="generacion" class="form-control" id="generacion" disabled value="{{ $unidad->inventario->generacion }}">
+                        </div>
+                    </div>
+
                     
-                    {{-- <div class="row mb-2">
-                        <div class="col">
-                            <input name="refacciones[]" value="{{ $r }}" class="form-control" />
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <label for="imei">IMEI</label>
+                            <input type="text" name="imei" class="form-control" id="imei" disabled value="{{ $unidad->inventario->imei }}">
                         </div>
-                        <div class="col">
-                            <input name="refacciones_cantidad[]" type="number" value="{{ $cant[$i] ?? 1 }}"
-                                class="form-control" />
+                        <div class="col-md-6">
+                            <label for="garantia">Garantia</label>
+                            <input type="text" name="garantia" class="form-control" id="garantia" disabled value="{{ $unidad->inventario->garantia }}">
                         </div>
-                    </div> --}}
-                    <table>
-                        <tbody id="rows-container">
-                            @foreach ($ref as $i => $r)
-                            <tr>
-                                <td><input type="text" name="refacciones[]" value="{{ $r }}" /></td>
-                                <td><input name="refacciones_cantidad[]" type="number" value="{{ $cant[$i] ?? 1 }}"/></td>
-                                <td>
-                                    <button type="button" class="btn btn-outline-primary d-flex justify-content-center align-items-center" onclick="removeRow(this)">
-                                        <svg xmlns="http://www.w3.org/2000/svg" style="cursor:pointer;" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-trash-2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                                        &nbsp;<span class="mt-1">Eliminar</span>
-                                    </button>
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table> 
-                </div>
-                <button type="button" class="btn btn-sm btn-outline-primary" onclick="addRow()">+ Añadir
-                    refacción</button>
+                    </div>
+                @endforeach
             </div>
         </div>
     </div>

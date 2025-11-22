@@ -82,66 +82,72 @@
                                                 class="{{ $badgeClass }} text-dark text-uppercase">{{ $prosp->potencial }}</span>
                                         </td>
                                         <td>
-                                            @php
-                                                /**
-                                                 *
-                                                 * 0 = rojo (sin atender),
-                                                 * 1 = amarillo (en proceso y se puedan visualizar las observaciones del estatus),
-                                                 * 2 = verde (proyecto concretado),
-                                                 * 3 = morado (competencia o instaladores),
-                                                 * 4 = gris (no funcional).
-                                                 *
-                                                 * */
-                                                $statusOptions = [
-                                                    0 => ['class' => 'danger', 'text' => 'Sin Atender'],
-                                                    1 => ['class' => 'warning text-dark', 'text' => 'En Proceso'],
-                                                    2 => ['class' => 'success', 'text' => 'Concretado'],
-                                                    3 => ['class' => 'purple', 'text' => 'Competencia/Instaladores'],
-                                                    4 => ['class' => 'secondary', 'text' => 'No Funcional'],
-                                                ];
+                                            @if($prosp->status == 2)
+                                                <span class="badge bg-success text-white">
+                                                    Concretado
+                                                </span>
+                                            @else
+                                                @php
+                                                    /**
+                                                     *
+                                                     * 0 = rojo (sin atender),
+                                                     * 1 = amarillo (en proceso y se puedan visualizar las observaciones del estatus),
+                                                     * 2 = verde (proyecto concretado),
+                                                     * 3 = morado (competencia o instaladores),
+                                                     * 4 = gris (no funcional).
+                                                     *
+                                                     * */
+                                                    $statusOptions = [
+                                                        0 => ['class' => 'danger', 'text' => 'Sin Atender'],
+                                                        1 => ['class' => 'warning text-dark', 'text' => 'En Proceso'],
+                                                        2 => ['class' => 'success', 'text' => 'Concretado'],
+                                                        3 => ['class' => 'purple', 'text' => 'Competencia/Instaladores'],
+                                                        4 => ['class' => 'secondary', 'text' => 'No Funcional'],
+                                                    ];
 
-                                                switch ($prosp->status) {
-                                                    case 0:
-                                                        $statusClass = 'danger';
-                                                        $statusText = 'Sin Atender';
-                                                        break;
-                                                    case 1:
-                                                        $statusClass = 'warning text-dark';
-                                                        $statusText = 'En Proceso';
-                                                        break;
-                                                    case 2:
-                                                        $statusClass = 'success';
-                                                        $statusText = 'Concretado';
-                                                        break;
-                                                    case 3:
-                                                        $statusClass = 'purple';
-                                                        $statusText = 'Competencia/Instaladores';
-                                                        break;
-                                                    case 4:
-                                                        $statusClass = 'secondary';
-                                                        $statusText = 'No Funcional';
-                                                        break;
-                                                    default:
-                                                        $statusClass = 'secondary';
-                                                        $statusText = 'Desconocido';
-                                                }
-                                            @endphp
-                                            <div class="btn-group">
-                                                <button type="button"
-                                                    class="btn btn-{{ $statusOptions[$prosp->status]['class'] ?? 'secondary' }} dropdown-toggle"
-                                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                    {{ $statusOptions[$prosp->status]['text'] ?? 'Desconocido' }}
-                                                </button>
-                                                <div class="dropdown-menu">
-                                                    @foreach ($statusOptions as $key => $option)
-                                                        @if ($key !== $prosp->status)
-                                                            <a class="dropdown-item py-2" href="{{ route('prospects.status', ['id' => $prosp->id, 'status' => $key]) }}">
-                                                                {{ $option['text'] }}
-                                                            </a>
-                                                        @endif
-                                                    @endforeach
+                                                    switch ($prosp->status) {
+                                                        case 0:
+                                                            $statusClass = 'danger';
+                                                            $statusText = 'Sin Atender';
+                                                            break;
+                                                        case 1:
+                                                            $statusClass = 'warning text-dark';
+                                                            $statusText = 'En Proceso';
+                                                            break;
+                                                        case 2:
+                                                            $statusClass = 'success';
+                                                            $statusText = 'Concretado';
+                                                            break;
+                                                        case 3:
+                                                            $statusClass = 'purple';
+                                                            $statusText = 'Competencia/Instaladores';
+                                                            break;
+                                                        case 4:
+                                                            $statusClass = 'secondary';
+                                                            $statusText = 'No Funcional';
+                                                            break;
+                                                        default:
+                                                            $statusClass = 'secondary';
+                                                            $statusText = 'Desconocido';
+                                                    }
+                                                @endphp
+                                                <div class="btn-group">
+                                                    <button type="button"
+                                                        class="btn btn-{{ $statusOptions[$prosp->status]['class'] ?? 'secondary' }} dropdown-toggle"
+                                                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        {{ $statusOptions[$prosp->status]['text'] ?? 'Desconocido' }}
+                                                    </button>
+                                                    <div class="dropdown-menu">
+                                                        @foreach ($statusOptions as $key => $option)
+                                                            @if ($key !== $prosp->status)
+                                                                <a class="dropdown-item py-2" href="{{ route('prospects.status', ['id' => $prosp->id, 'status' => $key]) }}">
+                                                                    {{ $option['text'] }}
+                                                                </a>
+                                                            @endif
+                                                        @endforeach
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            @endif
                                         </td>
                                         <td>
                                             <div class="btn-group">

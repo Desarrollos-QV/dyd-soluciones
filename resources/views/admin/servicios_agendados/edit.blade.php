@@ -1,6 +1,6 @@
  @extends('layouts.app')
  @section('title')
-     Editar servicio agendado
+     Visualizando servicio agendado
  @endsection
  @section('css')
      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.css" />
@@ -9,133 +9,15 @@
      <nav class="page-breadcrumb">
          <ol class="breadcrumb">
              <li class="breadcrumb-item"><a href="{{ url('./') }}">Inicio</a></li>
-             <li class="breadcrumb-item active" aria-current="page">Agregar nuevo servicio</li>
+             <li class="breadcrumb-item active" aria-current="page">Visualizando Servicio #{{ $servicios_agendado->id }}</li>
          </ol>
      </nav>
-
-     <form action="{{ route('servicios_agendados.update', $servicios_agendado) }}" method="POST" class="row" 
-        id="form-services" enctype="multipart/form-data">
-        @method('PUT')
-        @csrf
-        @include('admin.servicios_agendados.form', ['servicio' => $servicios_agendado])
+     <form action="{{ route('servicios_agendados.update', $servicios_agendado->id) }}" method="POST" 
+         id="form-services" enctype="multipart/form-data">
+         @method('PUT')
+         @csrf
+         @include('admin.servicios_agendados.form', ['servicio' => $servicios_agendado])
      </form>
-
-
-     <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.9.3/min/dropzone.min.js"></script>
-     <script>
-        Dropzone.autoDiscover = false;
-
-        const archivosExistentes = [
-            // Ejemplo de archivos existentes. Puedes generar esto desde tu backend.
-            @foreach ($servicios_agendado->fotos as $archivo)
-                {
-                    idService: "{{ $servicios_agendado->id }}",
-                    name : "{{ $archivo }}",
-                    url  : "{{ asset('uploads/servicios/registro_fotografico/'.$archivo) }}"
-                },
-            @endforeach
-        ];
-
-
-         const myDropzone = new Dropzone("#registro-fotografico-dropzone", {
-            url: "{{ route('servicios_agendados.update', $servicios_agendado) }}", // Mismo endpoint que el formulario
-            autoProcessQueue: false,
-            uploadMultiple: true,
-            parallelUploads: 10,
-            maxFiles: 10,
-            paramName: "fotos", // Importante: nombre del input para archivos
-            addRemoveLinks: true,
-            headers: {
-                'X-CSRF-TOKEN': "{{ csrf_token() }}"
-            }
-         });
-
-         // Cargar archivos existentes como "mock files"
-         myDropzone.on("addedfile", function(file) {
-             if (file.url) {
-                myDropzone.emit("thumbnail", file, file.url);
-                file.previewElement.classList.add('dz-success', 'dz-complete');
-             }
-         });
-
-         archivosExistentes.forEach(file => {
-            myDropzone.emit("addedfile", file);
-            myDropzone.emit("thumbnail", file, file.url);
-            myDropzone.emit("complete", file);
-         });
-
-         // Opcional: manejar la eliminación de archivos existentes
-         myDropzone.on("removedfile", function(file) { 
-             if (file.url) {
-                // Envía una petición AJAX para eliminar el archivo del servidor si es necesario
-                fetch("{{ route('servicios_agendados.delete-file') }}", {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': "{{ csrf_token() }}",
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ filename: file.name, idService: file.idService })
-                });
-             }
-         });
-
-         // Al hacer submit, evita el envío normal y procesa la cola de Dropzone
-         document.getElementById('form-services').addEventListener('submit', function(e) {
-             e.preventDefault();
-             // Si hay archivos, usa Dropzone para enviar todo
-             if (myDropzone.getQueuedFiles().length > 0) {
-                 myDropzone.processQueue();
-             } else {
-                // Si no hay archivos, envía el formulario normalmente
-                const form = e.target;
-                const formData = new FormData(form);
-
-                fetch(form.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    // Maneja la respuesta del backend
-                    if (data.success) {
-                        window.location.href =  `${data.redirect}?success=${encodeURIComponent(data.message)}`
-                        // Redirige o actualiza la vista si es necesario
-                    } else {
-                        alert('Error: ' + data.message);
-                    }
-                })
-                .catch(error => {
-                    alert('Error en la petición');
-                });
-             }
-         });
-
-         // Adjunta los campos del formulario a la petición de Dropzone
-         myDropzone.on('sendingmultiple', function(data, xhr, formData) {
-             // Agrega todos los campos del formulario
-             let form = document.getElementById('form-services');
-             for (let i = 0; i < form.elements.length; i++) {
-                 let el = form.elements[i];
-                 if (el.name && el.type !== 'file') {
-                    formData.append(el.name, el.value);
-                 }
-             }
-         });
-
-         // Maneja la respuesta del backend
-         myDropzone.on('successmultiple', function(files, response) {
-             // Redirige o muestra mensaje de éxito
-            console.log(response);
-            window.location.href =  `${response.redirect}?success=${encodeURIComponent(response.message)}` || "{{ route('servicios_agendados.index') }}";
-         });
-
-         myDropzone.on('errormultiple', function(files, response) {
-             alert('Error al guardar: ' + (response.message || ''));
-         });
-     </script>
  @endsection
 
  @section('js')
@@ -174,5 +56,36 @@
              // Elimina la fila (tr) que contiene el botón presionado
              btn.closest('tr').remove();
          }
+
+
+        /** Funciones del mapa */
+        function initMap() {
+            var markers = [];
+            var latitud = parseFloat(document.getElementById('lat').value);
+            var longitud = parseFloat(document.getElementById('lng').value);
+
+            var map = new google.maps.Map(
+            document.getElementById('map'), {
+                center: {
+                    lat: latitud,
+                    lng: longitud
+                },
+                zoom: 13
+            });
+
+                var geocoder = new google.maps.Geocoder;
+                var marker = new google.maps.Marker({
+                    map: map,
+                    draggable: false,
+                    position: {
+                        lat: latitud,
+                        lng: longitud
+                    }
+                });
+
+            markers.push(marker);
+        }
+        /** Funciones del mapa */
      </script>
+     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBqYcfefGddEiqR-OlfaLMSWP5m2RdMk18&libraries=places&callback=initMap"></script>
  @endsection

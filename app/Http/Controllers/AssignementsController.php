@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Traits\NotifiesUsers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Response;
 use Illuminate\Http\Request;
@@ -15,6 +16,8 @@ use App\Models\{
 
 class AssignementsController extends Controller
 {
+    use NotifiesUsers;
+
     private $folder = "admin.asignaciones.";
 
     /**
@@ -23,12 +26,34 @@ class AssignementsController extends Controller
      */
     public function index()
     {
-        $assignements = Asignaciones::with('cliente','device','tecnico')->get();
+        $assignements = Asignaciones::with('cliente','device','tecnico')
+                        ->whereStatus(0)
+                        ->get();
         $tecnicos    = User::where('role', 'tecnico')->get();
         // return response()->json([
         //     'assignements' => $assignements
         // ]);
 
+        return view($this->folder . 'index', compact('assignements', 'tecnicos'));
+    }
+
+    public function AssignsPerformed()
+    {
+        $assignements = Asignaciones::with('cliente','device','tecnico')
+                        ->whereStatus(5)
+                        ->get();
+        $tecnicos    = User::where('role', 'tecnico')->get();
+        
+        return view($this->folder . 'index', compact('assignements', 'tecnicos'));
+    }
+
+    public function AssignsInProgress()
+    {
+        $assignements = Asignaciones::with('cliente','device','tecnico')
+                        ->whereIn('status', [1, 2, 3, 4])
+                        ->get();
+        $tecnicos    = User::where('role', 'tecnico')->get();
+        
         return view($this->folder . 'index', compact('assignements', 'tecnicos'));
     }
 
@@ -165,7 +190,19 @@ class AssignementsController extends Controller
     {
         $assignement = Asignaciones::findOrFail($id);
         $assignement->tecnico_id = $tecnico;
+        $assignement->status = 1; // Cambiar estado a "En Progreso"
         $assignement->save();
+
+        // Generamos la notificación para el técnico asignado
+        $this->notifyUser(
+            $tecnico,
+            'service_assigned',
+            'Nueva Asignación',
+            'Se te ha asignado una nueva tarea. Por favor, revisa los detalles.',
+            ['assignement_id' => $assignement->id],
+            route('assignements.show', $assignement->id),
+            now()->addDays(7)
+        );
 
         return redirect()->route('assignements.index')->with('success', 'Técnico asignado con éxito.');
     }

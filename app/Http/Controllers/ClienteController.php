@@ -12,13 +12,12 @@ use Illuminate\Support\Facades\Auth;
 class ClienteController extends Controller
 {
  
-    
     public function index()
     {
         $clientes = Cliente::orderBy('created_at','DESC')->with([
             'unidades',
             'unidades.simcontrol',
-            'unidades.device'])->get();
+            'unidades.inventario'])->get();
        
         return view('admin.clientes.index', compact('clientes'));
     }

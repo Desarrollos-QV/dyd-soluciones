@@ -11,15 +11,15 @@ class Cliente extends Model
     use HasFactory;
 
     protected $fillable = [
-        'nombre',
-        'avatar',
-        'direccion',
-        'numero_contacto',
+        'nombre', // Obligatorio
+        'avatar', 
+        'direccion',// Obligatorio
+        'numero_contacto',// Obligatorio
         'numero_alterno',
         'tipo_empresa',
         'empresa',
         'identificacion',
-        'direccion_empresa',
+        'direccion_empresa',// Obligatorio
         'comprobante_domicilio',
         'copa_factura',
         'tarjeta_circulacion',

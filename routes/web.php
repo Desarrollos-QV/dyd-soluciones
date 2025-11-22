@@ -22,6 +22,7 @@ use App\Http\Controllers\ProspectsController;
 use App\Http\Controllers\SellersController;
 use App\Http\Controllers\DevicesController;
 use App\Http\Controllers\HistorialCajaController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SimControlController;
 
 
@@ -103,10 +104,12 @@ Route::group(['middleware' => 'isAdmin'], function () {
     /**
      * Asignaciones
      */
+    Route::get('assignements/inprogress', [AssignementsController::class, 'AssignsInProgress'])->name('assignements.inprogress');
+    Route::get('assignements/performed', [AssignementsController::class, 'AssignsPerformed'])->name('assignements.performed');
     Route::resource('assignements', AssignementsController::class);
     Route::get('assignements/assign/{id}/{tecnico}', [AssignementsController::class, 'AssignTecn'])->name('assignements.assign');
     Route::post('assignements/deleteSelected', [AssignementsController::class, 'deleteSelected'])->name('assignements.bulkDelete');
-
+    
     /**
      * Tecnicos
      */
@@ -170,8 +173,16 @@ Route::group(['middleware' => 'isAdmin'], function () {
      */
     Route::resource('historial-caja', HistorialCajaController::class)->names('historial-caja');
     Route::get('historial-caja/getElement/{id}', [HistorialCajaController::class, 'getElement'])->name('historial-caja.getElement');
+
 });
 
+
+
+/**
+ * Notificaciones
+ */
+Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+Route::post('/notifications/read/{id}', [NotificationController::class, 'markAsRead'])->name('notifications.read');
 
 /**
  * Servicios Agendados

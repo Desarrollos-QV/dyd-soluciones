@@ -18,26 +18,22 @@
                             <div class="row mb-3">
                                 <div class="col-md-4">
                                     <label>Fecha de instalación</label>
-                                    <input type="date" name="fecha_instalacion" class="form-control" required value="{{$service->fecha}}">
+                                    <input type="date" name="fecha_instalacion" class="form-control" required value="{{$service->cliente->fecha_instalacion}}">
                                 </div>
                                 <div class="col-md-4">
                                     <label>Tipo de servicio</label>
-                                    <select name="tipo_servicio" class="form-control" required>
-                                        <option value="Instalación" @if($service->tipo_servicio == 'Instalación') selected @endif>Instalación</option>
-                                        <option value="Reparación" @if($service->tipo_servicio == 'Reparación') selected @endif>Reparación</option>
-                                        <option value="Mantenimiento" @if($service->tipo_servicio == 'Mantenimiento') selected @endif>Mantenimiento</option>
-                                    </select>
+                                    <input type="text" name="tipo_servicio" class="form-control" disabled value="{{ $service->tipo_servicio }}">
                                 </div>
                                 <div class="col-md-4">
                                     <label>Lugar de instalación</label>
-                                    <input type="text" name="lugar_instalacion" class="form-control">
+                                    <input type="text" name="location" class="form-control" disabled value="{{ $service->location }}">
                                 </div>
                             </div>
 
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label>Nombre del técnico</label>
-                                    <input type="text" name="tecnico" class="form-control" required value="{{ $service->tecnico->name }}">
+                                    <input type="text" name="tecnico" class="form-control" disabled value="{{ ucwords($service->tecnico->name) }}">
                                 </div>
                                 <div class="col-md-6">
                                     <label>¿Encendido correcto tras cerrar switch?</label>

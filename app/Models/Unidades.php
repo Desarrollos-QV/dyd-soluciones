@@ -15,6 +15,7 @@ class Unidades extends Model
         'placa',
         'tipo_unidad',
         'fecha_instalacion',
+        'fecha_cobro',
         'dispositivo_instalado',
         'simcontrol_id',
         'devices_id',
@@ -46,8 +47,9 @@ class Unidades extends Model
         return $this->belongsTo(SimControl::class,'simcontrol_id');
     }
 
-    public function device()
+    public function inventario()
     {
+        // Agregar un prefijo device as Inventario
         return $this->belongsTo(Devices::class,'devices_id');
     }
 
@@ -59,6 +61,7 @@ class Unidades extends Model
             'placa',
             'tipo_unidad',
             'fecha_instalacion',
+            'fecha_cobro',
             'dispositivo_instalado',
             'simcontrol_id',
             'anio_unidad',
@@ -83,4 +86,23 @@ class Unidades extends Model
         return true;
     }
 
+    /**
+     * Generamos una funcion para obtener los dias faltantes a la fecha de cobro
+     */
+    static function diasFaltantesCobro($fecha_cobro) {
+        // Carbon::parse()->format('Y-m-d')
+        $fechaCobro = \Carbon\Carbon::parse($fecha_cobro);
+        $fechaActual = \Carbon\Carbon::now();
+        $days = $fechaActual->diffInDays($fechaCobro, false);
+        
+        // Debolvemos el bg-info si es mayor a 10 dias, bg-warning si es entre 5 y 10 dias, bg-danger si es menor a 5 dias
+        if ($days > 10) {
+            return  '<span class="badge bg-success text-white">'.$days.' días Faltantes</span>';
+        } elseif ($days <= 10 && $days >= 5) {
+            return  '<span class="badge bg-warning text-dark">'.$days.' días Faltantes</span>';
+        } else {
+            return  '<span class="badge bg-danger text-white">'.$days.' días Faltantes</span>';
+        }
+        
+    }
 }

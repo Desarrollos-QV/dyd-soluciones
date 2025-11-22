@@ -1,7 +1,11 @@
 <div class="col-lg-7">
     <div class="card">
         <div class="card-header">
-            <h4>Nueva Alta de servicio</h4>
+            @if($assignement->id)
+                <h4>Editar Asignación #{{ $assignement->id }}</h4>
+            @else
+               <h4>Nueva Alta de servicio</h4>
+            @endif
         </div>
         <div class="card-body">
             <div class="row mb-3">

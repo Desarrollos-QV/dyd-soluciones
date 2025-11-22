@@ -15,5 +15,6 @@ class SimControl extends Model
         'compañia',
         'numero_sim',
         'numero_publico',
+        'observaciones'
     ];
 }

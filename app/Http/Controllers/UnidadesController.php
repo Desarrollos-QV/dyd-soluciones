@@ -16,7 +16,7 @@ class UnidadesController extends Controller
 {
     public function index()
     {
-        $unidades = Unidades::with('cliente','simcontrol','device')->get();
+        $unidades = Unidades::with('cliente','simcontrol','inventario')->get();
         $clientes = Cliente::all();
         $simcontrols    = SimControl::all();
         $devicesList    = Devices::all();
@@ -55,6 +55,7 @@ class UnidadesController extends Controller
             'placa'                 => 'required|string|max:50',
             'tipo_unidad'           => 'required|string|max:100',
             'fecha_instalacion'     => 'required|string',
+            'fecha_cobro'           => 'required|date',
             'anio_unidad'           => 'nullable|string|max:50',
             'marca'                 => 'nullable|string|max:100',
             'submarca'              => 'nullable|string|max:100',
@@ -85,7 +86,8 @@ class UnidadesController extends Controller
             ]);
             
 
-            $data['fecha_instalacion'] = \Carbon\Carbon::parse($request->garantia)->format('Y-m-d');
+            $data['fecha_instalacion'] = \Carbon\Carbon::parse($request->fecha_instalacion)->format('Y-m-d');
+            $data['fecha_cobro'] = \Carbon\Carbon::parse($request->fecha_cobro)->format('Y-m-d');
             
             Unidades::create($data);
             // Quitamos del stock en caso de que se haya asignado un dispositivo
@@ -129,6 +131,7 @@ class UnidadesController extends Controller
             'placa'                 => 'required|string|max:50',
             'tipo_unidad'           => 'required|string|max:20',
             'fecha_instalacion'     => 'required|string',
+            'fecha_cobro'           => 'required|string',
             'anio_unidad'           => 'nullable|string|max:50',
             'marca'                 => 'nullable|string|max:30',
             'submarca'              => 'nullable|string|max:30',
@@ -157,7 +160,9 @@ class UnidadesController extends Controller
                 'pass' => $request->credenciales_pass,
             ]);
 
-            $data['fecha_instalacion'] = \Carbon\Carbon::parse($request->garantia)->format('Y-m-d');
+            // $data['fecha_instalacion'] = \Carbon\Carbon::parse($request->garantia)->format('Y-m-d');
+            $data['fecha_instalacion'] = \Carbon\Carbon::parse($request->fecha_instalacion)->format('Y-m-d');
+            $data['fecha_cobro'] = \Carbon\Carbon::parse($request->fecha_cobro)->format('Y-m-d');
 
             $unidade->update($data);
 

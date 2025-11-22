@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -10,6 +12,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\{
     Tecnico,
     User,
+    Cliente,
     Asignaciones,
     ServiciosAgendado,
     FirmaServicio
@@ -21,19 +24,54 @@ class ServicioAgendadoController extends Controller
 
     public function index(Request $r)
     {
-        $query = Asignaciones::with(['cliente','tecnico','device']);
-        if ($r->filled('search')) {
-            $q = $r->search;
-            $query->where('cliente', 'like', "%$q%")
-                ->orWhereHas('tecnico', fn($q2) => $q2->where('name', 'like', "%$q%"));
+        // $query = Asignaciones::where('tecnico_id',Auth::user()->id)->with(['cliente','cliente.unidades','tecnico','device']);
+        
+        // if ($r->filled('search')) {
+        //     $q = $r->search;
+        //     $query->where('cliente', 'like', "%$q%")
+        //         ->orWhereHas('tecnico', fn($q2) => $q2->where('name', 'like', "%$q%"));
+        // }
+        // $servicios = $query->paginate(10);
+
+        $ListClients = Asignaciones::where('tecnico_id', Auth::user()->id)->pluck('cliente_id');
+        $data        = [];
+
+        foreach ($ListClients as $key => $client) {
+            $Client = Cliente::where('id',$client)->with(['unidades'=>function($q){
+                $q->with('simcontrol','inventario');
+            }])->first();
+
+            $assign = Asignaciones::where('cliente_id',$client)->where('tecnico_id', Auth::user()->id)->with('getFirma')->first();
+
+            $data[] = [
+                'id' => $assign->id,
+                'tipo_servicio' => $assign->tipo_servicio,
+                'location' => $assign->location,
+                'coords'  => ['lat' => $assign->lat, 'lng' => $assign->lng],
+                'viaticos' => $assign->viaticos,
+                'tipo_vehiculo' => $assign->tipo_vehiculo,
+                'marca' => $assign->marca,
+                'modelo' => $assign->modelo,
+                'placa' => $assign->placa,
+                'status' => $assign->status,
+                'firma' => $assign->getFirma,
+                'cliente' => $Client
+            ];
         }
-        $servicios = $query->paginate(10);
+
+
+        /**
+         * Convertir Data a un objeto para facilitar el manejo en la vista Blade tipo  @foreach ($servicios as $s) $s->id
+         */
+        $dataCollection = collect($data)->map(function ($item) {
+            return (object) $item;
+        });
+
 
         // return response()->json([
-        //     'servicios' => $servicios
+        //     'servicios' => $dataCollection
         // ]);
-
-        return view($this->folder . 'index', compact('servicios'));
+        return view($this->folder . 'index', ['servicios' => $dataCollection]);
     }
 
     public function create()
@@ -105,13 +143,34 @@ class ServicioAgendadoController extends Controller
 
     }
 
-    public function edit(ServiciosAgendado $servicios_agendado)
+    public function edit($id)
     {
-        $tecnicos = User::where('role', 'tecnico')->get();
-        // return response()->json([
-        //     'servicio_agendado' => $servicios_agendado
-        // ]);
-        return view($this->folder . 'edit', compact('servicios_agendado', 'tecnicos'));
+        // Single eager-loaded query: get the assignment with its cliente and the cliente's unidades
+        // including nested relations (simcontrol and inventario)
+        $assign = Asignaciones::with(['cliente.unidades.simcontrol', 'cliente.unidades.inventario', 'getFirma'])
+            ->where('id', $id)
+            ->where('tecnico_id', Auth::id())
+            ->firstOrFail();
+
+        $data = [
+            'id' => $assign->id,
+            'tipo_servicio' => $assign->tipo_servicio,
+            'location' => $assign->location,
+            'coords'  => ['lat' => $assign->lat, 'lng' => $assign->lng],
+            'viaticos' => $assign->viaticos,
+            'tipo_vehiculo' => $assign->tipo_vehiculo,
+            'marca' => $assign->marca,
+            'modelo' => $assign->modelo,
+            'placa' => $assign->placa,
+            'status' => $assign->status,
+            'firma' => $assign->getFirma,
+            'cliente' => $assign->cliente
+        ];
+
+        // convert to object for compatibility with existing views
+        $servicios_agendado = (object) $data;
+
+        return view($this->folder . 'edit', compact('servicios_agendado'));
     }
 
     public function update(Request $req, ServiciosAgendado $servicios_agendado)
@@ -214,7 +273,39 @@ class ServicioAgendadoController extends Controller
     {
 
         $req = base64_decode($id);
-        $service = Asignaciones::with(['cliente','tecnico','device'])->find($req);
+        // $service = Asignaciones::with(['cliente','tecnico','device'])->find($req);
+
+        $assign = Asignaciones::with(['cliente.unidades.simcontrol', 'cliente.unidades.inventario','tecnico'])
+            ->where('id', $req)
+            ->where('tecnico_id', Auth::id())
+            ->first();
+
+        if( !$assign ) {
+           return redirect()->route('servicios_agendados.index')->with('error', 'Servicio no encontrado o no autorizado.');
+        }
+
+
+        $data = [
+            'id' => $assign->id,
+            'tipo_servicio' => $assign->tipo_servicio,
+            'location' => $assign->location,
+            'coords'  => ['lat' => $assign->lat, 'lng' => $assign->lng],
+            'viaticos' => $assign->viaticos,
+            'tipo_vehiculo' => $assign->tipo_vehiculo,
+            'marca' => $assign->marca,
+            'modelo' => $assign->modelo,
+            'placa' => $assign->placa,
+            'status' => $assign->status,
+            'tecnico' => $assign->tecnico,
+            'cliente' => $assign->cliente
+        ];
+
+        // convert to object for compatibility with existing views
+        $service = (object) $data;
+        
+        // return response()->json([
+        //     'servicios' => $service
+        // ]);
         return view($this->folder . 'firma_report', compact('service'));
     }
 

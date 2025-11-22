@@ -3,7 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\{Prospects, Sellers};
+use App\Models\{Prospects, Sellers, Cliente};
 
 class ProspectsController extends Controller
 {
@@ -127,6 +127,18 @@ class ProspectsController extends Controller
         $prospect = Prospects::findOrFail($_GET['id']);
         $prospect->status = $status;
         $prospect->save();
+
+
+        // Verificamos si el status es = 2(Concretado) para pasar este elemento a la tabla de clientes
+        if($status == 2){
+            $client = new Cliente;
+            $client->nombre             = $prospect->name_prospect;
+            $client->direccion          = $prospect->location;
+            $client->numero_contacto    = $prospect->contacts;
+            $client->empresa            = $prospect->name_company;
+            $client->direccion_empresa  = $prospect->company;
+            $client->save();
+        }
 
         return redirect()->route('prospects.index')->with('success', 'Estado del prospecto actualizado exitosamente');
     }

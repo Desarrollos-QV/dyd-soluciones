@@ -112,13 +112,30 @@
             @if (Auth::user()->role == 'admin' && Auth::user()->hasPermission('assignements.index'))
                 <!-- Servicios -->
                 <li class="nav-item nav-category">Servicios</li>
-                <li class="nav-item @if (Route::is('assignements.index')) active @endif">
-                    <a href="{{ route('assignements.index') }}" class="nav-link">
-                        <i class="link-icon" data-feather="file-plus"></i>
-                        <span class="link-title">Alta de servicios</span>
-                        <i class="link-arrow" data-feather="chevron-right"></i>
-                    </a>
-                </li>
+                <li class="nav-item">
+                        <a class="nav-link" data-toggle="collapse" href="#assigns" role="button"
+                            aria-expanded="false" aria-controls="assigns">
+                            <i class="link-icon" data-feather="file-plus"></i>
+                            <span class="link-title">Alta de servicios</span>
+                            <i class="link-arrow" data-feather="chevron-up"></i>
+                        </a>
+                        <div class="collapse @if (Route::is('assignements.index') || Route::is('assignements.inprogress') || Route::is('assignements.performed')) show @endif" id="assigns">
+                            <ul class="nav sub-menu">
+                                <li class="nav-item">
+                                    <a href="{{ route('assignements.index') }}"
+                                        class="nav-link @if (Route::is('assignements.index')) active @endif">Listado</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('assignements.inprogress') }}"
+                                        class="nav-link @if (Route::is('assignements.inprogress')) active @endif">Servicios En curso</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('assignements.performed') }}"
+                                        class="nav-link @if (Route::is('assignements.performed')) active @endif">Servicios Realizados</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
             @endif
 
             @if (Auth::user()->role == 'tecnico' && Auth::user()->hasPermission('servicios_agendados.index'))

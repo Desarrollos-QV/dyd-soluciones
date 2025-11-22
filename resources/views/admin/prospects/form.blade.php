@@ -12,7 +12,7 @@
                 <div class="row">
                     <div class="col-lg-6">
                         <div class="mb-3">
-                            <label for="name_company">Nombre de la campaña</label>
+                            <label for="name_company">Nombre de la compañía</label>
                             <input type="text" name="name_company" class="form-control mb-4 mb-md-0"
                             value="{{ $prospect->name_company ?? old('name_company') }}" required/>
                         </div>

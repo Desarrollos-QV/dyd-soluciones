@@ -38,6 +38,7 @@
                                     <td>SIM Asignada</td>
                                     <td>Disp. Instalado</td>
                                     <td>Instalacion</td>
+                                    <td>Corte</td>
                                     <td>Año/Marca/Submarca</td>
                                     <td>Número de motor</td>
                                     <td>VIN / IMEI</td>
@@ -47,7 +48,6 @@
                             </thead>
                             <tbody>
                                 @foreach ($unidades as $unit)
-                                   
                                     <tr @if(!App\Models\Unidades::checkCompleteness($unit->id)) class="table-warning " @endif>
                                         <td>
                                             <input type="checkbox" id="select_element_{{ $unit->id }}" name="select_element_{{ $unit->id }}">
@@ -162,9 +162,11 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        
                                         <td>
                                             <span class="badge bg-success text-white">{{ \Carbon\Carbon::parse($unit->fecha_instalacion)->format('Y-m-d') }}</span>
+                                        </td>
+                                        <td>
+                                            {!! App\Models\Unidades::diasFaltantesCobro($unit->fecha_cobro) !!}
                                         </td>
                                         <td>
                                             <span class="badge bg-info text-white">{{ $unit->anio_unidad }}</span> / <span

@@ -20414,7 +20414,7 @@ address p {
           .navbar .navbar-content .navbar-nav .nav-item.dropdown {
             position: static; } }
         .navbar .navbar-content .navbar-nav .nav-item.dropdown .dropdown-menu {
-          max-width: 280px;
+          max-width: 480px;
           position: absolute;
           right: -20px;
           left: auto;
@@ -25177,3 +25177,47 @@ div.tagsinput {
   float: right; }
 
 /*# sourceMappingURL=../maps/demo_1/style.css.map */
+
+
+/** Loading Animation **/
+.loading-animation {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: rgba(255, 255, 255, 0.8);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center; 
+}
+
+.loading-name {
+  width: 75%;
+  height: 10px;
+  display: block;
+  background-color: #f5f6f7;
+  animation: loading 1.5s infinite;
+}
+
+.loading-time {
+  width: 15%;
+  height: 10px;
+  display: block;
+  margin-top: 8px;
+  background-color: #f5f6f7;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-color: #f5f6f7;
+  }
+  50% {
+    background-color: #e0e0e0;
+  }
+  100% {
+    background-color: #f5f6f7;
+  }
+}

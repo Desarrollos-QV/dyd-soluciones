@@ -41,7 +41,7 @@ class TecnicoController extends Controller
         try {
             $data = $request->all();
 
-            $permission[] = 'dashboard,clientes.index,inventario.index';
+            $permission[] = 'dashboard,servicios_agendados.index,assignements.index,assignements.inprogress,assignements.performed,assignements.edit';
             $permission = implode(',', $permission);
             $data['password'] = Hash::make($request->password);
             $data['role'] = 'tecnico';

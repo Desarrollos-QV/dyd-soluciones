@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Models;
-
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -25,6 +24,7 @@ class Asignaciones extends Model
         'devices_id',
         'placa',
         'observaciones',
+        'status'
     ];
 
 
@@ -41,6 +41,11 @@ class Asignaciones extends Model
     public function tecnico()
     {
         return $this->belongsTo(User::class, 'tecnico_id');
+    }
+
+    public function getFirma()
+    {
+        return $this->hasOne(FirmaServicio::class, 'servicio_id');
     }
 
     static function checkCompleteService($clientId)

@@ -37,15 +37,15 @@ class SimControlController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'compañia' => 'required|string|max:255',
-            'numero_sim' => 'required|string|max:100',
-            'numero_publico' => 'required|string|max:100',
-        ]);
-
-        $data = $request->all();
-
         try {
+            $request->validate([
+                'compañia' => 'required|string|max:255',
+                'numero_sim' => 'required|string|min:10|max:100|unique:sim_controls,numero_sim',
+                'numero_publico' => 'required|string|max:100',
+            ]);
+
+            $data = $request->all();
+
             SimControl::create($data);
 
             return response()->json([
@@ -56,7 +56,7 @@ class SimControlController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'ok' => false,
-                'message' => 'Failed to create SIM Control.',
+                'message' => 'Failed to create SIM Control. '. $e->getMessage(),
             ], 500);
         }
     }
@@ -82,7 +82,7 @@ class SimControlController extends Controller
     {
         $request->validate([
             'compañia' => 'required|string|max:255',
-            'numero_sim' => 'required|string|max:100',
+            'numero_sim' => 'required|string|min:10|max:100|unique.sim_controls,numero_sim,' . $id,
             'numero_publico' => 'required|string|max:100',
         ]);
 

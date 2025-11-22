@@ -27,8 +27,6 @@
     <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
 
     @yield('css')
-
-
     <!-- End layout styles -->
     <link rel="shortcut icon" href="{{ asset('assets/images/favicon.png') }}" />
 </head>
@@ -94,6 +92,7 @@
     <script src="{{ asset('assets/vendors/core/core.js') }}"></script>
     <!-- endinject -->
     <!-- plugin js for this page -->
+    
     <script src="{{ asset('assets/vendors/chartjs/Chart.min.js') }}"></script>
     <script src="{{ asset('assets/vendors/jquery.flot/jquery.flot.js') }}"></script>
     <script src="{{ asset('assets/vendors/jquery.flot/jquery.flot.resize.js') }}"></script>
@@ -112,7 +111,8 @@
     <script src="{{ asset('assets/js/dashboard.js') }}"></script>
     <script src="{{ asset('assets/js/datepicker.js') }}"></script>
     <!-- end custom js for this page -->
-
+    <!-- custom js for Notifications -->
+    <script src="{{ asset('assets/js/notifications.js') }}"></script>
     @yield('js')
 
     <script>

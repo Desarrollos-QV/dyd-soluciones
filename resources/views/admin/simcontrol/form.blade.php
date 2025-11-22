@@ -22,6 +22,7 @@
                         <div class="mb-3">
                             <label for="numero_sim">Número SIM</label>
                             <input type="text" name="numero_sim" class="form-control mb-4 mb-md-0"
+                            min="10" max="30"
                             value="{{ $simcontrol->numero_sim ?? old('numero_sim') }}" required/>
                         </div>
                     </div>
@@ -33,6 +34,14 @@
                             <label for="numero_publico">Número Publico</label>
                              <input type="text" name="numero_publico" class="form-control mb-4 mb-md-0"
                             value="{{ $simcontrol->numero_publico ?? old('numero_publico') }}" required/>
+                        </div>
+                    </div> 
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="mb-3">
+                            <label for="observaciones">Observaciones</label>
+                            <textarea name="observaciones" id="observaciones" class="form-control mb-4" cols="30" rows="10" placeholder="observaciones">{!! $simcontrol->observaciones !!}</textarea>
                         </div>
                     </div> 
                 </div>

@@ -21,15 +21,20 @@
                 </div>
 
                 <div class="row mt-4">
-                    <div class="col-lg-6">
+                    <div class="col-lg-4">
                         <label for="tipo_unidad">Tipo de unidad</label>
                         <input type="text" name="tipo_unidad" id="tipo_unidad" class="form-control" required max="20"
                             value="{{ $unidad->tipo_unidad }}" required>
                     </div>
-                    <div class="col-lg-6">
+                    <div class="col-lg-4">
                         <label for="fecha_instalacion">Fecha Instalacion</label>
                         <input type="date" name="fecha_instalacion" id="fecha_instalacion" class="form-control"
                             value="{{ old('fecha_instalacion', isset($unidad->fecha_instalacion) ? \Carbon\Carbon::parse($unidad->fecha_instalacion)->format('Y-m-d') : now()->format('Y-m-d')) }}" required>
+                    </div>
+                    <div class="col-lg-4">
+                        <label for="fecha_cobro">Fecha de Cobro</label>
+                        <input type="date" name="fecha_cobro" id="fecha_cobro" class="form-control"
+                            value="{{ old('fecha_cobro', isset($unidad->fecha_cobro) ? \Carbon\Carbon::parse($unidad->fecha_cobro)->format('Y-m-d') : now()->format('Y-m-d')) }}" required>
                     </div>
                 </div>
 

@@ -31,44 +31,54 @@
                         <table id="dataTableExample" class="w-100 table table-bordered table-hover">
                             <thead>
                                 <tr>
-                                    <th>Fecha</th>
-                                    <th>Tipo</th>
-                                    <th>Técnico</th>
-                                    <th>Titular</th>
+                                    <th>#</th>
+                                    <th>Tipo de servicio</th>
+                                    <th class="text-center">Ubicación</th>
+                                    <th>Viaticos</th>
+                                    <th>Encargado de recibir</th>
+                                    <th>Fecha Instalación</th>
                                     <th>Contacto</th>
-                                    <th>Unidad</th>
-                                    <th>Firma</th>
+                                    <th>Estatus</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
+                                {{-- Tratar como un objeto --}}
                                 @foreach ($servicios as $s)
                                     <tr>
-                                        <td>{{ 
-                                            \Carbon\Carbon::parse($s->fecha_servicio)->format('d/m/Y')
-                                            }}</td>
+                                        <td>{{ $s->id }}</td>
                                         <td>{{ $s->tipo_servicio }}</td>
-                                        <td>{{ ucwords($s->tecnico->name) }}</td>
+                                        <td class="text-center">
+                                            <a href="https://google.com/maps?q={{$s->coords['lat']}},{{$s->coords['lng']}}" target="_blank">
+                                               <i class="link-icon" data-feather="map-pin"></i>
+                                            </a>
+                                        </td>
+                                        <td>{{ '$'.$s->viaticos }}</td>
                                         <td>{{ ucwords($s->cliente->nombre) }}</td>
+                                        <td>{{  \Carbon\Carbon::parse($s->cliente->fecha_instalacion)->format('d/m/Y') }}</td>
                                         <td>{{ $s->cliente->numero_contacto.' | '.$s->cliente->numero_alterno }}</td>
-                                        <td>{{ $s->device->dispositivo }}</td>
                                         <td>
-                                            @if ($s->firma_cliente != null)
-                                                <span class="badge badge-success">Firmado</span>
-                                            @else
-                                                <span class="badge badge-warning">Sin Firmar</span>
+                                            {{-- Verificamos el status --}}
+                                            @if($s->status == 0)
+                                                <span class="badge badge-warning text-white">Pendiente</span>
+                                            @elseif($s->status == 1)
+                                                <span class="badge badge-info text-white">En Proceso</span>
+                                            @elseif($s->status == 2)
+                                                <span class="badge badge-danger text-white">Cancelado</span>
+                                            @elseif($s->status == 5)
+                                                <span class="badge badge-success text-white">Completado</span>
                                             @endif
                                         </td>
                                         <td>
-
                                             <div class="btn-group">
                                                 <button type="button" class="btn btn-primary dropdown-toggle"
                                                     data-toggle="dropdown" aria-haspopup="true"
                                                     aria-expanded="false">Opciones</button>
                                                 <div class="dropdown-menu">
-                                                    <!-- <a class="dropdown-item"
-                                                        href="{{ route('servicios_agendados.edit', $s->id) }}">Editar</a>-->
-                                                    @if ($s->firma_cliente != null)
+                                                    <a class="dropdown-item" href="{{ route('servicios_agendados.edit', $s->id) }}">
+                                                        Visualizar / Editar
+                                                    </a>
+                                                    @if ($s->firma != null)
                                                         <a class="dropdown-item" target="_blank"
                                                             href="{{ route('servicios_agendados.generarPDF', ['id' => base64_encode($s->id)]) }}">Descargar
                                                             Reporte</a>
@@ -79,15 +89,17 @@
                                                             href="{{ route('servicios_agendados.firmar', ['id' => base64_encode($s->id)]) }}">Solicitar
                                                             Firma</a>
                                                     @endif
-                                                    <!-- <a class="dropdown-item" href="#">
-                                                        <form action="{{ route('servicios_agendados.destroy', $s) }}"
-                                                            method="POST">
-                                                            @csrf @method('DELETE')
-                                                            <button
-                                                                style="background: none;border:none;margin:0 !important;padding;padding: 0 !important;"
-                                                                onclick="return confirm('¿Eliminar Servicio?')">Eliminar</button>
-                                                        </form>
-                                                    </a>-->
+
+                                                    {{-- 
+                                                    <a class="dropdown-item" href="#">
+                                                            <form action="{{ route('servicios_agendados.destroy', $s) }}"
+                                                                method="POST">
+                                                                @csrf @method('DELETE')
+                                                                <button
+                                                                    style="background: none;border:none;margin:0 !important;padding;padding: 0 !important;"
+                                                                    onclick="return confirm('¿Eliminar Servicio?')">Eliminar</button>
+                                                            </form>
+                                                    </a> --}}
                                                 </div>
                                             </div>
                                         </td>
@@ -95,7 +107,7 @@
                                 @endforeach
                             </tbody>
                         </table>
-                        {{ $servicios->links() }}
+                        {{-- {{ $servicios->links() }} --}}
                     </div>
                 </div>
             </div>
