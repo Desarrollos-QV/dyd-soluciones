@@ -29,10 +29,10 @@
             @endif
 
 
-            @if (Auth::user()->hasPermission('prospects.index') || 
-                Auth::user()->hasPermission('sellers.index') || 
-                Auth::user()->hasPermission('clientes.index') || 
-                Auth::user()->hasPermission('unidades.index'))
+            @if (Auth::user()->hasPermission('prospects.index') ||
+                    Auth::user()->hasPermission('sellers.index') ||
+                    Auth::user()->hasPermission('clientes.index') ||
+                    Auth::user()->hasPermission('unidades.index'))
                 <li class="nav-item nav-category">Páginas</li>
 
                 @if (Auth::user()->hasPermission('prospects.index'))
@@ -113,38 +113,60 @@
                 <!-- Servicios -->
                 <li class="nav-item nav-category">Servicios</li>
                 <li class="nav-item">
-                        <a class="nav-link" data-toggle="collapse" href="#assigns" role="button"
-                            aria-expanded="false" aria-controls="assigns">
-                            <i class="link-icon" data-feather="file-plus"></i>
-                            <span class="link-title">Alta de servicios</span>
-                            <i class="link-arrow" data-feather="chevron-up"></i>
-                        </a>
-                        <div class="collapse @if (Route::is('assignements.index') || Route::is('assignements.inprogress') || Route::is('assignements.performed')) show @endif" id="assigns">
-                            <ul class="nav sub-menu">
-                                <li class="nav-item">
-                                    <a href="{{ route('assignements.index') }}"
-                                        class="nav-link @if (Route::is('assignements.index')) active @endif">Listado</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{{ route('assignements.inprogress') }}"
-                                        class="nav-link @if (Route::is('assignements.inprogress')) active @endif">Servicios En curso</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{{ route('assignements.performed') }}"
-                                        class="nav-link @if (Route::is('assignements.performed')) active @endif">Servicios Realizados</a>
-                                </li>
-                            </ul>
-                        </div>
-                    </li>
+                    <a class="nav-link" data-toggle="collapse" href="#assigns" role="button" aria-expanded="false"
+                        aria-controls="assigns">
+                        <i class="link-icon" data-feather="file-plus"></i>
+                        <span class="link-title">Alta de servicios</span>
+                        <i class="link-arrow" data-feather="chevron-up"></i>
+                    </a>
+                    <div class="collapse @if (Route::is('assignements.index') || Route::is('assignements.inprogress') || Route::is('assignements.performed')) show @endif" id="assigns">
+                        <ul class="nav sub-menu">
+                            <li class="nav-item">
+                                <a href="{{ route('assignements.index') }}"
+                                    class="nav-link @if (Route::is('assignements.index')) active @endif">Listado</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('assignements.inprogress') }}"
+                                    class="nav-link @if (Route::is('assignements.inprogress')) active @endif">Servicios En
+                                    curso</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('assignements.performed') }}"
+                                    class="nav-link @if (Route::is('assignements.performed')) active @endif">Servicios
+                                    Realizados</a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
             @endif
 
             @if (Auth::user()->role == 'tecnico' && Auth::user()->hasPermission('servicios_agendados.index'))
                 <li class="nav-item nav-category">Servicios</li>
                 <li class="nav-item">
-                    <a href="{{ route('servicios_agendados.index') }}"  class="nav-link">
+                    <a class="nav-link" data-toggle="collapse" href="#services" role="button" aria-expanded="false"
+                        aria-controls="services">
                         <i class="link-icon" data-feather="file-plus"></i>
-                        <span class="link-title">Agendados</span>
-                    </a> 
+                        <span class="link-title">Listado de servicios</span>
+                        <i class="link-arrow" data-feather="chevron-up"></i>
+                    </a>
+                    <div class="collapse @if (Route::is('servicios_agendados.index') || Route::is('servicios_agendados.inprogress') || Route::is('servicios_agendados.performed')) show @endif" id="services">
+                        <ul class="nav sub-menu">
+                            <li class="nav-item">
+                                <a href="{{ route('servicios_agendados.index') }}"
+                                    class="nav-link @if (Route::is('servicios_agendados.index')) active @endif">Nuevos Servicios</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('servicios_agendados.inprogress') }}"
+                                    class="nav-link @if (Route::is('servicios_agendados.inprogress')) active @endif">Servicios En
+                                    curso</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('servicios_agendados.performed') }}"
+                                    class="nav-link @if (Route::is('servicios_agendados.performed')) active @endif">Servicios
+                                    Realizados</a>
+                            </li>
+                        </ul>
+                    </div>
                 </li>
             @endif
 

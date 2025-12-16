@@ -38,11 +38,9 @@
                                     <th></th>
                                     <th>Dispositivo</th>
                                     <th>Marca</th>
-                                    <th>Camaras</th>
                                     <th>Generacion</th>
                                     <th>IMEI asignado</th>
                                     <th>Garantia</th>
-                                    <th>Accesorios</th>
                                     <th>IA</th>
                                     <th>Otra_empresa</th>
                                     <th>Stock</th>
@@ -58,7 +56,6 @@
                                         </td>
                                         <td>{{ $dev->dispositivo }}</td>
                                         <td>{{ $dev->marca }}</td>
-                                        <td>{{ $dev->camaras }}</td>
                                         <td>{{ $dev->generacion }}</td>
                                         <td>
                                             <span class="badge bg-info">
@@ -66,7 +63,6 @@
                                             </span>
                                         </td>
                                         <td>{{ \Carbon\Carbon::parse($dev->garantia)->format('Y-m-d') }}</td>
-                                        <td>{{ $dev->accesorios }}</td>
                                         <td>
                                             @php
                                                 switch ($dev->ia) {

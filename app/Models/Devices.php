@@ -23,7 +23,8 @@ class Devices extends Model
         'unidad_id',
         'otra_empresa',
         'stock',
-        'stock_min_alert'
+        'stock_min_alert',
+        'observations'
     ];
 
 
@@ -37,5 +38,10 @@ class Devices extends Model
         return $this->belongsTo(Unidades::class, 'unidad_id');
     }
 
- 
+    public function imeis()
+    {
+        return $this->hasMany(DeviceImei::class, 'device_id');
+    }
+
+
 }

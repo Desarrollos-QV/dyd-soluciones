@@ -1,98 +1,209 @@
 <?php
-
 namespace App\Http\Controllers;
- 
-use App\Services\TwilioService;
+
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Response;
+use App\Traits\NotifiesUsers;
+use Illuminate\Support\Str;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\Collection;
+use App\Models\CollectionPayment;
+use App\Models\Cliente;
+use App\Models\Unidades;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use App\Models\{
-    User,
-    Collections
-};
+use App\Models\HistorialCaja;
+use App\Models\Notification;
+use Illuminate\Support\Facades\DB;
 
 class CollectionsController extends Controller
 {
-    private $folder = "admin.collections";
+    use NotifiesUsers;
+    private $folder = "admin.gestor_cobranza.";
 
+    /**
+     * Dashboard principal del Gestor de Cobranza
+     */
 
-    public function index()
+    public function index(Request $request)
     {
-        $collection = Collections::where('user_id',Auth::user()->id)->first();
-        return view($this->folder , compact('collection'));
+        $totalDeuda = Collection::where('status', '!=', 'paid')->sum('amount');
+        $pagosprocesados = CollectionPayment::count();
+        $ingresosRegistrados = CollectionPayment::selectRaw('SUM(REPLACE(amount, ",", "") + 0) as total_amount')->value('total_amount');
+        $clientesMorosos = Collection::where('status', '!=', 'paid')
+            ->where('due_date', '<', Carbon::now())
+            ->count();
+
+        $query = Collection::with(['cliente', 'cliente.unidades', 'cliente.asignaciones']);
+
+        if ($request->search) {
+            $query->whereHas('cliente', function ($q) use ($request) {
+                $q->where('nombre', 'LIKE', "%{$request->search}%");
+            });
+        }
+
+        if ($request->status && $request->status !== 'todos') {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->dateFrom && $request->dateTo) {
+            $query->whereBetween('due_date', [$request->dateFrom, $request->dateTo]);
+        }
+
+        $data = $query->orderBy('due_date', 'ASC')->get();
+
+        return view($this->folder . 'index', compact(
+            'data',
+            'totalDeuda',
+            'pagosprocesados',
+            'ingresosRegistrados',
+            'clientesMorosos'
+        ));
+    }
+    public function getCollecionAll(Request $request)
+    {
+        $query = Collection::with(['cliente', 'unidad', 'cliente.unidades', 'cliente.asignaciones', 'pagos']);
+
+        if ($request->search) {
+            $query->whereHas('cliente', function ($q) use ($request) {
+                $q->where('nombre', 'LIKE', "%{$request->search}%");
+            });
+        }
+
+        if ($request->status && $request->status !== 'todos') {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->dateFrom && $request->dateTo) {
+            $query->whereBetween('due_date', [$request->dateFrom, $request->dateTo]);
+        }
+
+        $data = $query->orderBy('due_date', 'ASC')->get();
+
+        // Renderizar tabla en servidor
+        $html = view($this->folder . 'table', compact('data'))->render();
+
+        return response()->json(['html' => $html]);
     }
 
-    public function store(Request $request)
+    /**
+     * Registrar pago
+     */
+    public function pagar(Request $request, $id)
     {
-        try {
-            $request->validate([
-                'recordatorios'              => 'required|string',
-                'mensajes_automaticos'       => 'required|string',
-                'dias_tolerancia'            => 'required|numeric|min:0',
-                'TWILIO_SID'                 => 'string',
-                'TWILIO_AUTH_TOKEN'          => 'string',
-                'TWILIO_PHONE'               => 'string', 
-            ]);
+        $collection = Collection::with('cliente')->findOrFail($id);
+        $unidad = Unidades::find($collection->unidad_id);
 
-            $collect = Collections::where('user_id',Auth::user()->id)->first();
-            $collect->update($request->all());
+        CollectionPayment::create([
+            'collection_id' => $collection->id,
+            'amount' => $collection->amount,
+            'paid_by' => $collection->cliente_id,
+        ]);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Configuración actualizada con éxito.',
-                'redirect' => route('collections.index')
-            ]);
-       } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ]);
-        }
- 
+        $collection->update([
+            'status' => 'paid',
+            'paid_at' => Carbon::now()
+        ]);
+
+        $unidad->update([
+            'fecha_cobro' => Carbon::now()->addDays(30)
+        ]);
+
+        // Registramos el ingreso
+        HistorialCaja::create([
+            'user_id' => auth()->id(),
+            'fecha' => Carbon::now(),
+            'hora' => Carbon::now()->format('H:i:s'),
+            'tipo' => 'ingreso',
+            'concepto' => 'Pago Mensualidad',
+            'monto' => $collection->amount,
+            'descripcion' => "Pago de mensualidad del cliente: " . $collection->cliente->nombre,
+            'autorizado_por' => 1,
+        ]);
+
+        // Notificamos al Administrador
+        $this->notifyUser(
+            1, // SuperAdmin
+            'gestion_cobranza',
+            'Pago realizado',
+            "La mensualidad del cliente {$collection->cliente->nombre} ha sido pagada.",
+            json_encode(["unidad" => $collection->id]),
+            route('collections.index'),
+            now()->addDays(7)
+        );
+        return response()->json([
+            'status' => true,
+            'message' => "Pago realizado con éxito."
+        ]);
     }
 
-    public function sendTestNoify(Request $request, $type)
+    /**
+     * Notificar cliente (SMS/Email/WhatsApp según config)
+     */
+    public function notify($id)
     {
-        try{
-            $settings = Collections::where('user_id', Auth::user()->id)->first();
-            $sendTest = new TwilioService($settings->TWILIO_SID, $settings->TWILIO_AUTH_TOKEN, $settings->TWILIO_PHONE);
+        $collection = Collection::with(['cliente'])->findOrFail($id);
 
-            $phone = $request->query('phone_test');
-            $email = $request->query('email_test');
+        // Aquí aplicas tu método de notificación (Twilio, WhatsApp, Email, SMS, etc.)
+        // Ejemplo básico:
+        $medio = request('medio');
+        $phoneNumber = $collection->cliente->numero_contacto;
+        $clientName = $collection->cliente->nombre;
+        $amount = $collection->amount;
+        $message = "Hola {$clientName}, le recordamos el pago de su mensualidad por un monto de {$amount}. Por favor, comunicarse para coordinar. ¡Gracias!";
 
-            switch($type){
-                case 'sms':
-                    if($phone != null)
-                    {
-                        $req = $sendTest->sendMessageSMS($phone, 'SMS DEMO desde DYD Soluciones....');
-                    }
-                    break;
-                case 'whatsapp':
-                    if($phone != null)
-                    {
-                        $req = $sendTest->sendMessageWhatsapp($phone, 'Wahtsapp DEMO desde DYD Soluciones....');
-                    }
-                    break;
-                case 'email':
-                    if($email != null)
-                    {
-                        $req = $sendTest->sendMessageEmail($email, 'Email DEMO desde DYD Soluciones....');
-                    }
-                    break;
-            }
-
-            return response()->json([
-                'success' => true,
-                'data'    => $req,
-                'message' => 'Envio de prueba éxita.'
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ]);
+        // Notificamos al Usuario
+        switch ($medio) {
+            case 'sms':
+                // Aquí iría la lógica para enviar SMS, por ejemplo, usando un servicio como Twilio.
+                // Ejemplo: Twilio::sendMessage($phoneNumber, $message);
+                $this->notifyUserSMS(
+                    $phoneNumber,
+                    $message
+                );
+                break;
+            case 'whatsapp':
+                // Aquí iría la lógica para enviar un mensaje de WhatsApp.
+                // Ejemplo: WhatsAppService::sendMessage($phoneNumber, $message);
+                $this->notifyUserWhatsapp(
+                    $phoneNumber,
+                    $message
+                );
+                break;
+            case 'email':
+                // Aquí iría la lógica para enviar un correo electrónico.
+                // Asegúrate de que el cliente tenga un campo 'email'.
+                // Ejemplo: Mail::to($collection->cliente->email)->send(new PaymentReminderMail($message));
+                // $this->notifyUserEmail(
+                //     $phoneNumber,
+                //     $message
+                // );
+                break;
+            default:
+                $this->notifyUserSMS(
+                    $phoneNumber,
+                    $message
+                );
+                break;
         }
+
+
+        $collection->update([
+            'status' => 'notified',
+            'notified_at' => Carbon::now()
+        ]);
+
+        return back()->with('success', 'Cliente notificado correctamente.');
+    }
+
+    /**
+     * API para DropZone u otras integraciones
+     */
+    public function fetchData(Request $request)
+    {
+        $cobranzas = Collection::with(['cliente', 'unidad'])
+            ->orderBy('due_date', 'ASC')
+            ->get();
+
+        return response()->json($cobranzas);
     }
 }

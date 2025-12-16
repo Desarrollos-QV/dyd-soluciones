@@ -10,6 +10,7 @@ class Asignaciones extends Model
 
     protected $fillable = [
         'cliente_id',
+        'unidad_id',
         'tecnico_id',
         'tipo_servicio',
         'tel_contact',
@@ -30,17 +31,22 @@ class Asignaciones extends Model
 
     public function cliente()
     {
-        return $this->belongsTo(Cliente::class,'cliente_id',);
+        return $this->belongsTo(Cliente::class, 'cliente_id', );
     }
 
     public function device()
     {
-        return $this->belongsTo(Devices::class,'devices_id',);
+        return $this->belongsTo(Devices::class, 'devices_id', );
     }
 
     public function tecnico()
     {
         return $this->belongsTo(User::class, 'tecnico_id');
+    }
+
+    public function unidad()
+    {
+        return $this->belongsTo(Unidades::class, 'unidad_id');
     }
 
     public function getFirma()

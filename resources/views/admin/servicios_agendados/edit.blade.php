@@ -13,7 +13,7 @@
          </ol>
      </nav>
      <form action="{{ route('servicios_agendados.update', $servicios_agendado->id) }}" method="POST" 
-         id="form-services" enctype="multipart/form-data">
+         id="form-services" enctype="multipart/form-data" class="container-xxl">
          @method('PUT')
          @csrf
          @include('admin.servicios_agendados.form', ['servicio' => $servicios_agendado])
@@ -88,4 +88,4 @@
         /** Funciones del mapa */
      </script>
      <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBqYcfefGddEiqR-OlfaLMSWP5m2RdMk18&libraries=places&callback=initMap"></script>
- @endsection
+@endsection

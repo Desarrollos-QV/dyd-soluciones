@@ -11,7 +11,7 @@ class FirmaServicio extends Model
 
     protected $table = "firmas_servicio";
 
-    protected $fillable = ['servicio_id', 'firma', 'questions'];
+    protected $fillable = ['servicio_id', 'firma', 'questions','lat','lng','registro_fotografico','comentarios'];
 
     public function servicio()
     {

@@ -11,14 +11,15 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 class ClienteController extends Controller
 {
- 
+
     public function index()
     {
-        $clientes = Cliente::orderBy('created_at','DESC')->with([
+        $clientes = Cliente::orderBy('created_at', 'DESC')->with([
             'unidades',
             'unidades.simcontrol',
-            'unidades.inventario'])->get();
-       
+            'unidades.inventario'
+        ])->get();
+
         return view('admin.clientes.index', compact('clientes'));
     }
 
@@ -29,7 +30,7 @@ class ClienteController extends Controller
 
     public function store(Request $request)
     {
-        try{
+        try {
             $request->validate([
                 'nombre' => 'required',
                 'direccion' => 'required',
@@ -113,7 +114,7 @@ class ClienteController extends Controller
 
     public function edit(Cliente $cliente)
     {
-        
+
         return view('admin.clientes.edit', compact('cliente'));
     }
 
@@ -121,12 +122,12 @@ class ClienteController extends Controller
     {
         try {
             $request->validate([
-                'nombre' => 'required', 
+                'nombre' => 'required',
                 'direccion' => 'required',
                 'numero_contacto' => 'required',
                 'numero_alterno' => 'required',
                 'tipo_empresa' => 'required',
-                'empresa' => 'required', 
+                'empresa' => 'required',
                 'direccion_empresa' => 'required',
             ]);
 
@@ -199,7 +200,7 @@ class ClienteController extends Controller
             }
 
 
-            $cliente->update($data); 
+            $cliente->update($data);
             return response()->json([
                 'ok' => true,
                 'message' => 'Cliente actualizado con éxito.',
@@ -229,7 +230,7 @@ class ClienteController extends Controller
         $cliente = Cliente::findOrFail($clienteId);
 
         $zip = new \ZipArchive();
-        $zipFileName = $cliente->id.'_documentos_cliente_' . Str::slug($cliente->nombre,"_","es") . '.zip';
+        $zipFileName = $cliente->id . '_documentos_cliente_' . Str::slug($cliente->nombre, "_", "es") . '.zip';
         $zipFilePath = public_path($zipFileName);
 
         if ($zip->open($zipFilePath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === TRUE) {
@@ -246,19 +247,19 @@ class ClienteController extends Controller
             foreach ($documentFields as $field) {
                 if ($cliente->$field && file_exists(public_path($cliente->$field))) {
                     $filePath = public_path($cliente->$field);
-                    if (is_file($filePath)){
+                    if (is_file($filePath)) {
                         $zip->addFile($filePath, basename($filePath));
                     }
                 }
             }
 
-            
+
             $zip->close();
 
-            if($zip->lastId == -1){
+            if ($zip->lastId == -1) {
                 return redirect()->back()->with('error', 'No hay documentos disponibles para descargar.');
             }
-            
+
             return response()->download($zipFilePath)->deleteFileAfterSend(true);
         } else {
             return redirect()->back()->with('error', 'No se pudo crear el archivo zip.');
@@ -287,5 +288,12 @@ class ClienteController extends Controller
                 'message' => 'Error al eliminar los clientes: ' . $e->getMessage(),
             ]);
         }
+    }
+
+    public function getUnidades($clienteId)
+    {
+        $cliente = Cliente::findOrFail($clienteId);
+        $unidades = $cliente->unidades()->get();
+        return response()->json($unidades);
     }
 }

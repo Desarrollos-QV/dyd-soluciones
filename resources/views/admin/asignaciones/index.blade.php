@@ -92,15 +92,28 @@
                                             <span class="badge bg-warning text-white">{{ $assign->modelo }}</span> 
                                         </td>
                                         <td>{{ $assign->placa }}</td>                                        
-                                        <td>{{ $assign->observaciones ?? 'Sin Observaciones' }}</td>
+                                        <td>{{ (isset($assign->getFirma) && $assign->getFirma->comentarios) ? $assign->getFirma->comentarios : 'Sin Observaciones' }}</td>
                                         <td>
                                             <div class="btn-group">
                                                 <button type="button" class="btn btn-primary dropdown-toggle"
                                                     data-toggle="dropdown" aria-haspopup="true"
                                                     aria-expanded="false">Opciones</button>
                                                 <div class="dropdown-menu">
-                                                    <a class="dropdown-item"
-                                                        href="{{ route('assignements.edit', $assign->id) }}">Editar</a>
+                                                    <a class="dropdown-item" href="{{ route('assignements.edit', $assign->id) }}">Editar</a>
+                                                    @if (isset($assign->getFirma))
+                                                        @if($assign->getFirma->firma != null)
+                                                        <a class="dropdown-item" target="_blank" href="{{ route('servicios_agendados.generarPDF', ['id' => base64_encode($assign->id)]) }}">
+                                                            Descargar Reporte
+                                                        </a>
+                                                        <div class="dropdown-divider"></div>
+                                                        @endif
+                                                        @if($assign->getFirma->registro_fotografico != null)
+                                                        <a class="dropdown-item" href="{{ route('servicios_agendados.seePhotoRecord', ['id' => base64_encode($assign->id)]) }}">
+                                                            <i class="feather icon-camera"></i> Ver Registro Fotográfico
+                                                        </a>
+                                                        @endif
+                                                    @endif
+                                                    
                                                     <hr />
                                                     <form action="{{ route('assignements.destroy', $assign) }}" method="POST"
                                                         style="display:inline-block;">

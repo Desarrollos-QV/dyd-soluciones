@@ -22,9 +22,9 @@
             $(`<div class="dropdown-body loadMoreSpinNotify"><a href="javascript:;" class="dropdown-item"><div class="icon"><i data-feather="alert-circle"></i></div><div class="content"><p class="loading-name"></p><p class="sub-text text-muted loading-time"></p></div></a></div>`).appendTo(".inner-body-card-notify");
             $(`<div class="dropdown-body loadMoreSpinNotify"><a href="javascript:;" class="dropdown-item"><div class="icon"><i data-feather="alert-circle"></i></div><div class="content"><p class="loading-name"></p><p class="sub-text text-muted loading-time"></p></div></a></div>`).appendTo(".inner-body-card-notify");
            
-            var allElements = $('div.card-notify-list').length;
+            var allElements = $('a.card-notify-list').length;
             var url_pagination = '/notifications';
-    
+
             $.ajax({
                 url: url_pagination,
                 data: { skip: allElements},
@@ -40,7 +40,6 @@
                         evController.on('scroll', scrollNotifyHandler);
                     }, 100);
                 }else{
-                    console.log("Sin elemeneots")
                     $('.loadMoreSpinNotify').remove();
                     let emptyNotify = `
                         <a href="javascript:;" class="dropdown-item wrap_no_notifications">

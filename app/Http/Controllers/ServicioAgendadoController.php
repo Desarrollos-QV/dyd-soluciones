@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Traits\NotifiesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -20,12 +21,13 @@ use App\Models\{
 
 class ServicioAgendadoController extends Controller
 {
+    use NotifiesUsers;
     private $folder = "admin.servicios_agendados.";
 
     public function index(Request $r)
     {
         // $query = Asignaciones::where('tecnico_id',Auth::user()->id)->with(['cliente','cliente.unidades','tecnico','device']);
-        
+
         // if ($r->filled('search')) {
         //     $q = $r->search;
         //     $query->where('cliente', 'like', "%$q%")
@@ -34,29 +36,33 @@ class ServicioAgendadoController extends Controller
         // $servicios = $query->paginate(10);
 
         $ListClients = Asignaciones::where('tecnico_id', Auth::user()->id)->pluck('cliente_id');
-        $data        = [];
+        $data = [];
 
         foreach ($ListClients as $key => $client) {
-            $Client = Cliente::where('id',$client)->with(['unidades'=>function($q){
-                $q->with('simcontrol','inventario');
-            }])->first();
+            $Client = Cliente::where('id', $client)->with([
+                'unidades' => function ($q) {
+                    $q->with('simcontrol', 'inventario');
+                }
+            ])->first();
 
-            $assign = Asignaciones::where('cliente_id',$client)->where('tecnico_id', Auth::user()->id)->with('getFirma')->first();
+            $assign = Asignaciones::where('cliente_id', $client)->where('tecnico_id', Auth::user()->id)->whereStatus(0)->with('getFirma')->first();
 
-            $data[] = [
-                'id' => $assign->id,
-                'tipo_servicio' => $assign->tipo_servicio,
-                'location' => $assign->location,
-                'coords'  => ['lat' => $assign->lat, 'lng' => $assign->lng],
-                'viaticos' => $assign->viaticos,
-                'tipo_vehiculo' => $assign->tipo_vehiculo,
-                'marca' => $assign->marca,
-                'modelo' => $assign->modelo,
-                'placa' => $assign->placa,
-                'status' => $assign->status,
-                'firma' => $assign->getFirma,
-                'cliente' => $Client
-            ];
+            if (isset($assign->id)) {
+                $data[] = [
+                    'id' => $assign->id,
+                    'tipo_servicio' => $assign->tipo_servicio,
+                    'location' => $assign->location,
+                    'coords' => ['lat' => $assign->lat, 'lng' => $assign->lng],
+                    'viaticos' => $assign->viaticos,
+                    'tipo_vehiculo' => $assign->tipo_vehiculo,
+                    'marca' => $assign->marca,
+                    'modelo' => $assign->modelo,
+                    'placa' => $assign->placa,
+                    'status' => $assign->status,
+                    'firma' => $assign->getFirma,
+                    'cliente' => $Client
+                ];
+            }
         }
 
 
@@ -71,6 +77,96 @@ class ServicioAgendadoController extends Controller
         // return response()->json([
         //     'servicios' => $dataCollection
         // ]);
+        return view($this->folder . 'index', ['servicios' => $dataCollection]);
+    }
+
+    public function AssignsPerformed()
+    {
+        $ListClients = Asignaciones::where('tecnico_id', Auth::user()->id)->pluck('cliente_id');
+        $data = [];
+
+        foreach ($ListClients as $key => $client) {
+            $Client = Cliente::where('id', $client)->with([
+                'unidades' => function ($q) {
+                    $q->with('simcontrol', 'inventario');
+                }
+            ])->first();
+
+            $assign = Asignaciones::where('cliente_id', $client)
+                ->where('tecnico_id', Auth::user()->id)
+                ->whereStatus(5)
+                ->with('getFirma')->first();
+
+            if (isset($assign->id)) {
+                $data[] = [
+                    'id' => $assign->id,
+                    'tipo_servicio' => $assign->tipo_servicio,
+                    'location' => $assign->location,
+                    'coords' => ['lat' => $assign->lat, 'lng' => $assign->lng],
+                    'viaticos' => $assign->viaticos,
+                    'tipo_vehiculo' => $assign->tipo_vehiculo,
+                    'marca' => $assign->marca,
+                    'modelo' => $assign->modelo,
+                    'placa' => $assign->placa,
+                    'status' => $assign->status,
+                    'firma' => $assign->getFirma,
+                    'cliente' => $Client
+                ];
+            }
+        }
+
+        /**
+         * Convertir Data a un objeto para facilitar el manejo en la vista Blade tipo  @foreach ($servicios as $s) $s->id
+         */
+        $dataCollection = collect($data)->map(function ($item) {
+            return (object) $item;
+        });
+
+        return view($this->folder . 'index', ['servicios' => $dataCollection]);
+    }
+
+    public function AssignsInProgress()
+    {
+        $ListClients = Asignaciones::where('tecnico_id', Auth::user()->id)->pluck('cliente_id');
+        $data = [];
+
+        foreach ($ListClients as $key => $client) {
+            $Client = Cliente::where('id', $client)->with([
+                'unidades' => function ($q) {
+                    $q->with('simcontrol', 'inventario');
+                }
+            ])->first();
+
+            $assign = Asignaciones::where('cliente_id', $client)
+                ->where('tecnico_id', Auth::user()->id)
+                ->whereIn('status', [1, 2, 3, 4])
+                ->with('getFirma')->first();
+
+            if (isset($assign->id)) {
+                $data[] = [
+                    'id' => $assign->id,
+                    'tipo_servicio' => $assign->tipo_servicio,
+                    'location' => $assign->location,
+                    'coords' => ['lat' => $assign->lat, 'lng' => $assign->lng],
+                    'viaticos' => $assign->viaticos,
+                    'tipo_vehiculo' => $assign->tipo_vehiculo,
+                    'marca' => $assign->marca,
+                    'modelo' => $assign->modelo,
+                    'placa' => $assign->placa,
+                    'status' => $assign->status,
+                    'firma' => $assign->getFirma,
+                    'cliente' => $Client
+                ];
+            }
+        }
+
+        /**
+         * Convertir Data a un objeto para facilitar el manejo en la vista Blade tipo  @foreach ($servicios as $s) $s->id
+         */
+        $dataCollection = collect($data)->map(function ($item) {
+            return (object) $item;
+        });
+
         return view($this->folder . 'index', ['servicios' => $dataCollection]);
     }
 
@@ -147,7 +243,7 @@ class ServicioAgendadoController extends Controller
     {
         // Single eager-loaded query: get the assignment with its cliente and the cliente's unidades
         // including nested relations (simcontrol and inventario)
-        $assign = Asignaciones::with(['cliente.unidades.simcontrol', 'cliente.unidades.inventario', 'getFirma'])
+        $assign = Asignaciones::with(['unidad', 'getFirma'])
             ->where('id', $id)
             ->where('tecnico_id', Auth::id())
             ->firstOrFail();
@@ -156,7 +252,7 @@ class ServicioAgendadoController extends Controller
             'id' => $assign->id,
             'tipo_servicio' => $assign->tipo_servicio,
             'location' => $assign->location,
-            'coords'  => ['lat' => $assign->lat, 'lng' => $assign->lng],
+            'coords' => ['lat' => $assign->lat, 'lng' => $assign->lng],
             'viaticos' => $assign->viaticos,
             'tipo_vehiculo' => $assign->tipo_vehiculo,
             'marca' => $assign->marca,
@@ -164,11 +260,13 @@ class ServicioAgendadoController extends Controller
             'placa' => $assign->placa,
             'status' => $assign->status,
             'firma' => $assign->getFirma,
-            'cliente' => $assign->cliente
+            'cliente' => $assign->cliente,
+            'unidad' => $assign->unidad
         ];
 
         // convert to object for compatibility with existing views
         $servicios_agendado = (object) $data;
+
 
         return view($this->folder . 'edit', compact('servicios_agendado'));
     }
@@ -275,21 +373,20 @@ class ServicioAgendadoController extends Controller
         $req = base64_decode($id);
         // $service = Asignaciones::with(['cliente','tecnico','device'])->find($req);
 
-        $assign = Asignaciones::with(['cliente.unidades.simcontrol', 'cliente.unidades.inventario','tecnico'])
+        $assign = Asignaciones::with(['cliente.unidades.simcontrol', 'cliente.unidades.inventario', 'tecnico'])
             ->where('id', $req)
             ->where('tecnico_id', Auth::id())
             ->first();
 
-        if( !$assign ) {
-           return redirect()->route('servicios_agendados.index')->with('error', 'Servicio no encontrado o no autorizado.');
+        if (!$assign) {
+            return redirect()->route('servicios_agendados.index')->with('error', 'Servicio no encontrado o no autorizado.');
         }
-
 
         $data = [
             'id' => $assign->id,
             'tipo_servicio' => $assign->tipo_servicio,
             'location' => $assign->location,
-            'coords'  => ['lat' => $assign->lat, 'lng' => $assign->lng],
+            'coords' => ['lat' => $assign->lat, 'lng' => $assign->lng],
             'viaticos' => $assign->viaticos,
             'tipo_vehiculo' => $assign->tipo_vehiculo,
             'marca' => $assign->marca,
@@ -297,12 +394,13 @@ class ServicioAgendadoController extends Controller
             'placa' => $assign->placa,
             'status' => $assign->status,
             'tecnico' => $assign->tecnico,
-            'cliente' => $assign->cliente
+            'cliente' => $assign->cliente,
+            'firma' => $assign->getFirma
         ];
 
         // convert to object for compatibility with existing views
         $service = (object) $data;
-        
+
         // return response()->json([
         //     'servicios' => $service
         // ]);
@@ -312,35 +410,87 @@ class ServicioAgendadoController extends Controller
     public function guardar(Request $request)
     {
         try {
-            $request->validate([
+
+            // Validar todos los campos requeridos incluyendo fotos del registro fotográfico
+            $validated = $request->validate([
                 'firma' => 'required|string',
+                'images_sides' => 'required|max:5120',
+                'video_state_unit' => 'required|max:51200',
+                'foto_ubicacion_dispositivo' => 'required|max:5120',
+                'foto_toma_corriente' => 'required|max:5120',
+                'foto_toma_tierra' => 'required|max:5120',
+                'foto_coloca_relevador' => 'required|max:5120',
             ]);
 
+            // Verificar manualmente que los archivos existen
+            $fotoFields = [
+                'images_sides',
+                'video_state_unit',
+                'foto_ubicacion_dispositivo',
+                'foto_toma_corriente',
+                'foto_toma_tierra',
+                'foto_coloca_relevador'
+            ];
+
+            foreach ($fotoFields as $field) {
+                if (!$request->hasFile($field)) {
+                    return response()->json([
+                        'error' => "El campo {$field} es requerido"
+                    ], 422);
+                }
+            }
+
             $id = $request->input('service_id');
-            $service = ServiciosAgendado::find($id);
+            $service = Asignaciones::find($id);
 
-            $firmaData = $request->input('firma');
-            $firma = str_replace('data:image/png;base64,', '', $firmaData);
-            $firma = str_replace(' ', '+', $firma);
-            $firmaImage = base64_decode($firma);
-            $firmaFileName =  Str::uuid() . '.png';
+            if (!$service) {
+                return response()->json([
+                    'error' => 'Servicio no encontrado'
+                ], 404);
+            }
 
-
-            $rutaDestino = public_path('uploads/servicios/firmas');
-
-            // Crea la carpeta si no existe
+            // Crear carpeta si no existe
+            $rutaDestino = public_path('uploads/servicios/registro_fotografico');
             if (!file_exists($rutaDestino)) {
                 mkdir($rutaDestino, 0755, true);
             }
 
-            // Guarda la imagen en la nueva ruta
-            file_put_contents($rutaDestino . DIRECTORY_SEPARATOR . $firmaFileName, $firmaImage);
+            // Procesar y guardar archivos de registro fotográfico
+            $registro_fotografico = [];
+            $fotoFields = [
+                'images_sides' => '4_fotos_lados',
+                'video_state_unit' => 'video_estado_unidad',
+                'foto_ubicacion_dispositivo' => 'foto_ubicacion_dispositivo',
+                'foto_toma_corriente' => 'foto_toma_corriente',
+                'foto_toma_tierra' => 'foto_toma_tierra',
+                'foto_coloca_relevador' => 'foto_coloca_relevador'
+            ];
 
-            // Si necesitas guardar la ruta relativa en la base de datos:
-            $rutaRelativa = 'uploads/servicios/firmas/' . $firmaFileName;
+            foreach ($fotoFields as $fieldName => $displayName) {
+                if ($request->hasFile($fieldName)) {
+                    $file = $request->file($fieldName);
+                    $fileName = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                    $file->move($rutaDestino, $fileName);
+                    $registro_fotografico[$displayName] = $fileName;
+                }
+            }
 
+            // Procesar firma digital
+            $firmaData = $request->input('firma');
+            $firma = str_replace('data:image/png;base64,', '', $firmaData);
+            $firma = str_replace(' ', '+', $firma);
+            $firmaImage = base64_decode($firma);
+            $firmaFileName = Str::uuid() . '.png';
 
-            // Guardamos la firma del servicio
+            $rutaDestinoFirmas = public_path('uploads/servicios/firmas');
+            if (!file_exists($rutaDestinoFirmas)) {
+                mkdir($rutaDestinoFirmas, 0755, true);
+            }
+
+            file_put_contents($rutaDestinoFirmas . DIRECTORY_SEPARATOR . $firmaFileName, $firmaImage);
+            $rutaRelativaFirma = 'uploads/servicios/firmas/' . $firmaFileName;
+
+            // Procesar preguntas/respuestas
             $questions = json_encode([
                 'lugar_instalacion' => $request->input('lugar_instalacion'),
                 'equipo_encendido' => $request->input('equipo_encendido'),
@@ -357,36 +507,55 @@ class ServicioAgendadoController extends Controller
                 'manipulaciones_aceptadas' => $request->input('manipulaciones_aceptadas')
             ]);
 
+            // Procesar ubicación
+            $location = json_decode($request->input('location'), true);
+            $lat = $location['lat'] ?? null;
+            $lng = $location['lng'] ?? null;
+
+            // Crear registro de firma con todas las fotos unificadas
             $firmaService = FirmaServicio::create([
                 'servicio_id' => $service->id,
-                'firma' => $rutaRelativa,
-                'questions' => $questions
+                'firma' => $rutaRelativaFirma,
+                'questions' => $questions,
+                'registro_fotografico' => json_encode($registro_fotografico),
+                'lat' => $lat,
+                'lng' => $lng,
+                'comentarios' => $request->input('comentarios', null)
             ]);
 
-            $service->firma_cliente = $firmaService->id;
+            $service->status = 5; // Actualizar estado a 'Completado'
             $service->save();
 
+            // Notificamos al administrador
+            $this->notifyUser(
+                1,
+                'service_end',
+                'Servicio Firmado',
+                "El servicio #{$service->id} ha sido firmado y entregado por el técnico.",
+                [],
+                route('assignements.performed'),
+                now()->addDays(7)
+            );
+
             // Generar PDF
-            $pdf = Pdf::loadView($this->folder . 'conformidad', compact('firmaService'));
+            $pdf = Pdf::loadView($this->folder . 'conformidad', compact('firmaService', 'service'));
             return $pdf->download("conformidad_servicio_{$service->id}.pdf");
-            // return back()->with('success', 'Firma guardada correctamente.');
+
         } catch (\Exception $e) {
             return response()->json([
                 'error' => $e->getMessage()
-            ]);
-
-            // return redirect()->back()->with('error', $e->getMessage());
+            ], 500);
         }
     }
 
     public function generarPDF($id)
     {
         $id = base64_decode($id);
-        $service = ServiciosAgendado::findOrFail($id);
-        $firmaService = $service->firma;
+        $service = Asignaciones::findOrFail($id);
+        $firmaService = $service->getFirma;
 
         // Generar PDF
-        $pdf = Pdf::loadView($this->folder . 'conformidad', compact('service','firmaService')); 
+        $pdf = Pdf::loadView($this->folder . 'conformidad', compact('service', 'firmaService'));
 
         // Puedes guardar el PDF o forzar descarga:
         return $pdf->download("conformidad_servicio_{$service->id}.pdf");
@@ -394,5 +563,20 @@ class ServicioAgendadoController extends Controller
         // O para guardar:
         // Storage::put("pdfs/conformidad_{$data->id}.pdf", $pdf->output());
         // return redirect()->back()->with('success', 'PDF generado.');
+    }
+
+    public function seePhotoRecord($id)
+    {
+        $id = base64_decode($id);
+        $service = Asignaciones::findOrFail($id);
+        $firmaService = $service->getFirma;
+
+        if (!$firmaService || !$firmaService->registro_fotografico) {
+            return redirect()->back()->with('error', 'No hay registro fotográfico disponible para este servicio.');
+        }
+
+        $registroFotografico = json_decode($firmaService->registro_fotografico, true);
+
+        return view($this->folder . 'see_photo_record', compact('service', 'registroFotografico'));
     }
 }

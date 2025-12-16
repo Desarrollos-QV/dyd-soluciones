@@ -13,9 +13,9 @@
 <body>
     <h2>HOJA DE CONFORMIDAD DE REPARACIÓN</h2>
     
-    <div class="seccion"><span class="label">Fecha de Instalación:</span> {{ $firmaService->fecha }}</div>
+    <div class="seccion"><span class="label">Fecha de Instalación:</span> {{ $firmaService->created_at }}</div>
     <div class="seccion"><span class="label">Técnico:</span> {{ $service->tecnico->name }}</div>
-    <div class="seccion"><span class="label">Lugar:</span> {{ json_decode($firmaService->questions, true)['lugar_instalacion'] }}</div>
+    <div class="seccion"><span class="label">Lugar:</span> {{ $service->location }}</div>
     <div class="seccion"><span class="label">Tipo de Servicio:</span> {{ $service->tipo_servicio }}</div>
     <hr>
     @foreach(json_decode($firmaService->questions, true) as $label => $valor)

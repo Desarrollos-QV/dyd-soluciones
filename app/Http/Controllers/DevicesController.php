@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\{Devices, Cliente, Unidades};
+use App\Models\{Devices, Cliente, Unidades, DeviceImei};
 use Illuminate\Http\Request;
 
 class DevicesController extends Controller
@@ -26,10 +26,10 @@ class DevicesController extends Controller
      */
     public function create()
     {
-        $device   = new Devices;
+        $device = new Devices;
         $clientes = Cliente::all();
         $unidades = Unidades::all();
-        return view($this->folder . '.create', compact('device','clientes', 'unidades'));
+        return view($this->folder . '.create', compact('device', 'clientes', 'unidades'));
     }
 
     /**
@@ -42,22 +42,37 @@ class DevicesController extends Controller
         $request->validate([
             'dispositivo' => 'required|string|max:255',
             'marca' => 'required|string|max:255',
-            'camaras' => 'required|string|max:100',
             'generacion' => 'required|string|max:100',
-            'imei' => 'required|string|max:100',
+            'imei' => 'required|array',
+            'imei.*' => 'string|max:100', // Validate each IMEI
             'garantia' => 'required|string|max:100',
-            'accesorios' => 'nullable|string',
             'ia' => 'nullable|string',
             'otra_empresa' => 'nullable|string',
             'stock_min_alert' => 'required|integer',
-            'stock' => 'required|integer'
+            // 'stock' => 'required|integer' // Handled automatically
         ]);
 
         $data = $request->all();
         $data['garantia'] = \Carbon\Carbon::parse($request->garantia)->format('Y-m-d H:i:s');
 
+        $imeis = $request->input('imei', []);
+        $data['stock'] = count($imeis);
+        // Save first IMEI to legacy column for compatibility, or null
+        $data['imei'] = $imeis[0] ?? null;
+
         try {
-            Devices::create($data); 
+            $device = Devices::create($data);
+
+            // Save IMEIs
+            foreach ($imeis as $imei) {
+                if (!empty($imei)) {
+                    DeviceImei::create([
+                        'device_id' => $device->id,
+                        'imei' => $imei
+                    ]);
+                }
+            }
+
             return response()->json([
                 'ok' => true,
                 'message' => 'Dispositivo creado exitosamente',
@@ -81,6 +96,8 @@ class DevicesController extends Controller
     {
         $clientes = Cliente::all();
         $unidades = Unidades::all();
+        // Load imeis just in case accessing it doesn't auto-load (though it usually lazy loads)
+        // But better to be explicit or rely on View.
         return view($this->folder . '.edit', compact('device', 'clientes', 'unidades'));
     }
 
@@ -95,22 +112,37 @@ class DevicesController extends Controller
         $request->validate([
             'dispositivo' => 'required|string|max:255',
             'marca' => 'required|string|max:255',
-            'camaras' => 'required|string|max:100',
             'generacion' => 'required|string|max:100',
-            'imei' => 'required|string|max:100',
+            'imei' => 'required|array',
+            'imei.*' => 'string|max:100',
             'garantia' => 'required|string|max:100',
-            'accesorios' => 'nullable|string',
             'ia' => 'nullable|string',
             'otra_empresa' => 'nullable|string',
             'stock_min_alert' => 'required|integer',
-            'stock' => 'required|integer'
+            // 'stock' => 'required|integer'
         ]);
 
         $data = $request->all();
         $data['garantia'] = \Carbon\Carbon::parse($request->garantia)->format('Y-m-d H:i:s');
-    
+
+        $imeis = $request->input('imei', []);
+        $data['stock'] = count($imeis);
+        $data['imei'] = $imeis[0] ?? null;
+
         try {
             $device->update($data);
+
+            // Sync IMEIs
+            $device->imeis()->delete();
+            foreach ($imeis as $imei) {
+                if (!empty($imei)) {
+                    DeviceImei::create([
+                        'device_id' => $device->id,
+                        'imei' => $imei
+                    ]);
+                }
+            }
+
             return response()->json([
                 'ok' => true,
                 'message' => 'Dispositivo Actualizado exitosamente',

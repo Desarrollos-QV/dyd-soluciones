@@ -83,7 +83,9 @@
                                                             href="{{ route('servicios_agendados.generarPDF', ['id' => base64_encode($s->id)]) }}">Descargar
                                                             Reporte</a>
                                                         <a class="dropdown-item" href="javascript:void(0)"
-                                                            onclick="ShareLink()">Compartir Link</a>
+                                                            onclick="ShareLink('{{ route('servicios_agendados.generarPDF', ['id' => base64_encode($s->id)]) }}')">Compartir Link</a>
+                                                        
+                                                        
                                                     @else
                                                         <a class="dropdown-item" target="_blank"
                                                             href="{{ route('servicios_agendados.firmar', ['id' => base64_encode($s->id)]) }}">Solicitar
@@ -122,8 +124,8 @@
     <script src="{{ asset('assets/js/data-table.js') }}"></script>
     <!-- end custom js for this page -->
     <script>
-        function ShareLink() {
-            let route = ""; 
+        function ShareLink(route) {
+            console.log(route);
 
             Swal.fire({
                 title: "<strong>Descarga tu <u>Reporte</u></strong>",

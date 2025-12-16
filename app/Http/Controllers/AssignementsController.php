@@ -26,10 +26,10 @@ class AssignementsController extends Controller
      */
     public function index()
     {
-        $assignements = Asignaciones::with('cliente','device','tecnico')
-                        ->whereStatus(0)
-                        ->get();
-        $tecnicos    = User::where('role', 'tecnico')->get();
+        $assignements = Asignaciones::with('cliente', 'device', 'tecnico', 'getFirma')
+            ->whereStatus(0)
+            ->get();
+        $tecnicos = User::where('role', 'tecnico')->get();
         // return response()->json([
         //     'assignements' => $assignements
         // ]);
@@ -39,21 +39,21 @@ class AssignementsController extends Controller
 
     public function AssignsPerformed()
     {
-        $assignements = Asignaciones::with('cliente','device','tecnico')
-                        ->whereStatus(5)
-                        ->get();
-        $tecnicos    = User::where('role', 'tecnico')->get();
-        
+        $assignements = Asignaciones::with('cliente', 'device', 'tecnico')
+            ->whereStatus(5)
+            ->get();
+        $tecnicos = User::where('role', 'tecnico')->get();
+
         return view($this->folder . 'index', compact('assignements', 'tecnicos'));
     }
 
     public function AssignsInProgress()
     {
-        $assignements = Asignaciones::with('cliente','device','tecnico')
-                        ->whereIn('status', [1, 2, 3, 4])
-                        ->get();
-        $tecnicos    = User::where('role', 'tecnico')->get();
-        
+        $assignements = Asignaciones::with('cliente', 'device', 'tecnico')
+            ->whereIn('status', [1, 2, 3, 4])
+            ->get();
+        $tecnicos = User::where('role', 'tecnico')->get();
+
         return view($this->folder . 'index', compact('assignements', 'tecnicos'));
     }
 
@@ -65,9 +65,9 @@ class AssignementsController extends Controller
     public function create()
     {
         $assignement = new Asignaciones;
-        $clientes    = Cliente::all();
-        $tecnicos    = User::where('role', 'tecnico')->get();
-        $devices    = Devices::all();
+        $clientes = Cliente::all();
+        $tecnicos = User::where('role', 'tecnico')->get();
+        $devices = Devices::all();
 
         return view($this->folder . 'create', compact('assignement', 'clientes', 'tecnicos', 'devices'));
     }
@@ -79,24 +79,33 @@ class AssignementsController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'cliente_id'        => 'nullable|exists:clientes,id',
-            'tecnico_id'        => 'nullable',
-            'tipo_servicio'     => 'nullable|string',
-            'tel_contact'       => 'nullable|string',
+            'cliente_id' => 'nullable|exists:clientes,id',
+            'tecnico_id' => 'nullable',
+            'tipo_servicio' => 'nullable|string',
+            'tel_contact' => 'nullable|string',
             'encargado_recibir' => 'nullable|string',
-            'location'          => 'nullable|string',
-            'lat'               => 'nullable|string',
-            'lng'               => 'nullable|string',
-            'viaticos'          => 'nullable|string',
-            'tipo_vehiculo'     => 'nullable|string',
-            'marca'             => 'nullable|string',
-            'modelo'            => 'nullable|string',
-            'placa'             => 'nullable|string',
-            'observaciones'     => 'nullable|string',
+            'location' => 'nullable|string',
+            'lat' => 'nullable|string',
+            'lng' => 'nullable|string',
+            'viaticos' => 'nullable|string',
+            'tipo_vehiculo' => 'nullable|string',
+            'marca' => 'nullable|string',
+            'modelo' => 'nullable|string',
+            'unidad_id' => 'nullable|exists:unidades,id',
+            'placa' => 'nullable|string',
+            'observaciones' => 'nullable|string',
         ]);
 
         try {
-            Asignaciones::create($request->all());
+            $assignment = Asignaciones::create($request->all());
+
+            if ($request->filled('tecnico_id')) {
+                $tecnico = User::find($request->tecnico_id);
+                if ($tecnico) {
+                    $this->AssignTecn($assignment->id, $tecnico->id);
+                }
+            }
+
 
             return response()->json([
                 'ok' => true,
@@ -122,9 +131,9 @@ class AssignementsController extends Controller
     public function edit($id)
     {
         $assignement = Asignaciones::findOrFail($id);
-        $clientes    = Cliente::all();
-        $tecnicos    = User::where('role', 'tecnico')->get();
-        $devices     = Devices::all();
+        $clientes = Cliente::all();
+        $tecnicos = User::where('role', 'tecnico')->get();
+        $devices = Devices::all();
 
         return view($this->folder . 'edit', compact('assignement', 'clientes', 'tecnicos', 'devices'));
     }
@@ -137,25 +146,55 @@ class AssignementsController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'cliente_id'        => 'nullable|exists:clientes,id',
-            'tecnico_id'        => 'nullable',
-            'tipo_servicio'     => 'nullable|string',
-            'tel_contact'       => 'nullable|string',
+            'cliente_id' => 'nullable|exists:clientes,id',
+            'tecnico_id' => 'nullable',
+            'tipo_servicio' => 'nullable|string',
+            'tel_contact' => 'nullable|string',
             'encargado_recibir' => 'nullable|string',
-            'location'          => 'nullable|string',
-            'lat'               => 'nullable|string',
-            'lng'               => 'nullable|string',
-            'viaticos'          => 'nullable|string',
-            'tipo_vehiculo'     => 'nullable|string',
-            'marca'             => 'nullable|string',
-            'modelo'            => 'nullable|string',
-            'placa'             => 'nullable|string',
-            'observaciones'     => 'nullable|string',
+            'location' => 'nullable|string',
+            'lat' => 'nullable|string',
+            'lng' => 'nullable|string',
+            'viaticos' => 'nullable|string',
+            'tipo_vehiculo' => 'nullable|string',
+            'marca' => 'nullable|string',
+            'modelo' => 'nullable|string',
+            'unidad_id' => 'nullable|exists:unidades,id',
+            'placa' => 'nullable|string',
+            'observaciones' => 'nullable|string',
         ]);
 
         try {
             $assignement = Asignaciones::findOrFail($id);
             $assignement->update($request->all());
+
+            $originalTecnicoId = $assignement->tecnico_id;
+            $assignement->update($request->all());
+
+            if ($request->filled('tecnico_id')) {
+                $newTecnicoId = $request->tecnico_id;
+
+                // If technician changed and there was an original technician
+                if ($originalTecnicoId && $originalTecnicoId != $newTecnicoId) {
+                    $oldTecnico = User::find($originalTecnicoId);
+                    if ($oldTecnico) {
+                        $this->notifyUser(
+                            $oldTecnico->id,
+                            'service_reassigned',
+                            'Servicio Reasignado',
+                            'El servicio #' . $assignement->id . ' te ha sido reasignado a otro técnico.',
+                            ['assignement_id' => $assignement->id],
+                            route('servicios_agendados.edit', $assignement->id),
+                            now()->addDays(7)
+                        );
+                    }
+                }
+
+                // If a new technician is assigned or technician changed
+                if ($newTecnicoId && $originalTecnicoId != $newTecnicoId) {
+                    $this->AssignTecn($assignement->id, $newTecnicoId);
+                }
+            }
+
 
             return response()->json([
                 'ok' => true,
@@ -200,7 +239,7 @@ class AssignementsController extends Controller
             'Nueva Asignación',
             'Se te ha asignado una nueva tarea. Por favor, revisa los detalles.',
             ['assignement_id' => $assignement->id],
-            route('assignements.show', $assignement->id),
+            route('servicios_agendados.edit', $assignement->id),
             now()->addDays(7)
         );
 

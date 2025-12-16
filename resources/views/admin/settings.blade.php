@@ -9,7 +9,7 @@
         </ol>
     </nav>
 
-    <form action="{{ route('collections.store') }}" method="POST" id="update_collect" class="row"
+    <form action="{{ route('settings.store') }}" method="POST" id="update_collect" class="row"
         enctype="multipart/form-data">
         @csrf
         <div class="col-lg-8">

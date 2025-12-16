@@ -61,6 +61,12 @@
                                 </a>
                             </li>
                             <li class="nav-item">
+                                <a href="{{ route('settings.index') }}" class="nav-link">
+                                    <i data-feather="settings"></i>
+                                    <span>Configuraciones</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
                                 <a href="javascript:;" class="nav-link">
                                     <i data-feather="file-text"></i>
                                     <span>Reportes</span>

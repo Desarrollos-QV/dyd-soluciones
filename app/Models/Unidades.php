@@ -100,9 +100,10 @@ class Unidades extends Model
             return  '<span class="badge bg-success text-white">'.$days.' días Faltantes</span>';
         } elseif ($days <= 10 && $days >= 5) {
             return  '<span class="badge bg-warning text-dark">'.$days.' días Faltantes</span>';
+        } elseif($days < 0) {
+            return  '<span class="badge bg-danger text-white">'.abs($days).' días de Retraso</span>';
         } else {
             return  '<span class="badge bg-danger text-white">'.$days.' días Faltantes</span>';
         }
-        
     }
 }
