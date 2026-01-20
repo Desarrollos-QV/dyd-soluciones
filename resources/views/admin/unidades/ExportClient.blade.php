@@ -61,7 +61,7 @@
             <th>VIN</th>
             <th>IMEI</th>
             <th>Apagado</th>
-            <th>Foto</th>
+            <th>Fotos</th>
             <th>N° Emergencia</th>
             <th>Observaciones</th>
         </tr>
@@ -83,7 +83,14 @@
             <td>{{ $unidad->cuenta_con_apagado ? 'Sí' : 'No' }}</td>
             <td>
                 @if($unidad->foto_unidad)
-                    <img src="{{ public_path($unidad->foto_unidad) }}" alt="Foto de la unidad" width="50">
+                    @php
+                        $unitPics = json_decode($unidad->foto_unidad);
+                        foreach ($unitPics as $pic) {
+                            if (file_exists(public_path('uploads/fotos_unidades/'.$pic))) {
+                                echo '<img src="'.public_path('uploads/fotos_unidades/'.$pic).'" alt="Foto Unidad" width="50" height="50" style="object-fit: cover; margin-right: 5px;">';
+                            }
+                        }
+                    @endphp
                 @else
                     No disponible
                 @endif

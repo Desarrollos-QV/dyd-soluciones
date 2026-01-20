@@ -48,7 +48,7 @@ class ProspectsController extends Controller
             'name_prospect' => 'required|string|max:255',
             'company' => 'required|string|max:255',
             'potencial' => 'required|string|max:100',
-            'sellers_id' => 'required|exists:sellers,id',
+            'sellers_id' => 'exists:sellers,id',
             'location' => 'required|string',
             'contacts' => 'required|string',
             'observations' => 'nullable|string'
@@ -94,7 +94,7 @@ class ProspectsController extends Controller
             'name_prospect' => 'required|string|max:255',
             'company' => 'required|string|max:255',
             'potencial' => 'required|string|max:100',
-            'sellers_id' => 'required|exists:sellers,id',
+            'sellers_id' => 'exists:sellers,id',
             'location' => 'required|string',
             'contacts' => 'required|string',
             'observations' => 'nullable|string'

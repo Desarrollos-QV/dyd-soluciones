@@ -39,7 +39,7 @@
                 </div>
 
                 <div class="row mt-4">
-                    <div class="col-lg-3">
+                    <div class="col-lg-6">
                         <label for="dispositivo_instalado">Dispositivo instalado</label>
                         <select name="dispositivo_instalado" id="dispositivo_instalado" class="form-select" required>
                             <option value="DVR" @if($unidad->dispositivo_instalado == 'DVR') selected @endif>DVR</option>
@@ -56,7 +56,7 @@
                         </div>
                     </div>
 
-                    <div class="col-lg-3">
+                    <div class="col-lg-6">
                         <label for="simcontrol_id">Vincular SIM</label>
                         <select name="simcontrol_id" id="simcontrol_id" class="form-select" required>
                             @foreach($simcontrols as $sim)
@@ -66,8 +66,9 @@
                             @endforeach
                         </select>
                     </div>
-
-                    <div class="col-lg-3">
+                </div>
+                <div class="row mt-4">
+                    <div class="col-lg-6">
                         <label for="devices_id">Vincular de Inventario</label>
                         <select name="devices_id" id="devices_id" class="form-select" required>
                             @foreach($devices as $device)
@@ -82,6 +83,11 @@
                         <label for="numero_de_motor">Número de motor</label>
                         <input type="text" name="numero_de_motor" id="numero_de_motor" class="form-control" required
                             value="{{ $unidad->numero_de_motor }}">
+                    </div>
+                    <div class="col-lg-3">
+                        <label for="sensor">Sensor y/o Accesorio</label>
+                        <input type="text" name="sensor" id="sensor" class="form-control"
+                            value="{{ $unidad->sensor }}">
                     </div>
                 </div>
 
@@ -231,7 +237,7 @@
                         <label for="cliente_id">Asignado a cliente:</label>
                         <select name="cliente_id" id="cliente_id" class="form-select mb-4" required>
                             @foreach($clientes as $client)
-                            <option value="{{ $client->id }}"> {{$client->nombre}} </option>
+                            <option value="{{ $client->id }}" @if($client->id == $unidad->cliente_id) selected @endif > {{$client->nombre}} </option>
                             @endforeach
                         </select>
                     </div>

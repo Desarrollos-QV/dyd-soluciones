@@ -36,8 +36,8 @@
                                 <tr>
                                     <th></th>
                                     <th>Campaña</th>
-                                    <th>Prospecto</th>
-                                    <th>Empresa</th>
+                                    <th>Contacto</th>
+                                    <th>Giro mercantil</th>
                                     <th>Potencial</th>
                                     <th>Estatus</th>
                                     <th>Vendedor asignado</th>

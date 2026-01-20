@@ -12,14 +12,14 @@
                 <div class="row">
                     <div class="col-lg-6">
                         <div class="mb-3">
-                            <label for="name_company">Nombre de la compañía</label>
+                            <label for="name_company">Nombre de la la campaña o captación</label>
                             <input type="text" name="name_company" class="form-control mb-4 mb-md-0"
                             value="{{ $prospect->name_company ?? old('name_company') }}" required/>
                         </div>
                     </div>
                     <div class="col-lg-6">
                         <div class="mb-3">
-                            <label for="name_prospect">Nombre del  prospecto</label>
+                            <label for="name_prospect">Nombre del contacto</label>
                             <input type="text" name="name_prospect" class="form-control mb-4 mb-md-0"
                             value="{{ $prospect->name_prospect ?? old('name_prospect') }}" required/>
                         </div>
@@ -29,7 +29,7 @@
                 <div class="row">
                     <div class="col-lg-6">
                         <div class="mb-3">
-                            <label for="company">Empresa</label>
+                            <label for="company">Giro mercantíl</label>
                              <input type="text" name="company" class="form-control mb-4 mb-md-0"
                             value="{{ $prospect->company ?? old('company') }}" required/>
                         </div>

@@ -9,7 +9,7 @@ class SimControl extends Model
 {
     use HasFactory;
 
-    public $table = 'simcontrol';
+    protected $table = 'simcontrol';
 
     public $fillable = [
         'compañia',

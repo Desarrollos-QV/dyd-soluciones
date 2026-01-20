@@ -24,17 +24,20 @@
         <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
                 <div class="card-body">
-                    <form method="GET" class="row g-2 mb-4">
+                    <form method="GET" class="row align-items-center g-2 mb-4">
                         <div class="col-md-2">
+                            <label for="fecha_inicio">Fecha Inicio</label>
                             <input type="date" name="fecha_inicio" class="form-control"
                                 value="{{ request('fecha_inicio') }}">
                         </div>
 
                         <div class="col-md-2">
+                            <label for="fecha_fin">Fecha Fin</label>
                             <input type="date" name="fecha_fin" class="form-control" value="{{ request('fecha_fin') }}">
                         </div>
 
                         <div class="col-md-2">
+                            <label for="tipo">Tipo</label>
                             <select name="tipo" class="form-select">
                                 <option value="">Todos</option>
                                 <option value="ingreso" {{ request('tipo') == 'ingreso' ? 'selected' : '' }}>Ingreso
@@ -43,8 +46,14 @@
                             </select>
                         </div>
 
-                        <div class="col-md-6" style="display: flex;justify-content: end;">
-                            <button class="btn btn-success w-25">Filtrar</button>
+                        <div class="col-md-2 mt-4">
+                            <button class="btn btn-success">Filtrar</button>
+                        </div>
+
+                        <div class="col-md-4" style="display: flex;justify-content: end; gap: 5px;">
+                            <a href="{{ route('historial-caja.exportarExcel', ['fecha_inicio' => request('fecha_inicio'), 'fecha_fin' => request('fecha_fin'), 'tipo' => request('tipo')]) }}" class="btn btn-info text-white">
+                                <i data-feather="download"></i> Descargar Excel
+                            </a>
                         </div>
                     </form>
 

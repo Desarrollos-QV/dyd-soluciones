@@ -11,7 +11,7 @@
                 </div>
                 <div class="col-md-6">
                     <label>Dirección</label>
-                    <input type="text" name="direccion" value="{{$cliente->direccion}}" class="form-control">
+                    <input type="text" name="direccion" value="{{$cliente->direccion}}" class="form-control" required>
                 </div>
             </div>
 
@@ -29,11 +29,11 @@
             <div class="row mb-3">
                 <div class="col-md-6">
                     <label>Nombre de la empresa</label>
-                    <input type="text" name="empresa" value="{{$cliente->empresa}}" class="form-control">
+                    <input type="text" name="empresa" value="{{$cliente->empresa}}" class="form-control" required>
                 </div>
                 <div class="col-lg-6">
                     <label for="tipo_empresa">Tipo de empresa</label>
-                    <select name="tipo_empresa" id="tipo_empresa" class="form-select">
+                    <select name="tipo_empresa" id="tipo_empresa" class="form-select" required>
                         <option value="Ruta" @if($cliente->tipo_empresa == 'Ruta') selected @endif>Ruta</option>
                         <option value="Particular" @if($cliente->tipo_empresa == 'Particular') selected @endif>Particular</option>
                     </select>
@@ -43,7 +43,7 @@
             <div class="row mb-3">
                 <div class="col-md-12">
                     <label for="direccion_empresa">Dirección de la empresa</label>
-                    <input type="text" name="direccion_empresa" id="direccion_empresa" class="form-control" value="{{$cliente->direccion_empresa}}">
+                    <input type="text" name="direccion_empresa" id="direccion_empresa" class="form-control" required value="{{$cliente->direccion_empresa}}">
                 </div> 
             </div>
 

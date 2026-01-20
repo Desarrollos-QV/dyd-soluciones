@@ -15,5 +15,6 @@ class Sellers extends Model
         'phone',
         'level_education',
         'picture',
+        'observations'
     ];
 }

@@ -23,6 +23,7 @@ class Unidades extends Model
         'marca',
         'submarca',
         'numero_de_motor',
+        'sensor',
         'costo_plataforma',
         'costo_sim',
         'pago_mensual',

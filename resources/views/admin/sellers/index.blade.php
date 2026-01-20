@@ -39,6 +39,7 @@
                                 <th>Dirección</th>
                                 <th>Telefono</th>
                                 <th>Nivel de estudios</th>
+                                <th>Observaciones</th>
                                 <th class="w-100 d-flex justify-content-end align-items-center">Acciones</th>
                             </tr>
                         </thead>
@@ -55,6 +56,7 @@
                                 <td>{{ $sell->address }}</td>
                                 <td>{{ $sell->phone }}</td> 
                                 <td>{{ $sell->level_education }}</td>
+                                <td>{{ $sell->observations }}</td>
                                 <td class="d-flex justify-content-end">
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-primary dropdown-toggle"

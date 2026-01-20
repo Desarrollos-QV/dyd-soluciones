@@ -58,7 +58,8 @@ trait NotifiesUsers
         Log::info("Enviando Mensaje SMS..." . $telefono);
 
 
-        return $notify->sendMessageSMS($telefono, $message);
+        $notify->sendMessageSMS($telefono, $message);
+        return true;
     }
 
     public function notifyUserEmail($destination, $message)

@@ -189,6 +189,7 @@ Route::group(['middleware' => 'isAdmin'], function () {
     /**
      * Gestion de Historial de Caja
      */
+    Route::get('historial-caja/exportar-excel', [HistorialCajaController::class, 'exportarExcel'])->name('historial-caja.exportarExcel');
     Route::resource('historial-caja', HistorialCajaController::class)->names('historial-caja');
     Route::get('historial-caja/getElement/{id}', [HistorialCajaController::class, 'getElement'])->name('historial-caja.getElement');
 

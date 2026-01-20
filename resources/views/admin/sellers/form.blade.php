@@ -43,29 +43,23 @@
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="form-group">
                 <div class="row">
                     <div class="col-lg-12">
-                        <button type="submit"
-                            class="btn btn-primary">{{ isset($seller->id) ? 'Actualizar' : 'Guardar' }}</button>
-                        <a href="{{ route('sellers.index') }}" class="btn btn-secondary">Cancelar</a>
+                        <div class="mb-3">
+                            <label for="observations">Observaciones</label>
+                            <textarea name="observations" id="observations" class="form-control mb-4" rows="5" cols="5" placeholder="Observaciones Extra">{!! $seller->observations ?? old('observations') !!}</textarea>
+                        </div>
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 </div>
  
 <div class="col-lg-4">
     <div class="card">
-        <div class="card-header">
-            <h4 class="card-title">
-                <h5>Información de Cuenta/Accesos</h5>
-            </h4>
-        </div>
-
         <div class="card-body">
             <div class="form-group">
                 <div class="row">                   

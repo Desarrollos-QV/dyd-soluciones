@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 use App\Models\HistorialCaja;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\HistorialCajaExport;
 
 class HistorialCajaController extends Controller
 {
@@ -106,5 +108,22 @@ class HistorialCajaController extends Controller
         $historial_caja->delete();
 
         return redirect()->route('historial-caja.index')->with('success', 'Movimiento eliminado correctamente.');
+    }
+
+    /**
+     * Export historial to Excel
+     */
+    public function exportarExcel(Request $request)
+    {
+        $fechaInicio = $request->get('fecha_inicio');
+        $fechaFin = $request->get('fecha_fin');
+        $tipo = $request->get('tipo');
+
+        $nombreArchivo = 'Historial_Caja_' . now()->format('d-m-Y_H-i-s') . '.xlsx';
+
+        return Excel::download(
+            new HistorialCajaExport($fechaInicio, $fechaFin, $tipo),
+            $nombreArchivo
+        );
     }
 }

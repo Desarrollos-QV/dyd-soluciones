@@ -48,28 +48,26 @@
                                             <input type="checkbox" id="select_element_{{ $cliente->id }}" name="select_element_{{ $cliente->id }}">
                                         </td>
                                         <td>
-                                            <a href="{{ asset($cliente->avatar) }}" target="_blank">
-                                                @if ($cliente->avatar != null)
-                                                    <img src="{{ asset($cliente->avatar) }}"
-                                                        alt="Imagen de {{ $cliente->nombre }}">
-                                                @else
-                                                    <img src="{{ asset('assets/images/placeholder.jpg') }}"
-                                                        alt="Sin Imagen">
-                                                @endif
-                                            </a>
+                                            @if ($cliente->avatar != null)
+                                                <a href="{{ asset($cliente->avatar) }}" target="_blank">
+                                                    <img src="{{ asset($cliente->avatar) }}" alt="Imagen de {{ $cliente->nombre }}">
+                                                </a>
+                                            @else
+                                                <img src="{{ asset('assets/images/placeholder.jpg') }}"
+                                                    alt="Sin Imagen">
+                                            @endif
                                         </td>
                                         <td>
+                                            @if ($cliente->identificacion != null)
                                             <a href="{{ asset($cliente->identificacion) }}" target="_blank">
-
-                                                @if ($cliente->identificacion != null)
-                                                    <img src="{{ asset($cliente->identificacion) }}"
-                                                        alt="Imagen de {{ $cliente->nombre }}"
-                                                        style="border-radius: 12px !important">
-                                                @else
-                                                    <img src="{{ asset('assets/images/placeholder.jpg') }}"
-                                                        alt="Sin Imagen">
-                                                @endif
+                                                <img src="{{ asset($cliente->identificacion) }}"
+                                                    alt="Imagen de {{ $cliente->nombre }}"
+                                                    style="border-radius: 12px !important">
                                             </a>
+                                            @else
+                                                <img src="{{ asset('assets/images/placeholder.jpg') }}"
+                                                    alt="Sin Imagen">
+                                            @endif
                                         </td>
                                         <td>{{ ucwords($cliente->nombre) }}</td>
                                         <td>{{ $cliente->direccion }}</td>

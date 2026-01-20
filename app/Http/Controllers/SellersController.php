@@ -42,6 +42,7 @@ class SellersController extends Controller
             'phone' => 'required|string|max:20',
             'level_education' => 'required|string|max:100',
             'picture' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'observations' => 'nullable|string'
         ]);
 
         try {
@@ -94,6 +95,7 @@ class SellersController extends Controller
             'phone' => 'required|string|max:20',
             'level_education' => 'required|string|max:100',
             'picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'observations' => 'nullable|string'
         ]);
 
         try {

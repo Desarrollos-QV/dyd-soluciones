@@ -22,45 +22,54 @@ class TwilioService
 
     public function sendMessageWhatsapp($destination, $message)
     {
-        $client = new \GuzzleHttp\Client([
-            'verify' => false // Desactiva la verificación SSL
-        ]);
+        try{
+            $client = new \GuzzleHttp\Client([
+                'verify' => false // Desactiva la verificación SSL
+            ]);
 
-        $response = $client->request('POST', "https://api.twilio.com/2010-04-01/Accounts/{$this->sid}/Messages.json", [
-            'auth' => [$this->sid, $this->token],
-            'form_params' => [
-                'From' => 'whatsapp:' . $this->from,
-                'To' => 'whatsapp:' . $destination,
-                'Body' => $message
-            ],
-            'headers' => [
-                'Accept' => 'application/json',
-            ],
-        ]);
+            $response = $client->request('POST', "https://api.twilio.com/2010-04-01/Accounts/{$this->sid}/Messages.json", [
+                'auth' => [$this->sid, $this->token],
+                'form_params' => [
+                    'From' => 'whatsapp:' . $this->from,
+                    'To' => 'whatsapp:' . $destination,
+                    'Body' => $message
+                ],
+                'headers' => [
+                    'Accept' => 'application/json',
+                ],
+            ]);
 
-        return json_decode($response->getBody(), true);
+            return json_decode($response->getBody(), true);
+        }catch(\Exception $e){
+            throw new \Exception('Error sending WhatsApp message: ' . $e->getMessage());
+        }
     }
 
     public function sendMessageSMS($destination, $message)
     {
         
-        $client = new \GuzzleHttp\Client([
-            'verify' => false // Desactiva la verificación SSL
-        ]);
+        try{
+            $client = new \GuzzleHttp\Client([
+                'verify' => false // Desactiva la verificación SSL
+            ]);
 
-        $response = $client->request('POST', "https://api.twilio.com/2010-04-01/Accounts/{$this->sid}/Messages.json", [
-            'auth' => [$this->sid, $this->token],
-            'form_params' => [
-                'To' => $destination,
-                'From' => $this->from,
-                'Body' => $message
-            ],
-            'headers' => [
-                'Accept' => 'application/json',
-            ],
-        ]);
+            $response = $client->request('POST', "https://api.twilio.com/2010-04-01/Accounts/{$this->sid}/Messages.json", [
+                'auth' => [$this->sid, $this->token],
+                'form_params' => [
+                    'To' => $destination,
+                    'From' => $this->from,
+                    'Body' => $message
+                ],
+                'headers' => [
+                    'Accept' => 'application/json',
+                ],
+            ]);
 
-        return json_decode($response->getBody(), true);
+            return json_decode($response->getBody(), true);
+        }catch(\Exception $e){
+            return true;
+            // throw new \Exception('Error sending SMS: ' . $e->getMessage());
+        }
     }
 
     public function sendMessageEmail($destination, $message)
