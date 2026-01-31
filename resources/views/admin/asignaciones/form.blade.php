@@ -118,12 +118,20 @@
                         value="{{ $assignement->encargado_recibir }}">
                 </div>
                 <div class="col-lg-6">
-                    <label for="viaticos">Viaticos</label>
+                    <label for="viaticos">
+                        Viaticos
+                    </label>
                     <input type="text" id="viaticos" name="viaticos" class="form-control" step="0.01"
                         data-inputmask="'alias': 'currency'" required value="{{ $assignement->viaticos }}">
+                    <div>
+                        <label for="same_viaticos_check">¿Mismos Viaticos del servicio?</label>
+                        <input type="checkbox" name="same_viaticos_check" id="same_viaticos_check" @if($assignement->same_viaticos)
+                            checked @endif>
+                    </div>
                 </div>
             </div>
 
+            <!--
             <div class="row mb-3">
                 <div class="col-lg-4">
                     <label for="tipo_vehiculo">Tipo de Vehiculo</label>
@@ -144,9 +152,7 @@
                     <input type="text" id="placa" name="placa" class="form-control" value="{{ $assignement->placa }}">
                 </div>
             </div>
-
-            <!--
-         <div class="row mb-3">
+            <div class="row mb-3">
                 <div class="col-md-6">
                     <label for="devices_id">Dispositivo a asignar</label>
                     <select name="devices_id" id="devices_id" class="form-control" required>

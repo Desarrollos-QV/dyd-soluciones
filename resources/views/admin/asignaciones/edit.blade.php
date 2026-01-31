@@ -43,7 +43,7 @@
                 });
 
                 if (response.ok) {
-                    const data = await response.json();
+                    const data = await response.json(); 
                     window.location.href =
                         `${data.redirect}?success=${encodeURIComponent(data.message)}`;
                 } else {

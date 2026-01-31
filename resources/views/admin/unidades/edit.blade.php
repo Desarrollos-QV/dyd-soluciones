@@ -40,181 +40,181 @@
         input.type = 'hidden';
         input.name = 'foto_unidad';
 
-        let myDropzone = new Dropzone("#dropzoneForm", {
-            url: "{{ route('unidades.uploads') }}",
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            autoProcessQueue: false, // Importante: deshabilita el procesamiento automático
-            uploadMultiple: true,
-            parallelUploads: 5,
-            maxFiles: 5,
-            acceptedFiles: "image/*",
-            addRemoveLinks: true,
-            init: function() {
-                let dz = this;
+        // let myDropzone = new Dropzone("#dropzoneForm", {
+        //     url: "{{ route('unidades.uploads') }}",
+        //     headers: {
+        //         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        //     },
+        //     autoProcessQueue: false, // Importante: deshabilita el procesamiento automático
+        //     uploadMultiple: true,
+        //     parallelUploads: 5,
+        //     maxFiles: 5,
+        //     acceptedFiles: "image/*",
+        //     addRemoveLinks: true,
+        //     init: function() {
+        //         let dz = this;
                 
                
 
-                // Cargar imágenes existentes
-                function loadExistingFiles() {
-                    loadingExistingFiles = true; // Indicamos que estamos cargando archivos existentes
-                    fetch(`{{ url('unidades/fetchUploads/${id_unidad}') }}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.images) {
-                                data.images.forEach(function(image) {
-                                    // Crear un archivo mock para cada imagen existente
-                                    let mockFile = {
-                                        name: image.name,
-                                        size: image.size,
-                                        accepted: true,
-                                        status: Dropzone.ADDED
-                                    };
+        //         // Cargar imágenes existentes
+        //         function loadExistingFiles() {
+        //             loadingExistingFiles = true; // Indicamos que estamos cargando archivos existentes
+        //             fetch(`{{ url('unidades/fetchUploads/${id_unidad}') }}`)
+        //                 .then(response => response.json())
+        //                 .then(data => {
+        //                     if (data.images) {
+        //                         data.images.forEach(function(image) {
+        //                             // Crear un archivo mock para cada imagen existente
+        //                             let mockFile = {
+        //                                 name: image.name,
+        //                                 size: image.size,
+        //                                 accepted: true,
+        //                                 status: Dropzone.ADDED
+        //                             };
                                     
-                                    lastImages.push(image.name);
-                                    // Con estas:
-                                    dz.emit("addedfile", mockFile);
-                                    dz.emit("thumbnail", mockFile, image.url);
-                                    dz.emit("complete", mockFile);
-                                    dz.files.push(mockFile); // Añade el archivo a la lista de archivos
+        //                             lastImages.push(image.name);
+        //                             // Con estas:
+        //                             dz.emit("addedfile", mockFile);
+        //                             dz.emit("thumbnail", mockFile, image.url);
+        //                             dz.emit("complete", mockFile);
+        //                             dz.files.push(mockFile); // Añade el archivo a la lista de archivos
                                     
-                                    // Opcional: si quieres que parezca que ya está subido
-                                    mockFile.status = Dropzone.ADDED;
+        //                             // Opcional: si quieres que parezca que ya está subido
+        //                             mockFile.status = Dropzone.ADDED;
                                     
-                                    let element = dz.element.querySelector(
-                                        `[data-dz-name="${image.name}"]`);
-                                    if (element) {
-                                        let removeButton = element.parentElement.querySelector(
-                                            '.dz-remove');
-                                        if (removeButton) {
-                                            removeButton.addEventListener('click', function(e) {
-                                                e.preventDefault();
-                                                deleteExistingFile(image.id);
-                                            });
-                                        }
-                                    }
-                                });
-                            }
+        //                             let element = dz.element.querySelector(
+        //                                 `[data-dz-name="${image.name}"]`);
+        //                             if (element) {
+        //                                 let removeButton = element.parentElement.querySelector(
+        //                                     '.dz-remove');
+        //                                 if (removeButton) {
+        //                                     removeButton.addEventListener('click', function(e) {
+        //                                         e.preventDefault();
+        //                                         deleteExistingFile(image.id);
+        //                                     });
+        //                                 }
+        //                             }
+        //                         });
+        //                     }
 
                             
-                        });
-                }
+        //                 });
+        //         }
 
-                // Función para eliminar archivo existente
-                function deleteExistingFile(imageId) {
-                    fetch(`{{ url('unidades/deleteUploads/${id_unidad}') }}`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
-                                    .getAttribute('content')
-                            },
-                            body: JSON.stringify({
-                                id_unidad: id_unidad,
-                                pos: imageId
-                            })
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.ok) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'Eliminado',
-                                    text: data.message,
-                                    timer: 2000,
-                                    showConfirmButton: false
-                                });
-                            }
-                        });
-                }
+        //         // Función para eliminar archivo existente
+        //         function deleteExistingFile(imageId) {
+        //             fetch(`{{ url('unidades/deleteUploads/${id_unidad}') }}`, {
+        //                     method: 'POST',
+        //                     headers: {
+        //                         'Content-Type': 'application/json',
+        //                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+        //                             .getAttribute('content')
+        //                     },
+        //                     body: JSON.stringify({
+        //                         id_unidad: id_unidad,
+        //                         pos: imageId
+        //                     })
+        //                 })
+        //                 .then(response => response.json())
+        //                 .then(data => {
+        //                     if (data.ok) {
+        //                         Swal.fire({
+        //                             icon: 'success',
+        //                             title: 'Eliminado',
+        //                             text: data.message,
+        //                             timer: 2000,
+        //                             showConfirmButton: false
+        //                         });
+        //                     }
+        //                 });
+        //         }
 
-                // Cargar imágenes existentes al inicializar
-                loadExistingFiles();
+        //         // Cargar imágenes existentes al inicializar
+        //         loadExistingFiles();
 
-                // Eventos de depuración
-                this.on("addedfile", function(file) {
-                    console.log("Archivo añadido:", file.name);
-                });
+        //         // Eventos de depuración
+        //         this.on("addedfile", function(file) {
+        //             console.log("Archivo añadido:", file.name);
+        //         });
 
-                this.on('removedfile', function(file) {
-                    console.log("Archivo eliminado:", file.name);
-                    if(lastImages.length > 0){
-                        // Si el archivo eliminado está en lastImages, lo removemos de ahí también
-                        const index = lastImages.indexOf(file.name);
-                        console.log("Index a eliminar: ", {
-                                id_unidad: id_unidad,
-                                name: file.name
-                            });
-                        $.ajax({
-                            url: `{{ url('unidades/deleteUploads/${id_unidad}') }}`,
-                            data: {
-                                id_unidad: id_unidad,
-                                name: file.name
-                            },
-                            success: function(data) {
-                                console.log(data);
+        //         this.on('removedfile', function(file) {
+        //             console.log("Archivo eliminado:", file.name);
+        //             if(lastImages.length > 0){
+        //                 // Si el archivo eliminado está en lastImages, lo removemos de ahí también
+        //                 const index = lastImages.indexOf(file.name);
+        //                 console.log("Index a eliminar: ", {
+        //                         id_unidad: id_unidad,
+        //                         name: file.name
+        //                     });
+        //                 $.ajax({
+        //                     url: `{{ url('unidades/deleteUploads/${id_unidad}') }}`,
+        //                     data: {
+        //                         id_unidad: id_unidad,
+        //                         name: file.name
+        //                     },
+        //                     success: function(data) {
+        //                         console.log(data);
 
-                                if (data.ok) {
-                                    if (index > -1) {
-                                        lastImages.splice(index, 1);
-                                    }
-                                }   
-                            }
-                        });
-                    }
-                });
+        //                         if (data.ok) {
+        //                             if (index > -1) {
+        //                                 lastImages.splice(index, 1);
+        //                             }
+        //                         }   
+        //                     }
+        //                 });
+        //             }
+        //         });
 
-                dz.on("sending", function(file) {
-                    console.log("Enviando archivo:", file.name);
-                });
+        //         dz.on("sending", function(file) {
+        //             console.log("Enviando archivo:", file.name);
+        //         });
 
-                this.on("processing", function(file) {
-                    console.log("Procesando archivo:", file.name);
-                });
+        //         this.on("processing", function(file) {
+        //             console.log("Procesando archivo:", file.name);
+        //         });
 
-                this.on("uploadprogress", function(file, progress) {
-                    console.log("Progreso de subida:", file.name, progress + "%");
-                });
+        //         this.on("uploadprogress", function(file, progress) {
+        //             console.log("Progreso de subida:", file.name, progress + "%");
+        //         });
 
-                this.on("success", function(file) {
-                    console.log("Archivo subido con éxito:", file.name);
-                });
+        //         this.on("success", function(file) {
+        //             console.log("Archivo subido con éxito:", file.name);
+        //         });
 
 
-                this.on("successmultiple", function(files, response) {
-                    input.value = JSON.stringify(response.file_name);
-                    if(lastImages.length > 0){
-                        console.log("Combinando lastImages con nuevos archivos subidos.", lastImages);
-                        let allFiles = lastImages.concat(response.file_name);
-                        input.value = JSON.stringify(allFiles);
-                    }
-                    form.appendChild(input);
-                    submitForm(); // Ahora sí enviamos el form principal
-                });
+        //         this.on("successmultiple", function(files, response) {
+        //             input.value = JSON.stringify(response.file_name);
+        //             if(lastImages.length > 0){
+        //                 console.log("Combinando lastImages con nuevos archivos subidos.", lastImages);
+        //                 let allFiles = lastImages.concat(response.file_name);
+        //                 input.value = JSON.stringify(allFiles);
+        //             }
+        //             form.appendChild(input);
+        //             submitForm(); // Ahora sí enviamos el form principal
+        //         });
 
                 
-                // Evento que se ejecuta una sola vez cuando todas las subidas terminan
-                dz.on("queuecomplete", function(data) {
-                    if (!loadingExistingFiles) {
-                        processingFiles = false;
-                        console.log("Archivos procesados, enviando formulario...", loadingExistingFiles);
-                        if (!formSent) {
-                            form.appendChild(input);
-                            submitForm(); // Ahora sí enviamos el form principal
-                        }
-                    }
+        //         // Evento que se ejecuta una sola vez cuando todas las subidas terminan
+        //         dz.on("queuecomplete", function(data) {
+        //             if (!loadingExistingFiles) {
+        //                 processingFiles = false;
+        //                 console.log("Archivos procesados, enviando formulario...", loadingExistingFiles);
+        //                 if (!formSent) {
+        //                     form.appendChild(input);
+        //                     submitForm(); // Ahora sí enviamos el form principal
+        //                 }
+        //             }
 
-                });
+        //         });
 
-                this.on("error", function(file, response) {
-                    console.error("Error al subir:", response);
-                });
+        //         this.on("error", function(file, response) {
+        //             console.error("Error al subir:", response);
+        //         });
 
-            }
-        }).on('queuecomplete', function() {
-            console.log('Todas las subidas han finalizado.');
-        });
+        //     }
+        // }).on('queuecomplete', function() {
+        //     console.log('Todas las subidas han finalizado.');
+        // });
 
         function load_images() {
             $.ajax({
@@ -231,20 +231,21 @@
             formSubmitted = true; // Marca como enviado
 
             try {
-                // Si hay archivos en Dropzone, procesa la cola
-                if (myDropzone.getQueuedFiles().length > 0) {
-                    processingFiles = true;
+                // // Si hay archivos en Dropzone, procesa la cola
+                // if (myDropzone.getQueuedFiles().length > 0) {
+                //     processingFiles = true;
                     
-                    myDropzone.processQueue();
-                } else {
-                    // Si no hay archivos, envía el formulario normalmente 
-                    if(lastImages.length > 0){
-                        console.log("Combinando lastImages con nuevos archivos subidos.", lastImages);
-                        input.value = JSON.stringify(lastImages);
-                    }
-                    form.appendChild(input);
-                    submitForm();
-                }
+                //     myDropzone.processQueue();
+                // } else {
+                //     // Si no hay archivos, envía el formulario normalmente 
+                //     if(lastImages.length > 0){
+                //         console.log("Combinando lastImages con nuevos archivos subidos.", lastImages);
+                //         input.value = JSON.stringify(lastImages);
+                //     }
+                //     form.appendChild(input);
+                //     submitForm();
+                // }
+                submitForm();
             } catch (error) {
                 console.error('Error:', error);
                 ormSubmitted = false;
@@ -261,9 +262,9 @@
 
 
         async function submitForm() {
-            if (formSent || (processingFiles && myDropzone.getQueuedFiles().length > 0)) {
-                return;
-            }
+            // if (formSent || (processingFiles && myDropzone.getQueuedFiles().length > 0)) {
+            //     return;
+            // }
 
             formSent = true;
             const formData = new FormData(form);
@@ -315,8 +316,59 @@
             }
         }
 
+
+        function filterOptions(type) {
+            const simSelect = document.getElementById('simcontrol_id');
+            const deviceSelect = document.getElementById('devices_id');
+
+            const filter = (select, type) => {
+                let firstVisible = null;
+                Array.from(select.options).forEach(option => {
+                    const optionType = option.getAttribute('data-type');
+                    if (!optionType) { 
+                        return; 
+                    }
+
+                    if (type === 'Otro') {
+                         if (optionType === 'Otro') {
+                             option.hidden = false;
+                             option.disabled = false;
+                             if(!firstVisible) firstVisible = option;
+                         } else {
+                             option.hidden = true;
+                             option.disabled = true;
+                         }
+                    } else {
+                        if (optionType === type) {
+                            option.hidden = false;
+                            option.disabled = false;
+                            if(!firstVisible) firstVisible = option;
+                        } else {
+                             option.hidden = true;
+                             option.disabled = true;
+                        }
+                    }
+                });
+                
+                const selected = select.selectedOptions[0];
+                if (selected && selected.hidden && firstVisible && select.value !== "") {
+                    select.value = firstVisible.value;
+                } else if(selected && selected.hidden) {
+                    select.value = ""; 
+                }
+            };
+            if(simSelect) filter(simSelect, type);
+            if(deviceSelect) filter(deviceSelect, type);
+        }
+
+        // Run on load
+        if(dispositivo_instalado.value) {
+            filterOptions(dispositivo_instalado.value);
+        }
+
         dispositivo_instalado.addEventListener('change', (ev) => {
             let value = ev.target.value;
+            filterOptions(value);
             if (value == 'Otro') {
                 other_dispositivo_instalado.style.display = "block";
                 NewInput.setAttribute('name', 'dispositivo_instalado');

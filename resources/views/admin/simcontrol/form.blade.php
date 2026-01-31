@@ -13,6 +13,19 @@
                 <div class="row">
                     <div class="col-lg-6">
                         <div class="mb-3">
+                            <label for="type">Tipo</label>
+                            <select name="type" id="type" class="form-control mb-4 mb-md-0" required>
+                                <option value="">Seleccione un tipo</option>
+                                <option value="DVR" {{ $simcontrol->type == 'DVR' ? 'selected' : '' }}>DVR</option>
+                                <option value="GPS" {{ $simcontrol->type == 'GPS' ? 'selected' : '' }}>GPS</option>
+                                <option value="DASHCAM" {{ $simcontrol->type == 'DASHCAM' ? 'selected' : '' }}>DASHCAM</option>
+                                <option value="SENSOR" {{ $simcontrol->type == 'SENSOR' ? 'selected' : '' }}>SENSOR</option>
+                                <option value="Otro" {{ $simcontrol->type == 'Otro' ? 'selected' : '' }}>Otro</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3">
                             <label for="compañia">compañia</label>
                             <input type="text" name="compañia" class="form-control mb-4 mb-md-0"
                             value="{{ $simcontrol->compañia ?? old('compañia') }}" required/>

@@ -10,12 +10,26 @@
                 <div class="row">
                     <div class="col-lg-6">
                         <div class="mb-3">
+                            <label for="type">Tipo</label>
+                            <select name="type" id="type" class="form-control mb-4 mb-md-0" required>
+                                <option value="">Seleccione un tipo</option>
+                                <option value="DVR" {{ $device->type == 'DVR' ? 'selected' : '' }}>DVR</option>
+                                <option value="GPS" {{ $device->type == 'GPS' ? 'selected' : '' }}>GPS</option>
+                                <option value="DASHCAM" {{ $device->type == 'DASHCAM' ? 'selected' : '' }}>DASHCAM</option>
+                                <option value="SENSOR" {{ $device->type == 'SENSOR' ? 'selected' : '' }}>SENSOR</option>
+                                <option value="Otro" {{ $device->type == 'Otro' ? 'selected' : '' }}>Otro</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="mb-3">
                             <label for="dispositivo">Dispositivo</label>
                             <input type="text" name="dispositivo" class="form-control mb-4 mb-md-0"
                                 value="{{ $device->dispositivo ?? old('dispositivo') }}" required />
                         </div>
                     </div>
-                    <div class="col-lg-6">
+                    <div class="col-lg-2">
                         <div class="mb-3">
                             <label for="marca">Marca</label>
                             <input type="text" name="marca" class="form-control mb-4 mb-md-0"
@@ -55,14 +69,15 @@
                                     <div class="input-group mb-2 imei-row">
                                         <input type="text" name="imei[]" class="form-control" value="{{ $imei }}"
                                             placeholder="Ingrese IMEI" required>
-                                        <button type="button" class="btn btn-danger btn-remove-imei"
-                                            tabindex="-1">Quitar</button>
+                                        <!--<button type="button" class="btn btn-danger btn-remove-imei"
+                                            tabindex="-1">Quitar</button>-->
                                     </div>
                                 @endforeach
                             </div>
+                            <!--
                             <button type="button" class="btn btn-success btn-sm mt-2" id="btn-add-imei">
                                 Agregar IMEI
-                            </button>
+                            </button>-->
                         </div>
                     </div>
                 </div>

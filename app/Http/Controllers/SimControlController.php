@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\SimControl;
+use App\Imports\SimControlImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SimControlController extends Controller
 {
@@ -39,6 +41,7 @@ class SimControlController extends Controller
     {
         try {
             $request->validate([
+                'type' => 'required|string|max:255',
                 'compañia' => 'required|string|max:255',
                 'numero_sim' => 'required|string|min:10|max:100|unique:simcontrol,numero_sim',
                 'numero_publico' => 'required|string|max:100',
@@ -82,8 +85,9 @@ class SimControlController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
+            'type' => 'required|string|max:255',
             'compañia' => 'required|string|max:255',
-            'numero_sim' => 'required|string|min:10|max:100|unique.simcontrol,numero_sim,' . $id,
+            'numero_sim' => 'required|string|min:10|max:100',
             'numero_publico' => 'required|string|max:100',
         ]);
 
@@ -142,6 +146,29 @@ class SimControlController extends Controller
                 'ok' => false,
                 'message' => 'Failed to delete selected SIMs.',
             ], 500);
+        }
+    }
+    
+
+    public function import(Request $request) 
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv'
+        ]);
+
+        try {
+            Excel::import(new SimControlImport, $request->file('file'));
+            
+            return back()->with('success', 'SimCards importadas exitosamente.');
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+             $failures = $e->failures();
+             $messages = [];
+             foreach ($failures as $failure) {
+                 $messages[] = 'Fila ' . $failure->row() . ': ' . implode(', ', $failure->errors());
+             }
+             return back()->with('error', 'Error de validación: ' . implode('<br>', $messages));
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error al importar: ' . $e->getMessage());
         }
     }
 }

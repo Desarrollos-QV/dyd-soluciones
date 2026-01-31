@@ -31,7 +31,8 @@ class AssignementsController extends Controller
             ->get();
         $tecnicos = User::where('role', 'tecnico')->get();
         // return response()->json([
-        //     'assignements' => $assignements
+        //     'assignements' => $assignements,
+        //     'tecnicos' => $tecnicos
         // ]);
 
         return view($this->folder . 'index', compact('assignements', 'tecnicos'));
@@ -69,6 +70,8 @@ class AssignementsController extends Controller
         $tecnicos = User::where('role', 'tecnico')->get();
         $devices = Devices::all();
 
+        
+
         return view($this->folder . 'create', compact('assignement', 'clientes', 'tecnicos', 'devices'));
     }
 
@@ -88,11 +91,8 @@ class AssignementsController extends Controller
             'lat' => 'nullable|string',
             'lng' => 'nullable|string',
             'viaticos' => 'nullable|string',
-            'tipo_vehiculo' => 'nullable|string',
-            'marca' => 'nullable|string',
-            'modelo' => 'nullable|string',
+            'same_viaticos' => 'nullable|boolean',
             'unidad_id' => 'nullable|exists:unidades,id',
-            'placa' => 'nullable|string',
             'observaciones' => 'nullable|string',
         ]);
 
@@ -111,7 +111,7 @@ class AssignementsController extends Controller
                 'ok' => true,
                 'message' => 'Asignación creada correctamente.',
                 'code' => 200,
-                'redirect' => route('assignements.index')
+                'redirect' => route('assignements.inprogress')
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -155,11 +155,8 @@ class AssignementsController extends Controller
             'lat' => 'nullable|string',
             'lng' => 'nullable|string',
             'viaticos' => 'nullable|string',
-            'tipo_vehiculo' => 'nullable|string',
-            'marca' => 'nullable|string',
-            'modelo' => 'nullable|string',
+            'same_viaticos' => 'nullable',
             'unidad_id' => 'nullable|exists:unidades,id',
-            'placa' => 'nullable|string',
             'observaciones' => 'nullable|string',
         ]);
 
@@ -195,17 +192,36 @@ class AssignementsController extends Controller
                 }
             }
 
+            $data = $request->all();
+            if ($request->hasFile('file')) {
+                // Delete old file if exists
+                if ($assignement->file && file_exists(public_path('uploads/ordenes_servicio/' . $assignement->file))) {
+                    unlink(public_path('uploads/ordenes_servicio/' . $assignement->file));
+                }
+
+                $file = $request->file('file');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $file->move(public_path('uploads/ordenes_servicio'), $filename);
+                $data['file'] = $filename;
+            }
+
+            // Handle checkbox logic
+            $data['same_viaticos'] = $request->has('same_viaticos_check') ? 1 : 0;
+
+            $assignement->update($data);
+
 
             return response()->json([
                 'ok' => true,
                 'message' => 'Asignación actualizada correctamente.',
                 'code' => 200,
-                'redirect' => route('assignements.index')
+                'redirect' => route('assignements.index'),
+                'data' => $request->all()
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'ok' => false,
-                'message' => 'Error al crear el Dispositivo: ' . $e->getMessage(),
+                'message' => 'Error al actualizar la Asignación: ' . $e->getMessage(),
             ]);
         }
     }

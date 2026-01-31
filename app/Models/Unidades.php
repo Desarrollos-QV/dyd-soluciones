@@ -30,7 +30,6 @@ class Unidades extends Model
         'name_empresa',
         'credenciales',
         'vin',
-        'imei',
         'np_sim',
         'cuenta_con_apagado',
         'foto_unidad',

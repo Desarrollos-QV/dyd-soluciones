@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\{Devices, Cliente, Unidades, DeviceImei};
+use App\Imports\DevicesImport;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Http\Request;
 
 class DevicesController extends Controller
@@ -40,6 +42,7 @@ class DevicesController extends Controller
     public function store(Request $request)
     {
         $request->validate([
+            'type' => 'required|string|max:255',
             'dispositivo' => 'required|string|max:255',
             'marca' => 'required|string|max:255',
             'generacion' => 'required|string|max:100',
@@ -110,6 +113,7 @@ class DevicesController extends Controller
     public function update(Request $request, Devices $device)
     {
         $request->validate([
+            'type' => 'required|string|max:255',
             'dispositivo' => 'required|string|max:255',
             'marca' => 'required|string|max:255',
             'generacion' => 'required|string|max:100',
@@ -192,6 +196,29 @@ class DevicesController extends Controller
                 'ok' => false,
                 'message' => 'Error al eliminar los dispositivos: ' . $e->getMessage(),
             ]);
+        }
+    }
+    
+
+    public function import(Request $request) 
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv'
+        ]);
+
+        try {
+            Excel::import(new DevicesImport, $request->file('file'));
+            
+            return back()->with('success', 'Dispositivos importados exitosamente.');
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+             $failures = $e->failures();
+             $messages = [];
+             foreach ($failures as $failure) {
+                 $messages[] = 'Fila ' . $failure->row() . ': ' . implode(', ', $failure->errors());
+             }
+             return back()->with('error', 'Error de validación: ' . implode('<br>', $messages));
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error al importar: ' . $e->getMessage());
         }
     }
 }

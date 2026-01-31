@@ -19,6 +19,7 @@ class Asignaciones extends Model
         'lat',
         'lng',
         'viaticos',
+        'same_viaticos',
         'tipo_vehiculo',
         'marca',
         'modelo',
@@ -75,5 +76,10 @@ class Asignaciones extends Model
         }
 
         return true;
+    }
+
+    // Validamos el campo same_viaticos_check para cuando venga on = 1 si no  = 0
+    public function hasSameViaticos() {
+        return $this->same_viaticos == 1;
     }
 }

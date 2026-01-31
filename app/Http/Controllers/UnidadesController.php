@@ -12,11 +12,14 @@ use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\File;
 
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\UnidadesImport;
+
 class UnidadesController extends Controller
 {
     public function index()
     {
-        $unidades = Unidades::with('cliente','simcontrol','inventario')->get();
+        $unidades = Unidades::with('cliente','simcontrol','inventario')->orderBy('id', 'desc')->get();
         $clientes = Cliente::all();
         $simcontrols    = SimControl::all();
         $devicesList    = Devices::all();
@@ -44,6 +47,13 @@ class UnidadesController extends Controller
             }
         }
 
+        // return response()->json([
+        //     'unidad' => $unidad,
+        //     'clientes' => $clientes,
+        //     'simcontrols' => $simcontrols,
+        //     'devices' => $devices
+        // ]);
+
         return view('admin.unidades.create', compact('unidad', 'clientes', 'simcontrols' ,'devices'));
     }
 
@@ -62,7 +72,6 @@ class UnidadesController extends Controller
             'numero_de_motor'       => 'nullable|string|max:100',
             'sensor'                => 'nullable|string|max:100',
             'vin'                   => 'nullable|string|max:100',
-            'imei'                  => 'nullable|string|max:100',
             'np_sim'                => 'nullable|string|max:100',
             'cuenta_con_apagado'    => 'nullable|string', 
             'numero_de_emergencia'  => 'nullable|string',
@@ -139,7 +148,6 @@ class UnidadesController extends Controller
             'numero_de_motor'       => 'nullable|string|max:100',
             'sensor'                => 'nullable|string|max:100',
             'vin'                   => 'nullable|string|max:50',
-            'imei'                  => 'nullable|string|max:100',
             'np_sim'                => 'nullable|string|max:100',
             'cuenta_con_apagado'    => 'nullable|string', 
             'numero_de_emergencia'  =>  'nullable|string',
@@ -365,6 +373,27 @@ class UnidadesController extends Controller
                 'ok' => false,
                 'message' => 'Error al eliminar las unidades: ' . $e->getMessage(),
             ]);
+        }
+    }
+
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv',
+        ]);
+
+        try {
+            Excel::import(new UnidadesImport, $request->file('file'));
+            return back()->with('success', 'Unidades importadas correctamente.');
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+            $messages = [];
+            foreach ($failures as $failure) {
+                $messages[] = 'Fila ' . $failure->row() . ': ' . implode(', ', $failure->errors());
+            }
+            return back()->withErrors($messages);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error al importar: ' . $e->getMessage());
         }
     }
 }

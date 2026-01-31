@@ -18,6 +18,11 @@
                     <button class="btn btn-danger btn-sm mr-3" id="delete_selected">
                         <i data-feather="trash-2"></i> Eliminar Selección
                     </button>
+                    
+                    <button type="button" class="btn btn-success btn-sm ms-2 mr-3" data-toggle="modal" data-target="#importModal">
+                        <i data-feather="upload"></i> Importar Excel
+                    </button>
+
                     <a href="{{ route('unidades.create') }}" class="btn btn-primary btn-sm">
                         <i data-feather="plus"></i> Agregar Elemento
                     </a>
@@ -196,9 +201,11 @@
                                                     <a href="javascript:void(0)" class="dropdown-item"
                                                         onclick="alertSwwet('Observaciones', '{{ $unit->observaciones ?? 'Sin Obersaciones' }}')">Ver
                                                         observaciones</a>
-                                                    <a href="javascript:void(0)" class="dropdown-item"
-                                                        onclick="viewImages('Foto de la unidad', '{{ $unit->foto_unidad }}' ,'{{ asset('uploads/fotos_unidades') }}')">Ver
-                                                        Fotos de la unidad</a>
+                                                    @if($unit->foto_unidad != null)
+                                                        <a href="javascript:void(0)" class="dropdown-item"
+                                                            onclick="viewImages('Foto de la unidad', '{{ $unit->foto_unidad }}' ,'{{ asset('uploads/fotos_unidades') }}')">Ver
+                                                            Fotos de la unidad</a>
+                                                    @endif
                                                     <hr />
                                                     <a href="{{ route('unidades.destroy', $unit) }}" class="dropdown-item"
                                                         onclick="event.preventDefault(); if(confirm('¿Estás seguro de que deseas eliminar esta unidad? Esta acción no se puede deshacer.')) { this.querySelector('form').submit(); }">
@@ -219,6 +226,38 @@
                         </table>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Importar Excel -->
+    <div class="modal fade" id="importModal" tabindex="-1" role="dialog" aria-labelledby="importModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="importModalLabel">Importar Unidades desde Excel</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="{{ route('unidades.import') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="file" class="form-label">Seleccionar Archivo Excel</label>
+                            <input type="file" class="form-control" id="file" name="file" required accept=".xlsx,.xls,.csv">
+                        </div>
+                        <div class="alert alert-info">
+                            <strong>Nota:</strong> El archivo debe contener las columnas exactas requeridas por el sistema.
+                            <br>
+                            Columnas esperadas: <code>cliente_id</code>, <code>economico</code>, <code>placa</code>, <code>tipo_unidad</code>, <code>dispositivo_instalado</code>, <code>fecha_instalacion</code>, <code>fecha_cobro</code>, <code>simcontrol_id</code>, <code>devices_id</code>, etc.
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Importar</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

@@ -12,6 +12,7 @@ class SimControl extends Model
     protected $table = 'simcontrol';
 
     public $fillable = [
+        'type',
         'compañia',
         'numero_sim',
         'numero_publico',

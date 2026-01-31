@@ -46,7 +46,6 @@
                             <option value="GPS" @if($unidad->dispositivo_instalado == 'GPS') selected @endif>GPS</option>
                             <option value="DASHCAM" @if($unidad->dispositivo_instalado == 'DASHCAM') selected @endif>DASHCAM</option>
                             <option value="SENSOR" @if($unidad->dispositivo_instalado == 'SENSOR') selected @endif>SENSOR</option>
-                            <option value="Otro" @if($unidad->dispositivo_instalado == 'Otro') selected @endif>Otro</option>
                         </select>
                         <div class="row" id="other_dispositivo_instalado" style="display: none;">
                             <div class="col-md-12 mt-2" id="inner_other_disp">
@@ -60,7 +59,7 @@
                         <label for="simcontrol_id">Vincular SIM</label>
                         <select name="simcontrol_id" id="simcontrol_id" class="form-select" required>
                             @foreach($simcontrols as $sim)
-                                <option value="{{ $sim->id }}" @if($unidad->simcontrol_id == $sim->id) selected @endif>
+                                <option value="{{ $sim->id }}" data-type="{{ $sim->type }}" @if($unidad->simcontrol_id == $sim->id) selected @endif>
                                     {{ $sim->compañia }} - {{ $sim->numero_publico }}
                                 </option>
                             @endforeach
@@ -72,7 +71,7 @@
                         <label for="devices_id">Vincular de Inventario</label>
                         <select name="devices_id" id="devices_id" class="form-select" required>
                             @foreach($devices as $device)
-                                <option value="{{ $device->id }}" @if($unidad->devices_id == $device->id) selected @endif>
+                                <option value="{{ $device->id }}" data-type="{{ $device->type }}" @if($unidad->devices_id == $device->id) selected @endif>
                                     {{ $device->dispositivo }} - {{ $device->marca }}
                                 </option>
                             @endforeach
@@ -92,34 +91,29 @@
                 </div>
 
                 <div class="row mt-4">
-                    <div class="col-lg-3">
+                    <div class="col-lg-6">
+                        <label for="marca">Marca</label>
+                        <input type="text" name="marca" id="marca" class="form-control" required
+                            value="{{ $unidad->marca }}">
+                    </div>
+                    <div class="col-lg-4">
+                        <label for="submarca">Submarca</label>
+                        <input type="text" name="submarca" id="submarca" class="form-control" required
+                            value="{{ $unidad->submarca }}">
+                    </div>
+                    <div class="col-lg-2">
                         <label for="anio_unidad">Año de la unidad</label>
                         <input type="number" name="anio_unidad" id="anio_unidad" class="form-control"
                         min="1900" max="{{ date('Y') }}"
                         value="{{ $unidad->anio_unidad ?? old('anio_unidad') }}" required>
                     </div>
-                    <div class="col-lg-3">
-                        <label for="marca">Marca</label>
-                        <input type="text" name="marca" id="marca" class="form-control" required
-                            value="{{ $unidad->marca }}">
-                    </div>
-                    <div class="col-lg-3">
-                        <label for="submarca">Submarca</label>
-                        <input type="text" name="submarca" id="submarca" class="form-control" required
-                            value="{{ $unidad->submarca }}">
-                    </div>
-                    <div class="col-lg-3">
-                        <label for="vin">Número VIN</label>
-                        <input type="text" name="vin" id="vin" class="form-control" required
-                            value="{{ $unidad->vin }}">
-                    </div>
                 </div>
 
                 <div class="row mt-4">
                     <div class="col-lg-6">
-                        <label for="imei">IMEI</label>
-                        <input type="text" name="imei" id="imei" class="form-control" required
-                            value="{{ $unidad->imei }}">
+                        <label for="vin">Número VIN</label>
+                        <input type="text" name="vin" id="vin" class="form-control" required
+                            value="{{ $unidad->vin }}">
                     </div>
                     <div class="col-lg-6">
                         <label for="cuenta_con_apagado">¿Cuenta con apagado?</label>
@@ -248,10 +242,10 @@
                             value="{{ $unidad->numero_de_emergencia ?? old('numero_de_emergencia') }}">
                     </div>
 
-                    <div class="col-lg-12 mt-4">
+                    <!--<div class="col-lg-12 mt-4">
                         <label for="foto_unidad">Fotografias de la unidad</label>
                         <div id="dropzoneForm" class="dropzone"></div> 
-                    </div>
+                    </div>-->
                 </div>
             </div>
         </div>

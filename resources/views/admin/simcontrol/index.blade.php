@@ -18,6 +18,10 @@
                 <button class="btn btn-danger btn-sm mr-3" id="delete_selected">
                     <i data-feather="trash-2"></i> Eliminar Selección
                 </button>
+                <button type="button" class="btn btn-success btn-sm mr-2" data-toggle="modal"
+                    data-target="#importExcelModal">
+                    <i data-feather="upload"></i> Importar Excel
+                </button>
                 <a href="{{ route('simcontrol.create') }}" class="btn btn-primary btn-sm">
                     <i data-feather="plus"></i> Agregar nueva Simcard
                 </a>
@@ -33,6 +37,7 @@
                         <thead>
                             <tr>
                                 <th></th>
+                                <th>Tipo</th>
                                 <th>compañia</th>
                                 <th>numero SIM</th>
                                 <th>numero Público</th> 
@@ -46,6 +51,7 @@
                                     <input type="checkbox" id="select_element_{{ $sim->id }}"
                                         name="select_element_{{ $sim->id }}">
                                 </td>
+                                <td>{{ $sim->type }}</td>
                                 <td>{{ $sim->compañia }}</td>
                                 <td>{{ $sim->numero_sim }}</td>
                                 <td>{{ $sim->numero_publico }}</td> 
@@ -73,6 +79,40 @@
                     </table>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Importar Excel -->
+<div class="modal fade" id="importExcelModal" tabindex="-1" role="dialog" aria-labelledby="importExcelModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="importExcelModalLabel">Importar SimCards desde Excel</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="{{ route('simcontrol.import') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="file">Seleccionar archivo Excel (.xlsx, .xls, .csv)</label>
+                        <input type="file" name="file" id="file" class="form-control" required>
+                    </div>
+                    <div class="alert alert-info">
+                        <small>
+                            El archivo debe contener las siguientes columnas en la primera fila:
+                            <strong>type, compañia, numero_sim, numero_publico, observaciones</strong>
+                        </small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Importar</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

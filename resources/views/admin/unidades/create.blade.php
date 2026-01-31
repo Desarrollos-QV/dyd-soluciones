@@ -34,47 +34,47 @@
         let formSent = false;
 
         
-        let myDropzone = new Dropzone("#dropzoneForm", {
-            url: "{{ route('unidades.uploads') }}",
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-            },
-            autoProcessQueue: false, // Importante: deshabilita el procesamiento automático
-            uploadMultiple: true,
-            parallelUploads: 5,
-            maxFiles: 5,
-            acceptedFiles: "image/*",
-            addRemoveLinks: true,
-            init: function() {
-                let dz = this;
-                let input = document.createElement('input');
-                this.on("complete", function(data){
-                    // Evento que se ejecuta una sola vez cuando todas las subidas terminan
-                    dz.on("queuecomplete", function(data) {
-                        processingFiles = false;
-                        if (!formSent) {
-                            form.appendChild(input);
+        // let myDropzone = new Dropzone("#dropzoneForm", {
+        //     url: "{{ route('unidades.uploads') }}",
+        //     headers: {
+        //         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        //     },
+        //     autoProcessQueue: false, // Importante: deshabilita el procesamiento automático
+        //     uploadMultiple: true,
+        //     parallelUploads: 5,
+        //     maxFiles: 5,
+        //     acceptedFiles: "image/*",
+        //     addRemoveLinks: true,
+        //     init: function() {
+        //         let dz = this;
+        //         let input = document.createElement('input');
+        //         this.on("complete", function(data){
+        //             // Evento que se ejecuta una sola vez cuando todas las subidas terminan
+        //             dz.on("queuecomplete", function(data) {
+        //                 processingFiles = false;
+        //                 if (!formSent) {
+        //                     form.appendChild(input);
                             
-                            submitForm(); // Ahora sí enviamos el form principal
-                        }
+        //                     submitForm(); // Ahora sí enviamos el form principal
+        //                 }
                         
-                    });
+        //             });
 
-                    dz.on("successmultiple", function(files, response) {
-                        input.type = 'hidden';
-                        input.name = 'foto_unidad';
-                        input.value = JSON.stringify(response.file_name);
-                        form.appendChild(input);
-                        console.log("Archivos subidos:", response.file_name);
-                    });
+        //             dz.on("successmultiple", function(files, response) {
+        //                 input.type = 'hidden';
+        //                 input.name = 'foto_unidad';
+        //                 input.value = JSON.stringify(response.file_name);
+        //                 form.appendChild(input);
+        //                 console.log("Archivos subidos:", response.file_name);
+        //             });
 
-                    dz.on("error", function(file, response) {
-                        console.error("Error al subir:", response);
-                    });
+        //             dz.on("error", function(file, response) {
+        //                 console.error("Error al subir:", response);
+        //             });
 
-                });
-            }
-        });
+        //         });
+        //     }
+        // });
 
         form.addEventListener('submit', async function(event) {
             event.preventDefault(); // Evita el envío tradicional del formulario
@@ -83,13 +83,14 @@
 
             try {
                 // Si hay archivos en Dropzone, procesa la cola
-                if (myDropzone.getQueuedFiles().length > 0) { 
-                    processingFiles = true;
-                    myDropzone.processQueue();
-                } else {
-                    // Si no hay archivos, envía el formulario normalmente 
-                    submitForm();
-                }
+                // if (myDropzone.getQueuedFiles().length > 0) { 
+                //     processingFiles = true;
+                //     myDropzone.processQueue();
+                // } else {
+                //     // Si no hay archivos, envía el formulario normalmente 
+                //     submitForm();
+                // }
+                submitForm(); // Procesamos la cola directamente...
             } catch (error) {
                 console.error('Error:', error);
                 ormSubmitted = false;
@@ -106,9 +107,9 @@
 
 
         async function submitForm() {
-            if (formSent || (processingFiles && myDropzone.getQueuedFiles().length > 0)) {
-                return;
-            }
+            // if (formSent || (processingFiles && myDropzone.getQueuedFiles().length > 0)) {
+            //     return;
+            // }
 
             formSent = true;
             const formData = new FormData(form);
@@ -169,8 +170,62 @@
         }
 
 
+
+        function filterOptions(type) {
+            const simSelect = document.getElementById('simcontrol_id');
+            const deviceSelect = document.getElementById('devices_id');
+
+            const filter = (select, type) => {
+                let firstVisible = null;
+                Array.from(select.options).forEach(option => {
+                    const optionType = option.getAttribute('data-type');
+                    // Si no tiene data-type (placeholder), lo dejamos
+                    if (!optionType) { 
+                        return; 
+                    }
+
+                    if (type === 'Otro') {
+                         if (optionType === 'Otro') {
+                             option.hidden = false;
+                             option.disabled = false;
+                             if(!firstVisible) firstVisible = option;
+                         } else {
+                             option.hidden = true;
+                             option.disabled = true;
+                         }
+                    } else {
+                        if (optionType === type) {
+                            option.hidden = false;
+                            option.disabled = false;
+                            if(!firstVisible) firstVisible = option;
+                        } else {
+                             option.hidden = true;
+                             option.disabled = true;
+                        }
+                    }
+                });
+                
+                // Deseleccionar si el seleccionado esta oculto
+                const selected = select.selectedOptions[0];
+                if (selected && selected.hidden && firstVisible && select.value !== "") {
+                    select.value = firstVisible.value;
+                } else if(selected && selected.hidden) {
+                    select.value = ""; 
+                }
+            };
+            if(simSelect) filter(simSelect, type);
+            if(deviceSelect) filter(deviceSelect, type);
+        }
+
+        // Run on load
+        if(dispositivo_instalado.value) {
+            filterOptions(dispositivo_instalado.value);
+        }
+
         dispositivo_instalado.addEventListener('change', (ev) => {
             let value = ev.target.value;
+            filterOptions(value); // Filter on change
+
             if (value == 'Otro') {
                 other_dispositivo_instalado.style.display = "block";
                 NewInput.setAttribute('name', 'dispositivo_instalado');

@@ -81,12 +81,14 @@ Route::group(['middleware' => 'isAdmin'], function () {
      */
     Route::resource('devices', DevicesController::class);
     Route::post('devices/deleteSelected', [DevicesController::class, 'deleteSelected'])->name('devices.bulkDelete');
+    Route::post('devices/import', [DevicesController::class, 'import'])->name('devices.import');
 
 
     /**
      * * Unidades Routes
      */
     Route::resource('unidades', UnidadesController::class);
+    Route::post('unidades/import', [UnidadesController::class, 'import'])->name('unidades.import');
     Route::post('unidades/uploads', [UnidadesController::class, 'uploads'])->name('unidades.uploads');
     Route::get('unidades/fetchUploads/{unidad}', [UnidadesController::class, 'fetchUploads'])->name('unidades.fetchUploads');
     Route::get('unidades/deleteUploads/{unidad}', [UnidadesController::class, 'deleteUploads'])->name('unidades.deleteUploads');
@@ -143,6 +145,7 @@ Route::group(['middleware' => 'isAdmin'], function () {
      */
     Route::resource('simcontrol', SimControlController::class);
     Route::post('simcontrol/deleteSelected', [SimControlController::class, 'deleteSelected'])->name('simcontrol.bulkDelete');
+    Route::post('simcontrol/import', [SimControlController::class, 'import'])->name('simcontrol.import');
 
     /**
      * Ingresos/Gastos

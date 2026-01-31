@@ -11,6 +11,7 @@ class Devices extends Model
     use HasFactory;
 
     protected $fillable = [
+        'type',
         'dispositivo',
         'marca',
         'camaras',
