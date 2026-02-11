@@ -103,6 +103,11 @@ class User extends Authenticatable
         return $this->role === 'tecnico';
     }
 
+    public function isSeller()
+    {
+        return $this->role === 'seller';
+    }
+
     /**
      * Get the user's is Super Admin.
      */
@@ -127,6 +132,7 @@ class User extends Authenticatable
             ? true
             : false;
     }
+
 
     public function setPermissions($data)
     {
@@ -196,5 +202,4 @@ class User extends Authenticatable
         return $this->hasMany(ReporteIngresoEgreso::class);
     }
 
-    
 }

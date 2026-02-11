@@ -21,7 +21,7 @@
                     </div>
                 </td>
                 <td>
-                    <span class="badge bg-light text-dark border">{{ $item->unidad->economico }}</span>
+                    <span class="badge bg-light text-dark border">{{ $item->unidad?->economico }}</span>
                 </td>
                 <td>
                     <div class="d-flex align-items-center">

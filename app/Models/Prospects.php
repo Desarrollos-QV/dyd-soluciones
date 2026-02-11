@@ -26,4 +26,14 @@ class Prospects extends Model
         return $this->belongsTo(Sellers::class, 'sellers_id');
     }
 
+    public function notes()
+    {
+        return $this->hasMany(ProspectNote::class, 'prospect_id');
+    }
+
+    public function events()
+    {
+        return $this->hasMany(ProspectEvent::class, 'prospect_id');
+    }
+
 }

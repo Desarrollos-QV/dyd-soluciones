@@ -17,11 +17,15 @@
 
             <div class="row mb-3">
                 <div class="col-md-6">
+                    <label>Correo electrónico</label>
+                    <input type="email" name="email" value="{{$cliente->email}}" class="form-control" required>
+                </div>
+                <div class="col-md-3">
                     <label>Teléfono</label>
                     <input type="text" name="numero_contacto" value="{{$cliente->numero_contacto}}" class="form-control" required>
                 </div>
-                <div class="col-md-6">
-                    <label>Número de Emergencias o cliente</label>
+                <div class="col-md-3">
+                    <label>Número de Emergencias</label>
                     <input type="text" name="numero_alterno" value="{{$cliente->numero_alterno}}" class="form-control">
                 </div>
             </div>

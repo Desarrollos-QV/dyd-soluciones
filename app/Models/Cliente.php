@@ -16,6 +16,7 @@ class Cliente extends Model
         'direccion',// Obligatorio
         'numero_contacto',// Obligatorio
         'numero_alterno',
+        'email',
         'tipo_empresa',
         'empresa',
         'identificacion',

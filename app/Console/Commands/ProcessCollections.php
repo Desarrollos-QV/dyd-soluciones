@@ -119,7 +119,7 @@ class ProcessCollections extends Command
                     'Gestión de cobranza',
                     "La mensualidad del cliente {$unidad->cliente->nombre} esta por vencer.",
                     json_encode(["unidad" => $unidad->id]),
-                    route('collections.index'),
+                    route('collections.index'), // Redireccionamos a caja
                     now()->addDays(7)
                 );
 

@@ -35,6 +35,7 @@
     <div class="main-wrapper">
         @if (
             !Route::is('login') &&
+            !Route::is('sellers.login') &&
                 !Route::is('register') &&
                 !Route::is('password.request') &&
                 !Route::is('password.reset') &&
@@ -45,6 +46,7 @@
         @endif
 
         <div class="page-wrapper @if (Route::is('login') ||
+                Route::is('sellers.login') ||
                 Route::is('register') ||
                 Route::is('password.request') ||
                 Route::is('password.reset') ||
@@ -52,6 +54,7 @@
 
             @if (
                 !Route::is('login') &&
+                !Route::is('sellers.login') &&
                     !Route::is('register') &&
                     !Route::is('password.request') &&
                     !Route::is('password.reset') &&
@@ -77,7 +80,7 @@
             </div>
 
             <footer class="footer d-flex flex-column flex-md-row align-items-center justify-content-between">
-                <p class="text-muted text-center text-md-left">Copyright © 2025 DYD Soluciones. Todos los derechos
+                <p class="text-muted text-center text-md-left">Copyright © 2026 DYD Soluciones. Todos los derechos
                     reservados.</p>
                 <p class="text-muted text-center text-md-left mb-0 d-none d-md-block">
                     Desarrollado por <a href="https://desarrollosqv.com" target="_blank">DesarrollosQV</a> <i
@@ -101,6 +104,7 @@
     <script src="{{ asset('assets/vendors/progressbar.js/progressbar.min.js') }}"></script>
     <script src="https://cdn.datatables.net/v/dt/dt-2.3.4/datatables.min.js" integrity="sha384-X2pTSfom8FUa+vGQ+DgTCSyBZYkC1RliOduHa0X96D060s7Q//fnOh3LcazRNHyo" crossorigin="anonymous"></script>
     <!-- end plugin js for this page -->
+    @stack('plugin-scripts')
     <!-- inject:js -->
     <script src="{{ asset('assets/vendors/feather-icons/feather.min.js') }}"></script>
     <script src="{{ asset('assets/js/template.js') }}"></script>
@@ -114,6 +118,7 @@
     <!-- custom js for Notifications -->
     <script src="{{ asset('assets/js/notifications.js') }}"></script>
     @yield('js')
+    @stack('custom-scripts')
 
     <script>
         function alertSwwet(title, msg) {

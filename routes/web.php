@@ -2,6 +2,14 @@
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+
+// Contorllers para Sellers
+use App\Http\Controllers\Auth\SellersLoginController;
+use App\Http\Controllers\Sellers\HomeController as SellersHomeController;
+use App\Http\Controllers\Sellers\ProspectsController as SellersProspectsController;
+use App\Http\Controllers\Sellers\KanbanController; 
+
+// Contorllers para Admin
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SubaccountController;
 use App\Http\Controllers\ClienteController;
@@ -9,7 +17,6 @@ use App\Http\Controllers\UnidadesController;
 use App\Http\Controllers\AssignementsController;
 use App\Http\Controllers\CollectionsController;
 use App\Http\Controllers\SettingsController;
-
 use App\Http\Controllers\TecnicoController;
 use App\Http\Controllers\EjecucionInstalacionController;
 use App\Http\Controllers\EntregaServicioController;
@@ -37,6 +44,34 @@ use App\Http\Controllers\SimControlController;
 | contains the "web" middleware group. Now create something great!
 |
 */
+/*
+|--------------------------------------------------------------------------
+| Sellers Routes
+|--------------------------------------------------------------------------
+*/
+Route::get('/sellers/login', [SellersLoginController::class, 'showLoginForm'])->name('sellers.login');
+Route::post('/sellers/login', [SellersLoginController::class, 'login'])->name('sellers.login.submit');
+Route::post('/sellers/logout', [SellersLoginController::class, 'logout'])->name('sellers.logout');
+
+Route::group(['prefix' => 'sellers', 'middleware' => 'sellers', 'as' => 'sellers.'], function () {
+    Route::get('/dashboard', [SellersHomeController::class, 'index'])->name('dashboard');
+
+    // Ruta para Prospectos asignados
+    Route::get('prospects', [SellersProspectsController::class, 'index'])->name('prospects.index');
+    Route::get('prospects/create', [SellersProspectsController::class, 'create'])->name('prospects.create');
+    Route::post('prospects', [SellersProspectsController::class, 'store'])->name('prospects.store');
+    Route::get('prospects/{id}/edit', [SellersProspectsController::class, 'edit'])->name('prospects.edit');
+    Route::put('prospects/{id}', [SellersProspectsController::class, 'update'])->name('prospects.update');
+
+    // Rutas Kanban
+    Route::get('kanban', [KanbanController::class, 'index'])->name('kanban.index');
+    Route::post('kanban/update-status', [KanbanController::class, 'updateStatus'])->name('kanban.updateStatus');
+    Route::post('kanban/note', [KanbanController::class, 'storeNote'])->name('kanban.storeNote');
+    Route::post('kanban/event', [KanbanController::class, 'storeEvent'])->name('kanban.storeEvent');
+    Route::post('kanban/convert-client', [KanbanController::class, 'convertToClient'])->name('kanban.convertToClient');
+    Route::get('kanban/prospect/{id}', [KanbanController::class, 'getProspectDetails'])->name('kanban.getProspectDetails');
+});
+
 Auth::routes();
 
 /*|--------------------------------------------------------------------------
@@ -203,6 +238,7 @@ Route::group(['middleware' => 'isAdmin'], function () {
  */
 Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
 Route::post('/notifications/read/{id}', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+Route::get('/notifications/count', [NotificationController::class, 'count'])->name('notifications.count');
 
 /**
  * Servicios Agendados

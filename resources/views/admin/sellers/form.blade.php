@@ -62,6 +62,23 @@
     <div class="card">
         <div class="card-body">
             <div class="form-group">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label for="email">Correo Electronico</label>
+                            <input type="email" name="email" class="form-control mb-4 mb-md-0"
+                            value="{{ $seller->email ?? old('email') }}" required/>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label for="password">Contraseña</label>
+                            <input type="password" name="password" class="form-control mb-4 mb-md-0"
+                            value="{{ $seller->password ?? old('password') }}" required/>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="row">                   
                     <div class="col-lg-12 mt-4">
                         @if(isset($seller->id))

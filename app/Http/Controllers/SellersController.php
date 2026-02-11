@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Sellers;
+use Illuminate\Support\Facades\Hash;
 
 class SellersController extends Controller
 {
@@ -38,6 +39,8 @@ class SellersController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'email' => 'required|string|max:255',
+            'password' => 'required|string|max:255',
             'address' => 'required|string',
             'phone' => 'required|string|max:20',
             'level_education' => 'required|string|max:100',
@@ -55,6 +58,8 @@ class SellersController extends Controller
                 $file->move(public_path('uploads/identificaciones'), $filename); // Guardar en la carpeta 'uploads/ine_comprobantes'
                 $data['picture'] = 'uploads/identificaciones/' . $filename; // Ruta relativa para guardar en la base de datos
             }
+
+            $data['password'] = Hash::make($data['password']);
 
             Sellers::create($data);
             return response()->json([
@@ -91,6 +96,8 @@ class SellersController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'email' => 'required|string|max:255',
+            'password' => 'required|string|max:255',
             'address' => 'required|string',
             'phone' => 'required|string|max:20',
             'level_education' => 'required|string|max:100',
@@ -113,6 +120,11 @@ class SellersController extends Controller
                 $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/identificaciones'), $filename); // Guardar en la carpeta 'uploads/ine_comprobantes'
                 $data['picture'] = 'uploads/identificaciones/' . $filename; // Ruta relativa para guardar en la base de datos
+            }
+
+            // Validamos si la contraseña ha sido cambiada
+            if ($request->has('password') && $request->password != '') {
+                $data['password'] = Hash::make($request->password);
             }
 
             $seller->update($data);

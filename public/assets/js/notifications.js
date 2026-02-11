@@ -28,8 +28,7 @@
             $.ajax({
                 url: url_pagination,
                 data: { skip: allElements},
-            }).done(function (data) {
-                console.log(data);
+            }).done(function (data) { 
                 if(data){
                     $('.loadMoreSpinNotify').remove();
                     $(data).appendTo(".inner-body-card-notify");
@@ -62,8 +61,7 @@
         }
 
         btnEvent.on('click', function (ev) {
-            console.log("Event Click en Notificaciones");
-        if (evController[0].classList.contains('show')) {
+            if (evController[0].classList.contains('show')) {
                 // Si ya está abierto, el click lo cerraría, así que prevenimos la acción
                 ev.preventDefault();
                 ev.stopPropagation();
@@ -73,7 +71,33 @@
                 $(".card-notify-list").remove(); // Eliminamos todas las notificaciones
                 $('.wrap_no_notifications').remove(); // Eliminamos todos los nulls
                 Checknotify(0);
+                $('.indicator').hide();
             }
         });
+
+
+        // Obtenemos cantidad de notificaciones
+        function countNotify(){
+            $.ajax({
+                url: '/notifications/count',
+                type: 'GET',
+                success: function (data) { 
+                    if(data.count > 0){
+                        // Reproduciremos un audio
+                        var audio = new Audio('/assets/audios/notify.mp3');
+                        audio.play();
+                        $('.indicator').show();
+                    }else{
+                        $('.indicator').hide();
+                    }
+                }
+            });
+        }
+
+        countNotify();
+        // Sera un Timer de 10 segundos para obtener la cantidad de notificaciones
+        setInterval(function() {
+            countNotify();
+        }, 10000);
     });
 })(jQuery);

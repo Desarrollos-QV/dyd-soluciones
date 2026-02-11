@@ -33,6 +33,7 @@ class ClienteController extends Controller
         try {
             $request->validate([
                 'nombre' => 'required',
+                'email' => 'required',
                 'direccion' => 'required',
                 'numero_contacto' => 'required',
                 'numero_alterno' => 'nullable',
@@ -123,6 +124,7 @@ class ClienteController extends Controller
         try {
             $request->validate([
                 'nombre' => 'required',
+                'email' => 'required',
                 'direccion' => 'required',
                 'numero_contacto' => 'required',
                 'numero_alterno' => 'nullable',

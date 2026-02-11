@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\{Prospects, Sellers, Cliente};
+use App\Traits\NotifiesUsers;
 
 class ProspectsController extends Controller
 {
+    use NotifiesUsers;
     public $folder = 'admin.prospects';
 
     /**
@@ -128,7 +130,6 @@ class ProspectsController extends Controller
         $prospect->status = $status;
         $prospect->save();
 
-
         // Verificamos si el status es = 2(Concretado) para pasar este elemento a la tabla de clientes
         if($status == 2){
             $client = new Cliente;
@@ -138,6 +139,13 @@ class ProspectsController extends Controller
             $client->empresa            = $prospect->name_company;
             $client->direccion_empresa  = $prospect->company;
             $client->save();
+        }
+
+        // Validamos si el prospecto ya esta asignado a un seller si es asi, notificamos al seller que el status de su prospecto ha cambiado
+        if($prospect->sellers_id != null){
+            $this->notifySeller($prospect->sellers_id, 'info', 'Prospecto actualizado', 'El status de tu prospecto ha cambiado', [
+                'prospect' => $prospect
+            ], route('sellers.prospects.index'));
         }
 
         return redirect()->route('prospects.index')->with('success', 'Estado del prospecto actualizado exitosamente');
@@ -151,8 +159,24 @@ class ProspectsController extends Controller
     public function AssignSeller($id , $seller)
     {
         $prospect = Prospects::findOrFail($id);
+
+        // Validamos si el prospecto ya tiene un seller asignado
+        if($prospect->sellers_id != 0   ){
+            // Obtenemos el selle actual para notificarle que ya no sera su prospecto
+            $this->notifySeller($prospect->sellers_id, 'info', 'Prospecto reasignado', 'El prospecto ha sido reasignado a otro vendedor', [
+                'prospect' => $prospect
+            ], route('sellers.prospects.index'));
+        }
+
         $prospect->sellers_id = $seller;
         $prospect->save();
+
+        if($seller != 0){
+            // Notificamos al nuevo seller que se le ha asignado un nuevo prospecto
+            $this->notifySeller($prospect->sellers_id, 'info', 'Nuevo prospecto asignado', 'Se te ha asignado un nuevo prospecto', [
+                'prospect' => $prospect
+            ], route('sellers.prospects.index'));
+        }
 
         return redirect()->route('prospects.index')->with('success', 'Vendedor asignado al prospecto exitosamente');
     }

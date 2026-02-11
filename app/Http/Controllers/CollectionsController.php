@@ -154,34 +154,38 @@ class CollectionsController extends Controller
         // Notificamos al Usuario
         switch ($medio) {
             case 'sms':
-                // Aquí iría la lógica para enviar SMS, por ejemplo, usando un servicio como Twilio.
-                // Ejemplo: Twilio::sendMessage($phoneNumber, $message);
                 $this->notifyUserSMS(
                     $phoneNumber,
-                    $message
+                    request('mensaje')
                 );
                 break;
             case 'whatsapp':
-                // Aquí iría la lógica para enviar un mensaje de WhatsApp.
-                // Ejemplo: WhatsAppService::sendMessage($phoneNumber, $message);
                 $this->notifyUserWhatsapp(
                     $phoneNumber,
-                    $message
+                    request('mensaje')
                 );
                 break;
             case 'email':
-                // Aquí iría la lógica para enviar un correo electrónico.
-                // Asegúrate de que el cliente tenga un campo 'email'.
-                // Ejemplo: Mail::to($collection->cliente->email)->send(new PaymentReminderMail($message));
-                // $this->notifyUserEmail(
-                //     $phoneNumber,
-                //     $message
-                // );
+                // Verificar que el cliente tenga email
+                if (!$collection->cliente->email) {
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'El cliente no tiene un correo electrónico registrado.'
+                    ], 400);
+                }
+                
+                $this->notifyUserEmail(
+                    $collection->cliente->email,
+                    $clientName,
+                    $amount,
+                    $collection->due_date,
+                    request('mensaje')
+                );
                 break;
             default:
                 $this->notifyUserSMS(
                     $phoneNumber,
-                    $message
+                    request('mensaje')
                 );
                 break;
         }

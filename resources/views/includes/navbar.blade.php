@@ -15,8 +15,7 @@
         </form>
         <ul class="navbar-nav">
             <li class="nav-item dropdown nav-notifications">
-                <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button"
-                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <i data-feather="bell"></i>
                     <div class="indicator">
                         <div class="circle"></div>
@@ -34,16 +33,22 @@
             <li class="nav-item dropdown nav-profile">
                 <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <img src="{{ Auth::user()->avatar ? asset(Auth::user()->avatar) : asset('assets/images/placeholder.jpg') }}" alt="userr">
+                    <img src="{{ Auth::user()->avatar ? asset(Auth::user()->avatar) : asset('assets/images/background-login.jpg') }}" alt="userr">
                 </a>
                 <div class="dropdown-menu" aria-labelledby="profileDropdown">
                     <div class="dropdown-header d-flex flex-column align-items-center">
                         <div class="figure mb-3">
-                            <img src="{{ Auth::user()->avatar ? asset(Auth::user()->avatar) : asset('assets/images/placeholder.jpg') }}" alt="">
+                            @if(Auth::user())
+                                <img src="{{ Auth::user()->avatar ? asset(Auth::user()->avatar) : asset('assets/images/background-login.jpg') }}" alt="">
+                            @elseif(Auth::guard('sellers')->check())
+                                <img src="{{ Auth::guard('sellers')->user()->picture ? asset(Auth::guard('sellers')->user()->picture) : asset('assets/images/background-login.jpg') }}" alt="">
+                            @else
+                                <img src="{{ asset('assets/images/background-login.jpg') }}" alt="">
+                            @endif
                         </div>
                         <div class="info text-center">
-                            <p class="name font-weight-bold mb-0">{{ Auth::user()->name }}</p>
-                            <p class="email text-muted mb-3">{{ Auth::user()->email }}</p>
+                            <p class="name font-weight-bold mb-0">{{ Auth::user() ? Auth::user()->name : (Auth::guard('sellers')->check() ? Auth::guard('sellers')->user()->name : 'Usuario') }}</p>
+                            <p class="email text-muted mb-3">{{ Auth::user() ? Auth::user()->email : (Auth::guard('sellers')->check() ? Auth::guard('sellers')->user()->email : 'Email') }}</p>
                         </div>
                     </div>
                     <div class="dropdown-body">
@@ -73,7 +78,7 @@
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <form action="{{ route('logout') }}" method="POST">
+                                <form @if(Auth::guard('sellers')->check()) action="{{ route('sellers.logout') }}" @else action="{{ route('logout') }}" @endif method="POST">
                                     @csrf
                                     <button type="submit" href="javascript:void(0)" class="nav-link btn btn-link">
                                         <i data-feather="log-out"></i>
