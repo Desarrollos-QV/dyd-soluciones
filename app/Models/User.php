@@ -157,10 +157,25 @@ class User extends Authenticatable
                     $permission[] = 'subaccounts.create';
                     $permission[] = 'subaccounts.edit';
                     break;
+                case 'prospects':
+                    $permission[] = 'prospects.index';
+                    $permission[] = 'prospects.create';
+                    $permission[] = 'prospects.edit';
+                    break;
+                case 'sellers':
+                    $permission[] = 'sellers.index';
+                    $permission[] = 'sellers.create';
+                    $permission[] = 'sellers.edit';
+                    break;
                 case 'clientes':
                     $permission[] = 'clientes.index';
                     $permission[] = 'clientes.create';
                     $permission[] = 'clientes.edit';
+                    break;
+                case 'unidades':
+                    $permission[] = 'unidades.index';
+                    $permission[] = 'unidades.create';
+                    $permission[] = 'unidades.edit';
                     break;
                 case 'tecnicos':
                     $permission[] = 'tecnicos.index';
@@ -172,10 +187,28 @@ class User extends Authenticatable
                     $permission[] = 'inventario.create';
                     $permission[] = 'inventario.edit';
                     break;
+                case 'devices':
+                    $permission[] = 'devices.index';
+                    $permission[] = 'devices.create';
+                    $permission[] = 'devices.edit';
+                    break;
+                case 'simcontrol':
+                    $permission[] = 'simcontrol.index';
+                    $permission[] = 'simcontrol.create';
+                    $permission[] = 'simcontrol.edit';
+                    break;
                 case 'gastos':
                     $permission[] = 'gastos.index';
                     $permission[] = 'gastos.create';
                     $permission[] = 'gastos.edit';
+                    break;
+                case 'historial-caja':
+                    $permission[] = 'historial-caja.index';
+                    $permission[] = 'historial-caja.create';
+                    break;
+                case 'collections':
+                    $permission[] = 'collections.index';
+                    $permission[] = 'collections.create';
                     break;
                 case 'reports':
                     $permission[] = 'reports.index';
@@ -183,9 +216,9 @@ class User extends Authenticatable
                     $permission[] = 'reports.edit';
                     break;
                 case 'servicios':
-                    $permission[] = 'servicios.index';
-                    $permission[] = 'servicios.create';
-                    $permission[] = 'servicios.edit';
+                    $permission[] = 'assignements.index';
+                    $permission[] = 'assignements.create';
+                    $permission[] = 'assignements.edit';
                     break;
                 case 'reportes_services':
                     $permission[] = 'reportes_services.index';

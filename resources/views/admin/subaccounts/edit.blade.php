@@ -43,16 +43,12 @@
                     <h6 class="card-title" id="permissions">Selecciona los permisos a asignar</h6>
                 </div>
                 <div class="card-body">
-                    <div class="card-header">
-                        <h6 class="card-title" id="permissions">
-                            Principal
-                        </h6>
-                    </div>
-                    <div class="form-group">
+                    <div class="mb-4">
+                        <h6 class="text-muted border-bottom pb-2 mb-3">Principal</h6>
                         <div class="form-check form-check-inline">
                             <label class="form-check-label">
                                 <input type="checkbox" 
-                                @if (isset($permissions) && in_array('dashboard', $permissions)) checked="checked" @endif
+                                @if (isset($permissions) && in_array('dashboard', $permissions)) checked @endif
                                 name="dashboard" class="form-check-input">
                                 Dashboard
                             </label>
@@ -60,25 +56,35 @@
                         <div class="form-check form-check-inline">
                             <label class="form-check-label">
                                 <input type="checkbox" 
-                                @if (isset($permissions) && in_array('subaccounts.index', $permissions)) checked="checked" @endif
+                                @if (isset($permissions) && (in_array('subaccounts.index', $permissions) || in_array('subaccounts', $permissions))) checked @endif
                                 name="subaccounts" class="form-check-input">
                                 SubCuentas
                             </label>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <h6 class="card-title" id="permissions">Páginas Iniciales</h6>
-                </div>
-                <div class="card-body">
-                    <div class="form-group">
+                    <div class="mb-4">
+                        <h6 class="text-muted border-bottom pb-2 mb-3">Páginas</h6>
                         <div class="form-check form-check-inline">
                             <label class="form-check-label">
                                 <input type="checkbox" 
-                                @if (isset($permissions) && in_array('clientes.index', $permissions)) checked="checked" @endif
+                                @if (isset($permissions) && (in_array('prospects.index', $permissions) || in_array('prospects', $permissions))) checked @endif
+                                name="prospects" class="form-check-input">
+                                Prospectos
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <label class="form-check-label">
+                                <input type="checkbox" 
+                                @if (isset($permissions) && (in_array('sellers.index', $permissions) || in_array('sellers', $permissions))) checked @endif
+                                name="sellers" class="form-check-input">
+                                Vendedores
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <label class="form-check-label">
+                                <input type="checkbox" 
+                                @if (isset($permissions) && (in_array('clientes.index', $permissions) || in_array('clientes', $permissions))) checked @endif
                                 name="clientes" class="form-check-input">
                                 Clientes
                             </label>
@@ -86,33 +92,51 @@
                         <div class="form-check form-check-inline">
                             <label class="form-check-label">
                                 <input type="checkbox" 
-                                @if (isset($permissions) && in_array('tecnicos.index', $permissions)) checked="checked" @endif
+                                @if (isset($permissions) && (in_array('unidades.index', $permissions) || in_array('unidades', $permissions))) checked @endif
+                                name="unidades" class="form-check-input">
+                                Unidades
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h6 class="text-muted border-bottom pb-2 mb-3">Técnicos</h6>
+                        <div class="form-check form-check-inline">
+                            <label class="form-check-label">
+                                <input type="checkbox" 
+                                @if (isset($permissions) && (in_array('tecnicos.index', $permissions) || in_array('tecnicos', $permissions))) checked @endif
                                 name="tecnicos" class="form-check-input">
                                 Técnicos
                             </label>
                         </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <h6 class="text-muted border-bottom pb-2 mb-3">Servicios</h6>
                         <div class="form-check form-check-inline">
                             <label class="form-check-label">
                                 <input type="checkbox" 
-                                @if (isset($permissions) && in_array('inventario.index', $permissions)) checked="checked" @endif
-                                name="inventario" class="form-check-input">
-                                Inventario
+                                @if (isset($permissions) && (in_array('servicios.index', $permissions) || in_array('servicios', $permissions) || in_array('assignements.index', $permissions))) checked @endif
+                                name="servicios" class="form-check-input">
+                                Alta de servicios
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <label class="form-check-label">
+                                <input type="checkbox" 
+                                @if (isset($permissions) && (in_array('reportes_services.index', $permissions) || in_array('reportes_services', $permissions))) checked @endif
+                                name="reportes_services" class="form-check-input">
+                                Reportes de Servicios
                             </label>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <h6 class="card-title" id="permissions">Contabilidad</h6>
-                </div>
-                <div class="card-body">
-                    <div class="form-group">
+                    <div class="mb-4">
+                        <h6 class="text-muted border-bottom pb-2 mb-3">Contabilidad y Cobranza</h6>
                         <div class="form-check form-check-inline">
                             <label class="form-check-label">
                                 <input type="checkbox" 
-                                @if (isset($permissions) && in_array('gastos.index', $permissions)) checked="checked" @endif
+                                @if (isset($permissions) && (in_array('gastos.index', $permissions) || in_array('gastos', $permissions))) checked @endif
                                 name="gastos" class="form-check-input">
                                 Registro de gastos
                             </label>
@@ -120,35 +144,41 @@
                         <div class="form-check form-check-inline">
                             <label class="form-check-label">
                                 <input type="checkbox" 
-                                @if (isset($permissions) && in_array('reports.index', $permissions)) checked="checked" @endif
+                                @if (isset($permissions) && (in_array('reports.index', $permissions) || in_array('reports', $permissions))) checked @endif
                                 name="reports" class="form-check-input">
-                                Reportes
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <h6 class="card-title" id="permissions">Servicios</h6>
-                </div>
-                <div class="card-body">
-                    <div class="form-group">
-                        <div class="form-check form-check-inline">
-                            <label class="form-check-label">
-                                <input type="checkbox" 
-                                @if (isset($permissions) && in_array('servicios.index', $permissions)) checked="checked" @endif
-                                name="servicios" class="form-check-input">
-                                Servicios Agendados
+                                Reportes (Contabilidad)
                             </label>
                         </div>
                         <div class="form-check form-check-inline">
                             <label class="form-check-label">
                                 <input type="checkbox" 
-                                @if (isset($permissions) && in_array('reportes_services.index', $permissions)) checked="checked" @endif
-                                name="reportes_services" class="form-check-input">
-                                Reportes
+                                @if (isset($permissions) && (in_array('devices.index', $permissions) || in_array('devices', $permissions))) checked @endif
+                                name="devices" class="form-check-input">
+                                Control de Inventario
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <label class="form-check-label">
+                                <input type="checkbox" 
+                                @if (isset($permissions) && (in_array('simcontrol.index', $permissions) || in_array('simcontrol', $permissions))) checked @endif
+                                name="simcontrol" class="form-check-input">
+                                Control de SIM
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <label class="form-check-label">
+                                <input type="checkbox" 
+                                @if (isset($permissions) && (in_array('historial-caja.index', $permissions) || in_array('historial-caja', $permissions))) checked @endif
+                                name="historial-caja" class="form-check-input">
+                                Caja y Administración
+                            </label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <label class="form-check-label">
+                                <input type="checkbox" 
+                                @if (isset($permissions) && (in_array('collections.index', $permissions) || in_array('collections', $permissions))) checked @endif
+                                name="collections" class="form-check-input">
+                                Gestión de cobranza
                             </label>
                         </div>
                     </div>

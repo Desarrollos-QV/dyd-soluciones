@@ -13,8 +13,19 @@
         <ul class="nav">
             <li class="nav-item nav-category">Principal {{ Auth::user()->role  }}</li>
 
-            <!-- PANEL ADMINISTRADOR -->
-            @if(Auth::user() && Auth::user()->role == 'admin')
+
+            <!-- dashboard,prospects.index,
+             prospects.create,
+             prospects.edit,
+             tecnicos.index,
+             tecnicos.create,
+             tecnicos.edit,
+             servicios.index,
+             servicios.create,
+             servicios.edit,
+             assignements.index -->
+            <!-- PANEL ADMINISTRADOR/SUBCUENTAS -->
+            @if(Auth::user() && (Auth::user()->role == 'admin' || Auth::user()->role == 'subadmin'))
                 <li class="nav-item @if (Route::is('home') || Route::is('dashboard')) active @endif">
                     <a href="{{ url('./') }}" class="nav-link @if (Route::is('home') || Route::is('dashboard')) active @endif">
                         <i class="link-icon" data-feather="home"></i>
@@ -99,7 +110,6 @@
                     @endif --}}
                 @endif
 
-
                 @if (Auth::user()->hasPermission('tecnicos.index'))
                     <!-- Tecnicos -->
                     <li class="nav-item nav-category">Técnicos</li>
@@ -112,7 +122,7 @@
                     </li>
                 @endif
 
-                @if (Auth::user()->role == 'admin' && Auth::user()->hasPermission('assignements.index'))
+                @if (Auth::user()->role == 'admin' || Auth::user()->role == 'subadmin' && Auth::user()->hasPermission('assignements.index'))
                     <!-- Servicios -->
                     <li class="nav-item nav-category">Servicios</li>
                     <li class="nav-item">
