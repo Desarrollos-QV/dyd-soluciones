@@ -28,7 +28,22 @@ class HistorialCajaController extends Controller
         $historial = $query->orderByDesc('fecha')->paginate(20);
         $tecnicos = User::whereRole('tecnico')->whereIsActive('1')->get();
 
-        return view('admin.historial_caja.index', compact('historial','tecnicos'));
+        $listPerms = ['gastos.index','gastos.create','gastos.edit','historial-caja.index','historial-caja.create','collections.index','collections.create'];
+ 
+        $administradores = User::whereRole('subadmin')
+        ->whereIsActive('1') // Que este activo
+        ->where('id','!=',1) // Que no sea el super admin
+        // Validamos si cuenta con los permisos para gestion de caja
+        ->where(function ($query) use ($listPerms) {
+            foreach ($listPerms as $perm) {
+                $query->orWhere('permissions', 'like', "%{$perm}%");
+            }
+        })
+        ->get();
+
+        $tecnicos = [...$tecnicos, ...$administradores];
+
+        return view('admin.historial_caja.index', compact('historial','tecnicos','administradores'));
     }
 
     /**

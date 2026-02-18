@@ -49,7 +49,7 @@
                     </div>
                     <div class="col-lg-6">
                         <div class="mb-3">
-                            <label>IMEIs Asignados</label>
+                            <label>IMEI Asignado</label>
                             <div id="imei_container">
                                 @php
                                     $imeis = [];
@@ -109,8 +109,7 @@
                         <div class="mb-3">
                             <label for="stock">Stock del dispositivo</label>
                             <input type="number" name="stock" id="stock" class="form-control mb-4 mb-md-0"
-                                value="{{ $device->stock ?? old('stock') ?? 0 }}" readonly />
-                            <small class="text-muted">Calculado automáticamente</small>
+                                value="{{ $device->stock ?? old('stock') ?? 1 }}" />
                         </div>
                     </div>
                     <div class="col-lg-3">

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Traits\NotifiesUsers;
 use App\Models\{
     Unidades,
     Cliente,
@@ -17,6 +18,9 @@ use App\Imports\UnidadesImport;
 
 class UnidadesController extends Controller
 {
+    
+    use NotifiesUsers;
+
     public function index()
     {
         $unidades = Unidades::with('cliente','simcontrol','inventario')->orderBy('id', 'desc')->get();
@@ -103,6 +107,19 @@ class UnidadesController extends Controller
             // Quitamos del stock en caso de que se haya asignado un dispositivo
             $data['devices_id'] != null && $data['devices_id'] != 0 ? Devices::find($data['devices_id'])->decrement('stock') : null;
 
+            // Si el stock es menor al minimo para alerta notificamos
+            if(Devices::find($data['devices_id'])->stock <= Devices::find($data['devices_id'])->stock_min_alert){
+                // Generamos la notificación para el técnico asignado
+                $this->notifyUser(
+                    1, // Administracion
+                    'stock_alert',
+                    'Stock Alerta',
+                    'Se ha creado un nuevo dispositivo con stock menor al minimo para alerta.',
+                    [],
+                    route('devices.index'),
+                    now()->addDays(7)
+                );
+            }
             return response()->json([
                 'ok' => true,
                 'message' => 'Elemento creado con éxito.',
@@ -239,14 +256,27 @@ class UnidadesController extends Controller
             return redirect()->route('unidades.index')->with('success', 'Dispositivo desasignado de la Unidad exitosamente');
         }else{
             // Si se está asignando un nuevo dispositivo, decrementamos el stock
-            if($unidad->devices_id != null && $unidad->devices_id != 0)
+            if($unidad->devices_id != $device)
             {
                 // Devolvemos el stock del dispositivo anterior
-                Devices::find($unidad->devices_id)->increment('stock');
+                Devices::find($unidad->devices_id)?->increment('stock');
             }
 
             // Decrementamos el stock del nuevo dispositivo asignado
-            Devices::find($device)->decrement('stock');
+            Devices::find($device)?->decrement('stock');
+            // Si el stock es menor al minimo para alerta notificamos
+            if(Devices::find($device)?->stock <= Devices::find($device)?->stock_min_alert){
+                // Generamos la notificación para el técnico asignado
+                $this->notifyUser(
+                    1, // Administracion
+                    'stock_alert',
+                    'Stock Alerta',
+                    'Se ha creado un nuevo dispositivo con stock menor al minimo para alerta.',
+                    [],
+                    route('devices.index'),
+                    now()->addDays(7)
+                );
+            }
         }
 
         $unidad->devices_id = $device;

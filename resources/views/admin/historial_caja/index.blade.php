@@ -159,9 +159,10 @@
                                         <label for="autorizado_por">Quien lo autoriza</label>
                                         <select name="autorizado_por" id="autorizado_por" class="form-select">
                                             <option value="">Seleccion un elemento</option>
-                                            @foreach ($tecnicos as $tecns)
-                                                <option value="{{ $tecns->id }}">
-                                                    {{ $tecns->name }}
+                                            <option value="1">SuperAdmin <sub>(SuperAdmin)</sub> </option>
+                                            @foreach ($administradores as $admin)
+                                                <option value="{{ $admin->id }}">
+                                                    {{ $admin->name }} <sub>({{ $admin->role }})</sub>
                                                 </option>
                                             @endforeach
                                         </select>
@@ -174,7 +175,7 @@
                                             <option value="">Seleccion un elemento</option>
                                             @foreach ($tecnicos as $tecns)
                                                 <option value="{{ $tecns->id }}">
-                                                    {{ $tecns->name }}
+                                                    {{ $tecns->name }} <sub>({{ $tecns->role }})</sub>
                                                 </option>
                                             @endforeach
                                         </select>
@@ -247,7 +248,7 @@
                         })
                     })
                    .then(async res => {
-                        if(response.ok){
+                        if(res.ok){
                             Swal.fire(
                                 'Éxito',
                                 'Movimiento guardado correctamente.',

@@ -52,14 +52,13 @@ class DevicesController extends Controller
             'ia' => 'nullable|string',
             'otra_empresa' => 'nullable|string',
             'stock_min_alert' => 'required|integer',
-            // 'stock' => 'required|integer' // Handled automatically
+            'stock' => 'required|integer' // Handled automatically
         ]);
 
         $data = $request->all();
         $data['garantia'] = \Carbon\Carbon::parse($request->garantia)->format('Y-m-d H:i:s');
 
-        $imeis = $request->input('imei', []);
-        $data['stock'] = count($imeis);
+        $imeis = $request->input('imei', []); 
         // Save first IMEI to legacy column for compatibility, or null
         $data['imei'] = $imeis[0] ?? null;
 
@@ -123,14 +122,13 @@ class DevicesController extends Controller
             'ia' => 'nullable|string',
             'otra_empresa' => 'nullable|string',
             'stock_min_alert' => 'required|integer',
-            // 'stock' => 'required|integer'
+            'stock' => 'required|integer'
         ]);
 
         $data = $request->all();
         $data['garantia'] = \Carbon\Carbon::parse($request->garantia)->format('Y-m-d H:i:s');
 
         $imeis = $request->input('imei', []);
-        $data['stock'] = count($imeis);
         $data['imei'] = $imeis[0] ?? null;
 
         try {
