@@ -33,7 +33,13 @@
             <li class="nav-item dropdown nav-profile">
                 <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button"
                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <img src="{{ Auth::user()->avatar ? asset(Auth::user()->avatar) : asset('assets/images/background-login.jpg') }}" alt="userr">
+                    @if(Auth::user())
+                        <img src="{{ Auth::user()->avatar ? asset(Auth::user()->avatar) : asset('assets/images/background-login.jpg') }}" alt="">
+                    @elseif(Auth::guard('sellers')->check())
+                        <img src="{{ Auth::guard('sellers')->user()->picture ? asset(Auth::guard('sellers')->user()->picture) : asset('assets/images/background-login.jpg') }}" alt="">
+                    @else
+                        <img src="{{ asset('assets/images/background-login.jpg') }}" alt="">
+                    @endif
                 </a>
                 <div class="dropdown-menu" aria-labelledby="profileDropdown">
                     <div class="dropdown-header d-flex flex-column align-items-center">

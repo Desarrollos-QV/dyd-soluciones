@@ -11,7 +11,7 @@
     </div>
     <div class="sidebar-body">
         <ul class="nav">
-            <li class="nav-item nav-category">Principal {{ Auth::user()->role  }}</li>
+            <li class="nav-item nav-category">Principal </li>
 
 
             <!-- dashboard,prospects.index,
