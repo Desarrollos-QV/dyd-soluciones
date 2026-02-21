@@ -17,6 +17,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->command('collections:process')->everyMinute();
+        $schedule->command('prospects:notify-meetings')->daily();
     }
 
     /**

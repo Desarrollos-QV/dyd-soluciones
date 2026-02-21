@@ -14,7 +14,7 @@ class GastoController extends Controller
     public function index()
     {
         $gastos = Gasto::orderBy('fecha', 'desc')->where('tipo','egreso')->with(['Autoriza','Solicita'])->paginate(10);
-
+      
         return view('admin.gastos.index', compact('gastos'));
     }
 
@@ -22,7 +22,19 @@ class GastoController extends Controller
     {
         
         $tecnicos = User::whereRole('tecnico')->whereIsActive('1')->get();
-        return view('admin.gastos.create', compact('tecnicos'));
+        $listPerms = ['gastos.index','gastos.create','gastos.edit','historial-caja.index','historial-caja.create','collections.index','collections.create'];
+ 
+        $administradores = User::whereRole('subadmin')
+        ->whereIsActive('1') // Que este activo
+        ->where('id','!=',1) // Que no sea el super admin
+        // Validamos si cuenta con los permisos para gestion de caja
+        ->where(function ($query) use ($listPerms) {
+            foreach ($listPerms as $perm) {
+                $query->orWhere('permissions', 'like', "%{$perm}%");
+            }
+        })
+        ->get();
+        return view('admin.gastos.create', compact('tecnicos','administradores'));
     }
 
     public function store(Request $request)
@@ -80,7 +92,19 @@ class GastoController extends Controller
     {
         
         $tecnicos = User::whereRole('tecnico')->whereIsActive('1')->get();
-        return view('admin.gastos.edit', compact('gasto','tecnicos'));
+        $listPerms = ['gastos.index','gastos.create','gastos.edit','historial-caja.index','historial-caja.create','collections.index','collections.create'];
+ 
+        $administradores = User::whereRole('subadmin')
+        ->whereIsActive('1') // Que este activo
+        ->where('id','!=',1) // Que no sea el super admin
+        // Validamos si cuenta con los permisos para gestion de caja
+        ->where(function ($query) use ($listPerms) {
+            foreach ($listPerms as $perm) {
+                $query->orWhere('permissions', 'like', "%{$perm}%");
+            }
+        })
+        ->get();
+        return view('admin.gastos.edit', compact('gasto','tecnicos','administradores'));
     }
 
     public function update(Request $request, Gasto $gasto)

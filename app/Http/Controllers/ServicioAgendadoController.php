@@ -41,7 +41,7 @@ class ServicioAgendadoController extends Controller
         foreach ($ListClients as $key => $client) {
             $Client = Cliente::where('id', $client)->with([
                 'unidades' => function ($q) {
-                    $q->with('simcontrol', 'inventario');
+                    $q->with('simcontrol', 'inventario', 'sensorName');
                 }
             ])->first();
 
@@ -88,7 +88,7 @@ class ServicioAgendadoController extends Controller
         foreach ($ListClients as $key => $client) {
             $Client = Cliente::where('id', $client)->with([
                 'unidades' => function ($q) {
-                    $q->with('simcontrol', 'inventario');
+                    $q->with('simcontrol', 'inventario', 'sensorName');
                 }
             ])->first();
 
@@ -133,7 +133,7 @@ class ServicioAgendadoController extends Controller
         foreach ($ListClients as $key => $client) {
             $Client = Cliente::where('id', $client)->with([
                 'unidades' => function ($q) {
-                    $q->with('simcontrol', 'inventario');
+                    $q->with('simcontrol', 'inventario', 'sensorName');
                 }
             ])->first();
 
@@ -243,7 +243,7 @@ class ServicioAgendadoController extends Controller
     {
         // Single eager-loaded query: get the assignment with its cliente and the cliente's unidades
         // including nested relations (simcontrol and inventario)
-        $assign = Asignaciones::with(['unidad', 'getFirma'])
+        $assign = Asignaciones::with(['unidad.simcontrol', 'unidad.inventario', 'unidad.sensorName', 'getFirma'])
             ->where('id', $id)
             ->where('tecnico_id', Auth::id())
             ->firstOrFail();
@@ -267,6 +267,7 @@ class ServicioAgendadoController extends Controller
         // convert to object for compatibility with existing views
         $servicios_agendado = (object) $data;
 
+        // return response()->json($servicios_agendado);
 
         return view($this->folder . 'edit', compact('servicios_agendado'));
     }
@@ -373,7 +374,7 @@ class ServicioAgendadoController extends Controller
         $req = base64_decode($id);
         // $service = Asignaciones::with(['cliente','tecnico','device'])->find($req);
 
-        $assign = Asignaciones::with(['cliente.unidades.simcontrol', 'cliente.unidades.inventario', 'tecnico'])
+        $assign = Asignaciones::with(['unidad.simcontrol', 'unidad.inventario', 'unidad.sensorName', 'tecnico', 'getFirma'])
             ->where('id', $req)
             ->where('tecnico_id', Auth::id())
             ->first();
@@ -395,6 +396,7 @@ class ServicioAgendadoController extends Controller
             'status' => $assign->status,
             'tecnico' => $assign->tecnico,
             'cliente' => $assign->cliente,
+            'unidad' => $assign->unidad,
             'firma' => $assign->getFirma
         ];
 

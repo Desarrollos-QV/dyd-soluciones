@@ -44,6 +44,7 @@ class UnidadesController extends Controller
         $clientes   = Cliente::all();
         $simcontrols       = SimControl::all();
         $devicesList    = Devices::all();
+        $sensores       = Devices::where('type', 'sensor')->get();
         $devices        = [];
         foreach ($devicesList as $device) {
             if ($device->stock >= $device->stock_min_alert) {
@@ -58,7 +59,7 @@ class UnidadesController extends Controller
         //     'devices' => $devices
         // ]);
 
-        return view('admin.unidades.create', compact('unidad', 'clientes', 'simcontrols' ,'devices'));
+        return view('admin.unidades.create', compact('unidad', 'clientes', 'simcontrols' ,'devices', 'sensores'));
     }
 
     public function store(Request $request)
@@ -120,6 +121,22 @@ class UnidadesController extends Controller
                     now()->addDays(7)
                 );
             }
+
+            // Lo Mismo hacemos con sensor, Quitamos del Stock y verificamos su stock_min_alert
+            $data['sensor'] != null && $data['sensor'] != 0 ? Devices::find($data['sensor'])->decrement('stock') : null;
+            if(Devices::find($data['sensor'])->stock <= Devices::find($data['sensor'])->stock_min_alert){
+                // Generamos la notificación para el técnico asignado
+                $this->notifyUser(
+                    1, // Administracion
+                    'stock_alert',
+                    'Stock Alerta',
+                    'Se ha creado un nuevo dispositivo con stock menor al minimo para alerta.',
+                    [],
+                    route('devices.index'),
+                    now()->addDays(7)
+                );
+            }
+
             return response()->json([
                 'ok' => true,
                 'message' => 'Elemento creado con éxito.',
@@ -140,6 +157,7 @@ class UnidadesController extends Controller
         $clientes = Cliente::all();
         $simcontrols       = SimControl::all();
         $devicesList    = Devices::all();
+        $sensores       = Devices::where('type', 'sensor')->get();
         $devices        = [];
         foreach ($devicesList as $device) {
             if ($device->stock >= $device->stock_min_alert) {
@@ -147,7 +165,7 @@ class UnidadesController extends Controller
             }
         }
 
-        return view('admin.unidades.edit', compact('unidad','clientes', 'simcontrols' ,'devices'));
+        return view('admin.unidades.edit', compact('unidad','clientes', 'simcontrols' ,'devices', 'sensores'));
     }
 
     public function update(Request $request, Unidades $unidade)

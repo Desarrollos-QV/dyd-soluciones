@@ -45,7 +45,7 @@
                             <option value="DVR" @if($unidad->dispositivo_instalado == 'DVR') selected @endif>DVR</option>
                             <option value="GPS" @if($unidad->dispositivo_instalado == 'GPS') selected @endif>GPS</option>
                             <option value="DASHCAM" @if($unidad->dispositivo_instalado == 'DASHCAM') selected @endif>DASHCAM</option>
-                            <option value="SENSOR" @if($unidad->dispositivo_instalado == 'SENSOR') selected @endif>SENSOR</option>
+                            <option value="SENSOR" @if($unidad->dispositivo_instalado == 'SENSOR') selected @endif>SENSOR Y/O ACCESORIOS</option>
                         </select>
                         <div class="row" id="other_dispositivo_instalado" style="display: none;">
                             <div class="col-md-12 mt-2" id="inner_other_disp">
@@ -83,10 +83,17 @@
                         <input type="text" name="numero_de_motor" id="numero_de_motor" class="form-control" required
                             value="{{ $unidad->numero_de_motor }}">
                     </div>
+                    
                     <div class="col-lg-3">
                         <label for="sensor">Sensor y/o Accesorio</label>
-                        <input type="text" name="sensor" id="sensor" class="form-control"
-                            value="{{ $unidad->sensor }}">
+                        <select name="sensor" id="sensor" class="form-select" required>
+                            <option value="">Seleccionar</option>
+                            @foreach($sensores as $sensor)
+                                <option value="{{ $sensor->id }}" data-type="{{ $sensor->type }}" @if($unidad->sensor == $sensor->id) selected @endif>
+                                    {{ $sensor->dispositivo }}
+                                </option>
+                            @endforeach
+                        </select>
                     </div>
                 </div>
 
@@ -220,7 +227,7 @@
     <div class="card">
         <div class="card-header">
             <h4 class="card-title">
-                <h5>Asignaciónes y Fotografias</h5>
+                <h5>Asignaciónes</h5>
             </h4>
         </div>
 

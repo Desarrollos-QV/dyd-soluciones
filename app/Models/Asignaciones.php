@@ -63,10 +63,6 @@ class Asignaciones extends Model
             'cliente_id',
             'tecnico_id',
             'tel_contact',
-            'tipo_vehiculo',
-            'marca',
-            'modelo',
-            'placa',
         ];
 
         foreach ($inputs as $input) {

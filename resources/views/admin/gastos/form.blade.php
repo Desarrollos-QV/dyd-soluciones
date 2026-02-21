@@ -75,8 +75,11 @@
                             <label for="autorizado_por">Quien lo autoriza</label>
                             <select name="autorizado_por" id="autorizado_por" class="form-select" required>
                                 <option value="">Seleccion un elemento</option>
-                                @foreach($tecnicos as $tecns)
-                                <option value="{{$tecns->id}}" @if(isset($gasto) && $tecns->id == $gasto->autorizado_por) selected @endif>{{ $tecns->name }}</option>
+                                <option value="1">SuperAdmin <sub>(SuperAdmin)</sub> </option>
+                                @foreach ($administradores as $admin)
+                                    <option value="{{ $admin->id }}">
+                                        {{ $admin->name }} <sub>({{ $admin->role }})</sub>
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
@@ -86,8 +89,10 @@
                             <label for="solicitado_por">Quien lo solicita</label>
                             <select name="solicitado_por" id="solicitado_por" class="form-select" required>
                                 <option value="">Seleccion un elemento</option>
-                                @foreach($tecnicos as $tecns)
-                                <option value="{{$tecns->id}}" @if(isset($gasto) && $tecns->id == $gasto->solicitado_por) selected @endif>{{ $tecns->name }}</option>
+                                @foreach ($tecnicos as $tecns)
+                                    <option value="{{ $tecns->id }}">
+                                        {{ $tecns->name }} <sub>({{ $tecns->role }})</sub>
+                                    </option>
                                 @endforeach
                             </select>
                         </div>

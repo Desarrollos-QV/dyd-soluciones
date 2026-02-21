@@ -59,7 +59,7 @@
                     </div>
                     <div class="col-lg-6">
                         <div class="mb-3">
-                            <label for="location">Ubicación</label>
+                            <label for="location">Ubicación del prospecto</label>
                              <input type="text" name="location" class="form-control mb-4 mb-md-0"
                             value="{{ $prospect->location ?? old('location') }}" required/>
                         </div>

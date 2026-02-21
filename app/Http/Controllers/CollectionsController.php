@@ -95,8 +95,8 @@ class CollectionsController extends Controller
 
         CollectionPayment::create([
             'collection_id' => $collection->id,
+            'paid_by' => auth()->id(),
             'amount' => $collection->amount,
-            'paid_by' => $collection->cliente_id,
         ]);
 
         $collection->update([
@@ -104,8 +104,9 @@ class CollectionsController extends Controller
             'paid_at' => Carbon::now()
         ]);
 
+        // Restablecemos el mes en la unidad
         $unidad->update([
-            'fecha_cobro' => Carbon::now()->addDays(30)
+            'fecha_cobro' => Carbon::now()->addMonth()
         ]);
 
         // Registramos el ingreso

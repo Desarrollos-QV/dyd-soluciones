@@ -25,6 +25,10 @@ class HistorialCajaController extends Controller
             $query->where('tipo', $request->tipo);
         }
 
+        $totalIngresos = (clone $query)->where('tipo', 'ingreso')->sum('monto');
+        $totalEgresos = (clone $query)->where('tipo', 'egreso')->sum('monto');
+        $totalBalance = $totalIngresos - $totalEgresos;
+
         $historial = $query->orderByDesc('fecha')->paginate(20);
         $tecnicos = User::whereRole('tecnico')->whereIsActive('1')->get();
 
@@ -43,7 +47,7 @@ class HistorialCajaController extends Controller
 
         $tecnicos = [...$tecnicos, ...$administradores];
 
-        return view('admin.historial_caja.index', compact('historial','tecnicos','administradores'));
+        return view('admin.historial_caja.index', compact('historial','tecnicos','administradores', 'totalIngresos', 'totalEgresos', 'totalBalance'));
     }
 
     /**

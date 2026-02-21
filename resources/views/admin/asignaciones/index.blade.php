@@ -40,8 +40,6 @@
                                     <td>Encargado de recibir</td>
                                     <td>Ubicación</td>
                                     <td>Viaticos</td>
-                                    <td>Tipo de vehiculo</td>
-                                    <td>Placa</td>
                                     <td>Observaciones</td>
                                     <th class="w-100 d-flex justify-content-end align-items-center">Acciones</th>
                                 </tr>
@@ -83,15 +81,7 @@
                                                <i class="link-icon" data-feather="map-pin"></i>
                                             </a>
                                         </td>
-                                        <td>${{ $assign->viaticos }}</td>
-                                        <td>
-                                            <span class="badge bg-secondary text-white">{{ $assign->tipo_vehiculo }}</span>
-                                            /
-                                            <span class="badge bg-info text-white">{{ $assign->marca }}</span> 
-                                            / 
-                                            <span class="badge bg-warning text-white">{{ $assign->modelo }}</span> 
-                                        </td>
-                                        <td>{{ $assign->placa }}</td>                                        
+                                        <td>${{ $assign->viaticos }}</td>                                   
                                         <td>{{ (isset($assign->getFirma) && $assign->getFirma->comentarios) ? $assign->getFirma->comentarios : 'Sin Observaciones' }}</td>
                                         <td>
                                             <div class="btn-group">

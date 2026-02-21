@@ -19,7 +19,7 @@
                                 <option value="DVR" {{ $simcontrol->type == 'DVR' ? 'selected' : '' }}>DVR</option>
                                 <option value="GPS" {{ $simcontrol->type == 'GPS' ? 'selected' : '' }}>GPS</option>
                                 <option value="DASHCAM" {{ $simcontrol->type == 'DASHCAM' ? 'selected' : '' }}>DASHCAM</option>
-                                <option value="SENSOR" {{ $simcontrol->type == 'SENSOR' ? 'selected' : '' }}>SENSOR</option>
+                                <option value="SENSOR" {{ $simcontrol->type == 'SENSOR' ? 'selected' : '' }}>SENSOR Y/O ACCESORIOS</option>
                                 <option value="Otro" {{ $simcontrol->type == 'Otro' ? 'selected' : '' }}>Otro</option>
                             </select>
                         </div>

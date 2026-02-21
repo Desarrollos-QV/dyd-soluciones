@@ -16,7 +16,7 @@
                                 <option value="DVR" {{ $device->type == 'DVR' ? 'selected' : '' }}>DVR</option>
                                 <option value="GPS" {{ $device->type == 'GPS' ? 'selected' : '' }}>GPS</option>
                                 <option value="DASHCAM" {{ $device->type == 'DASHCAM' ? 'selected' : '' }}>DASHCAM</option>
-                                <option value="SENSOR" {{ $device->type == 'SENSOR' ? 'selected' : '' }}>SENSOR</option>
+                                <option value="SENSOR" {{ $device->type == 'SENSOR' ? 'selected' : '' }}>SENSOR Y/O ACCESORIOS</option>
                                 <option value="Otro" {{ $device->type == 'Otro' ? 'selected' : '' }}>Otro</option>
                             </select>
                         </div>

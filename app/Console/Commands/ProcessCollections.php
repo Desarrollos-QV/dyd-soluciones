@@ -62,30 +62,33 @@ class ProcessCollections extends Command
 
         foreach ($unidades as $unidad) {
             Log::info("!!--------------------------------------------------------------------------!!");
-            Log::info("!!--------------------------------------------------------------------------!!");
            
             $fechaCobro = Carbon::parse($unidad->fecha_cobro);
+            $estatus = $fechaCobro->lt($hoy) ? 'overdue' : 'pending';
 
-            if ($fechaCobro->lt($hoy)) {
-                $estatus = 'paid'; 
-            } else {
-                $estatus = 'pending';
-            }
+            // Buscamos si ya existe un registro de cobranza activo para esta unidad
+            $collection = Collection::where('unidad_id', $unidad->id)
+                ->where('status', '!=', 'paid')
+                ->first();
 
-            Collection::updateOrCreate(
-                [
-                    'unidad_id' => $unidad->id,
-                    'notified_at' => $hoy
-                ],
-                [
+            if ($collection) {
+                $collection->update([
                     'cliente_id' => $unidad->cliente_id,
-                    'unidad_id' => $unidad->id,
                     'due_date' => $fechaCobro,
                     'amount' => $unidad->pago_mensual,
                     'status' => $estatus,
-                    'notified_at' => $hoy
-                ]
-            );
+                ]);
+                Log::info("✔ Actualizado cobro para Unidad #{$unidad->id} | Cliente #{$unidad->cliente_id} | Estatus: {$estatus}");
+            } else {
+                Collection::create([
+                    'unidad_id' => $unidad->id,
+                    'cliente_id' => $unidad->cliente_id,
+                    'due_date' => $fechaCobro,
+                    'amount' => $unidad->pago_mensual,
+                    'status' => $estatus,
+                ]);
+                Log::info("✔ Creado nuevo cobro para Unidad #{$unidad->id} | Cliente #{$unidad->cliente_id} | Estatus: {$estatus}");
+            }
 
             $days = Carbon::now()->diffInDays($fechaCobro, false);
         
