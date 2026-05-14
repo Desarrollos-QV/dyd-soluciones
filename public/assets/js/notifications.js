@@ -102,8 +102,8 @@
 
         countNotify();
         // Sera un Timer de 10 segundos para obtener la cantidad de notificaciones
-        // setInterval(function() {
-        //     countNotify();
-        // }, 10000);
+        setInterval(function() {
+            countNotify();
+        }, 10000);
     });
 })(jQuery);
