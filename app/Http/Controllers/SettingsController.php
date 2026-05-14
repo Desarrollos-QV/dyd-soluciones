@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
  
 use App\Services\TwilioService;
+use App\Traits\NotifiesUsers;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Response;
@@ -14,8 +15,8 @@ use App\Models\{
 
 class SettingsController extends Controller
 {
+    use NotifiesUsers;
     private $folder = "admin.settings";
-
 
     public function index()
     {
@@ -52,40 +53,62 @@ class SettingsController extends Controller
  
     }
 
-    public function sendTestNoify(Request $request, $type)
+    public function sendTestNoify(Request $request)
     {
         try{
+            $type = $request->input('type');
             $settings = Settings::where('user_id', Auth::user()->id)->first();
             $sendTest = new TwilioService($settings->TWILIO_SID, $settings->TWILIO_AUTH_TOKEN, $settings->TWILIO_PHONE);
 
-            $phone = $request->query('phone_test');
-            $email = $request->query('email_test');
+            $type = $request->input('type');
+            $mensaje_personalizado = $request->input('mensaje_personalizado');
+            $phone_test = $request->input('phone_test');
+            $email_test = $request->input('email_test');
 
             switch($type){
                 case 'sms':
-                    if($phone != null)
+                    if($phone_test != null)
                     {
-                        $req = $sendTest->sendMessageSMS($phone, 'SMS DEMO desde DYD Soluciones....');
+                        $req = $this->notifyUserSMS($phone_test, $mensaje_personalizado);
                     }
                     break;
                 case 'whatsapp':
-                    if($phone != null)
+                    if($phone_test != null)
                     {
-                        $req = $sendTest->sendMessageWhatsapp($phone, 'Wahtsapp DEMO desde DYD Soluciones....');
+                        /**
+                         * Enviamos la plantilla
+                         * Hola Sr. Adrian Quezada, te recordamos que tienes un pago pendiente con Dyd Soluciones.
+                         * Por la cantidad de : $2,500 MXN
+                         * Si ya realizaste tu pago, puedes ignorar este mensaje.
+                         */
+
+                        $clientName  = "Usuario De prueba";
+                        $businesName = "DYD Soluciones";
+                        $amount      = "2000";
+                        
+                        $contentSid = config('services.twilio.template_reminder_pay',
+                                                env('TWILIO_TEMPLATE_REMINDER_PAY'));
+
+                        $req = $this->notifyUserWhatsappTemplate($phone_test, $contentSid, [
+                            '1' => $clientName,
+                            '2' => $businesName,
+                            '3' => '$' . number_format((float) str_replace(',', '', $amount), 2).' MXN Monto demo',
+                        ]);
                     }
                     break;
                 case 'email':
-                    if($email != null)
+                    if($email_test != null)
                     {
-                        $req = $sendTest->sendMessageEmail($email, 'Email DEMO desde DYD Soluciones....');
+                        $req = $sendTest->sendMessageEmail($email_test, 'Email DEMO desde DYD Soluciones....');
                     }
                     break;
             }
 
             return response()->json([
+                'req' => $request->all(),
                 'success' => true,
-                'data'    => $req,
-                'message' => 'Envio de prueba éxita.'
+                'data'    => $req ?? 'Enviado',
+                'message' => 'Envio de prueba éxita via: '.$type.'.'
             ]);
 
         } catch (\Exception $e) {

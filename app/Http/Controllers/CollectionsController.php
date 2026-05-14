@@ -51,6 +51,8 @@ class CollectionsController extends Controller
 
         $data = $query->orderBy('due_date', 'ASC')->get();
 
+       
+
         return view($this->folder . 'index', compact(
             'data',
             'totalDeuda',
@@ -144,60 +146,81 @@ class CollectionsController extends Controller
     {
         $collection = Collection::with(['cliente'])->findOrFail($id);
 
-        // Aquí aplicas tu método de notificación (Twilio, WhatsApp, Email, SMS, etc.)
-        // Ejemplo básico:
-        $medio = request('medio');
+        $medio       = request('medio');
         $phoneNumber = $collection->cliente->numero_contacto;
-        $clientName = $collection->cliente->nombre;
-        $amount = $collection->amount;
-        $message = "Hola {$clientName}, le recordamos el pago de su mensualidad por un monto de {$amount}. Por favor, comunicarse para coordinar. ¡Gracias!";
+        $clientName  = $collection->cliente->nombre;
+        $amount      = $collection->amount;
+        $businesName = "DYD Soluciones";
+        $dueDate     = $collection->due_date
+            ? Carbon::parse($collection->due_date)->format('d/m/Y')
+            : 'próximo vencimiento';
 
-        // Notificamos al Usuario
-        switch ($medio) {
-            case 'sms':
-                $this->notifyUserSMS(
-                    $phoneNumber,
-                    request('mensaje')
-                );
-                break;
-            case 'whatsapp':
-                $this->notifyUserWhatsapp(
-                    $phoneNumber,
-                    request('mensaje')
-                );
-                break;
-            case 'email':
-                // Verificar que el cliente tenga email
-                if (!$collection->cliente->email) {
+        try {
+            switch ($medio) {
+
+                case 'whatsapp':
+                    /**
+                     * Template en Twilio: reminder_pay
+                     * Hola {1}, te recordamos que tienes un pago pendiente con {2}.
+                     * Por la cantidad de : {3} MXN
+                     * Si ya realizaste tu pago, puedes ignorar este mensaje.
+                     */
+                    $contentSid = config('services.twilio.template_reminder_pay',
+                                        env('TWILIO_TEMPLATE_REMINDER_PAY'));
+
+                    $this->notifyUserWhatsappTemplate($phoneNumber, $contentSid, [
+                        '1' => $clientName,
+                        '2' => $businesName,
+                        '3' => '$' . number_format((float) str_replace(',', '', $amount), 2).' MXN',
+                    ]);
+                    break;
+
+                case 'sms':
+                    $message = request('mensaje')
+                        ?? "Hola {$clientName}, le recordamos el pago de \${$amount} con vencimiento el {$dueDate}. Comuníquese con nosotros. ¡Gracias!";
+                    $this->notifyUserSMS($phoneNumber, $message);
+                    break;
+
+                case 'email':
+                    if (!$collection->cliente->email) {
+                        return response()->json([
+                            'status'  => false,
+                            'message' => 'El cliente no tiene un correo electrónico registrado.'
+                        ], 400);
+                    }
+                    $this->notifyUserEmail(
+                        $collection->cliente->email,
+                        $clientName,
+                        $amount,
+                        $collection->due_date,
+                        request('mensaje')
+                    );
+                    break;
+
+                default:
                     return response()->json([
-                        'status' => false,
-                        'message' => 'El cliente no tiene un correo electrónico registrado.'
-                    ], 400);
-                }
-                
-                $this->notifyUserEmail(
-                    $collection->cliente->email,
-                    $clientName,
-                    $amount,
-                    $collection->due_date,
-                    request('mensaje')
-                );
-                break;
-            default:
-                $this->notifyUserSMS(
-                    $phoneNumber,
-                    request('mensaje')
-                );
-                break;
+                        'status'  => false,
+                        'message' => 'Medio de notificación no reconocido.'
+                    ], 422);
+            }
+
+            $collection->update([
+                'status'      => 'notified',
+                'notified_at' => Carbon::now(),
+            ]);
+
+            return response()->json([
+                'status'  => true,
+                'message' => "Cliente {$clientName} notificado correctamente vía {$medio}."
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error("Error en notify() [{$medio}]: " . $e->getMessage());
+            return response()->json([
+                'status'  => false,
+                'message' => 'Error al enviar la notificación: ' . $e->getMessage()
+            ], 500);
         }
-
-
-        $collection->update([
-            'status' => 'notified',
-            'notified_at' => Carbon::now()
-        ]);
-
-        return back()->with('success', 'Cliente notificado correctamente.');
     }
 
     /**

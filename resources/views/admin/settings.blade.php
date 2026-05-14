@@ -50,11 +50,23 @@
                             </div>
                         </div>
 
-                        <div class="row mt-4">
+                        <div class="row mt-4" id="custom_message_container">
                             <div class="col-lg-12">
                                 <label for="mensaje_personalizado">Mensaje Automatico a enviar</label>
                                 <textarea name="mensaje_personalizado" id="mensaje_personalizado" class="form-control" rows="8"
                                     placeholder="Mensaje que sera enviado a todos los usuarios">{!! $collection->mensaje_personalizado !!}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4" id="whatsapp_template_container" style="display: none;">
+                            <div class="col-lg-12">
+                                <label>Mensaje Automatico a enviar</label>
+                                <div class="alert alert-info">
+                                    <p>Se usará la plantilla <strong>reminder_pay</strong> para los mensajes de WhatsApp.</p>
+                                    <a href="https://business.facebook.com/latest/whatsapp_manager/template_details/?business_id=1474122813130436&tab=template-details&childRoute=CAPI&id=831040500045195&nav_ref=whatsapp_manager&asset_id=1461526848422681" target="_blank" class="btn btn-primary mt-2">
+                                        <i class="link-icon" data-feather="external-link"></i> Ver plantilla en uso
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -135,6 +147,24 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            
+            const recordatoriosSelect = document.getElementById('recordatorios');
+            const customMessageContainer = document.getElementById('custom_message_container');
+            const whatsappTemplateContainer = document.getElementById('whatsapp_template_container');
+
+            function toggleMessageView() {
+                if (recordatoriosSelect.value === 'whatsapp') {
+                    customMessageContainer.style.display = 'none';
+                    whatsappTemplateContainer.style.display = '';
+                } else {
+                    customMessageContainer.style.display = '';
+                    whatsappTemplateContainer.style.display = 'none';
+                }
+            }
+
+            recordatoriosSelect.addEventListener('change', toggleMessageView);
+            toggleMessageView(); // Inicializar estado al cargar
+
             // Envio de formulario para actualizacion
             const form = document.getElementById('update_collect');
             form.addEventListener('submit', async function(event) {
@@ -188,23 +218,36 @@
             const btnTest = document.getElementById('sendDemoNotify');
             btnTest.addEventListener('click', async function(ev) {
                 let recordatoriosInput = document.getElementById('recordatorios').value;
+                let mensaje_personalizadoInput = document.getElementById('mensaje_personalizado').value;
                 let phone_testInput = document.getElementById('phone_test').value; 
                 let email_testInput = document.getElementById('email_test').value; 
-                let route = `{{ url('sendTestNotify') }}/${recordatoriosInput}`;
-                route += `?phone_test=${encodeURIComponent(phone_testInput)}&email_test=${encodeURIComponent(email_testInput)}`;
+                let route = `{{ url('sendTestNotify') }}`;
+
+                const formData = new FormData();
+                formData.append('type', recordatoriosInput);
+                formData.append('mensaje_personalizado', mensaje_personalizadoInput);
+                formData.append('phone_test', phone_testInput);
+                formData.append('email_test', email_testInput);
 
                 const response = await fetch(route, {
-                    method: 'GET',
+                    method: 'POST',
                     headers: {
                         'Accept': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
                             .getAttribute('content')
-                    }
+                    },
+                    body: formData
                 });
 
                 if (response.ok) {
                     const data = await response.json();
-                    console.log(data);
+                    Swal.fire({
+                        type: 'success',
+                        title: 'Enviado...',
+                        text: 'Prueba enviada correctamente.'
+                    }).then(() => {
+                        window.location.reload();
+                    });
                 } else {
                     const errorData = await response.json();
                     console.error('Errores:', errorData);

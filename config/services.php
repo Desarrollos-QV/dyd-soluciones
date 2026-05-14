@@ -31,4 +31,14 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'twilio' => [
+        'sid'                      => env('TWILIO_SID'),
+        'token'                    => env('TWILIO_AUTH_TOKEN'),
+        'from'                     => env('TWILIO_PHONE'),
+        // ContentSid del template "reminder_pay_1" en el Content Template Builder de Twilio
+        'phone_sms_capabilities'   => env('TWILIO_PHONE_SMS_CAPABILITIES'),
+        'template_reminder_pay'  => env('TWILIO_TEMPLATE_REMINDER_PAY'),
+        'template_reminder_pay_1'  => env('TWILIO_TEMPLATE_REMINDER_PAY_1'),
+    ],
+
 ];

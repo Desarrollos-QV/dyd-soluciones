@@ -224,10 +224,20 @@
                             </label>
                         </div>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-3" id="custom_message_container">
                         <label class="form-label fw-bold">Mensaje</label>
                         <textarea class="form-control" id="mensajeNotificacion" rows="4"
                             placeholder="Escriba el mensaje...">Estimado cliente, le recordamos que su pago se encuentra vencido. Por favor, regularice su situación.</textarea>
+                    </div>
+                    
+                    <div class="mb-3" id="whatsapp_template_container" style="display: none;">
+                        <label class="form-label fw-bold">Mensaje</label>
+                        <div class="alert alert-info">
+                            <p>Se usará la plantilla <strong>reminder_pay</strong> para los mensajes de WhatsApp.</p>
+                            <a href="https://business.facebook.com/latest/whatsapp_manager/template_details/?business_id=1474122813130436&tab=template-details&childRoute=CAPI&id=831040500045195&nav_ref=whatsapp_manager&asset_id=1461526848422681" target="_blank" class="btn btn-primary mt-2">
+                                <i class="feather icon-external-link"></i> Ver plantilla en uso
+                            </a>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer border-top">
@@ -261,6 +271,28 @@
             document.getElementById('filterStatus').addEventListener('change', cargarDatos);
             document.getElementById('dateFrom').addEventListener('change', cargarDatos);
             document.getElementById('dateTo').addEventListener('change', cargarDatos);
+
+            // Toggle for WhatsApp template info
+            const envioRadios = document.querySelectorAll('input[name="envioMedio"]');
+            const customMessageContainer = document.getElementById('custom_message_container');
+            const whatsappTemplateContainer = document.getElementById('whatsapp_template_container');
+
+            function toggleModalMessageView() {
+                const selectedMedio = document.querySelector('input[name="envioMedio"]:checked');
+                if (selectedMedio && selectedMedio.value === 'whatsapp') {
+                    customMessageContainer.style.display = 'none';
+                    whatsappTemplateContainer.style.display = 'block';
+                } else {
+                    customMessageContainer.style.display = 'block';
+                    whatsappTemplateContainer.style.display = 'none';
+                }
+            }
+
+            envioRadios.forEach(radio => {
+                radio.addEventListener('change', toggleModalMessageView);
+            });
+            
+            toggleModalMessageView();
         }
 
         function cargarDatos() {
@@ -379,7 +411,7 @@
                     mensaje: mensaje
                 },
                 success: function (res) {
-                    bootstrap.Modal.getInstance(document.getElementById('notificacionModal')).hide();
+                    new bootstrap.Modal(document.getElementById('notificacionModal')).hide();
                     if (typeof Swal !== 'undefined') {
                         Swal.fire('Enviado', 'Notificación enviada correctamente', 'success');
                     } else {
@@ -387,8 +419,10 @@
                     }
                 },
                 error: function (err) {
+                    const fail = err.responseJSON;
+                    console.error(fail);
                     if (typeof Swal !== 'undefined') {
-                        Swal.fire('Error', 'No se pudo enviar la notificación', 'error');
+                        Swal.fire('Error', fail.message, 'error');
                     } else {
                         alert('Error al enviar notificación');
                     }

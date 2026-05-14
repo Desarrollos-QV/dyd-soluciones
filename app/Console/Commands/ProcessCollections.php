@@ -47,88 +47,108 @@ class ProcessCollections extends Command
         Log::info('⏳ Iniciando procesamiento de cobranza...');
         Log::info("📅 Fecha actual: {$hoy->toDateString()}");
 
-        $unidades = Unidades::whereNotNull('fecha_cobro')
+        $query = Unidades::whereNotNull('fecha_cobro')
             ->whereDate('fecha_cobro', '<=', $limite)
-            ->with('cliente')
-            ->get();
+            ->with('cliente');
 
-        if ($unidades->isEmpty()) {
+        if ($query->count() === 0) {
             Log::info('✅ No hay unidades por procesar.');
             return Command::SUCCESS;
         }
 
+        Log::info("Unidades encontradas: ". $query->count());
 
-        Log::info("Unidades encontradas: ". count($unidades));
+        $query->chunkById(100, function ($unidades) use ($hoy, $settings) {
+            foreach ($unidades as $unidad) {
+                Log::info("!!--------------------------------------------------------------------------!!");
+            
+                $fechaCobro = Carbon::parse($unidad->fecha_cobro);
+                $estatus = $fechaCobro->lt($hoy) ? 'overdue' : 'pending';
 
-        foreach ($unidades as $unidad) {
-            Log::info("!!--------------------------------------------------------------------------!!");
-           
-            $fechaCobro = Carbon::parse($unidad->fecha_cobro);
-            $estatus = $fechaCobro->lt($hoy) ? 'overdue' : 'pending';
+                // Buscamos si ya existe un registro de cobranza activo para esta unidad
+                $collection = Collection::where('unidad_id', $unidad->id)
+                    ->where('status', '!=', 'paid')
+                    ->first();
 
-            // Buscamos si ya existe un registro de cobranza activo para esta unidad
-            $collection = Collection::where('unidad_id', $unidad->id)
-                ->where('status', '!=', 'paid')
-                ->first();
-
-            if ($collection) {
-                $collection->update([
-                    'cliente_id' => $unidad->cliente_id,
-                    'due_date' => $fechaCobro,
-                    'amount' => $unidad->pago_mensual,
-                    'status' => $estatus,
-                ]);
-                Log::info("✔ Actualizado cobro para Unidad #{$unidad->id} | Cliente #{$unidad->cliente_id} | Estatus: {$estatus}");
-            } else {
-                Collection::create([
-                    'unidad_id' => $unidad->id,
-                    'cliente_id' => $unidad->cliente_id,
-                    'due_date' => $fechaCobro,
-                    'amount' => $unidad->pago_mensual,
-                    'status' => $estatus,
-                ]);
-                Log::info("✔ Creado nuevo cobro para Unidad #{$unidad->id} | Cliente #{$unidad->cliente_id} | Estatus: {$estatus}");
-            }
-
-            $days = Carbon::now()->diffInDays($fechaCobro, false);
-        
-            Log::info('Dias faltantes para esta alerta: '. $days);
-
-            // Verificamos si estan activas las notificaciones autmaticas
-            if($settings->mensajes_automaticos == 'si'){
-                // Notificamos al Usuario
-                if($settings->recordatorios == 'sms'){
-                    $this->notifyUserSMS(
-                        $unidad->cliente->numero_contacto,
-                        $settings->mensaje_personalizado //<- Mensaje automatico
-                    );
-                }else if($settings->recordatorios == 'whatsapp'){
-                    $this->notifyUserWhatsapp(
-                        $unidad->cliente->numero_contacto,
-                        $settings->mensaje_personalizado //<- Mensaje automatico
-                    );
-                }else if($settings->recordatorios == 'email'){
-                    // $this->notifyUserEmail(
-                    //     $unidad->cliente->numero_contacto,
-                    //     $settings->mensaje_automatico // Falta de email
-                    // );
+                if ($collection) {
+                    $collection->update([
+                        'cliente_id' => $unidad->cliente_id,
+                        'due_date' => $fechaCobro,
+                        'amount' => $unidad->pago_mensual,
+                        'status' => $estatus,
+                    ]);
+                    Log::info("✔ Actualizado cobro para Unidad #{$unidad->id} | Cliente #{$unidad->cliente_id} | Estatus: {$estatus}");
+                } else {
+                    $collection = Collection::create([
+                        'unidad_id' => $unidad->id,
+                        'cliente_id' => $unidad->cliente_id,
+                        'due_date' => $fechaCobro,
+                        'amount' => $unidad->pago_mensual,
+                        'status' => $estatus,
+                    ]);
+                    Log::info("✔ Creado nuevo cobro para Unidad #{$unidad->id} | Cliente #{$unidad->cliente_id} | Estatus: {$estatus}");
                 }
+
+                $days = Carbon::now()->diffInDays($fechaCobro, false);
+            
+                Log::info('Dias faltantes para esta alerta: '. $days);
+
+                // Verificamos si ya notificamos sobre este cobro
+                if (empty($collection->notified_at)) {
+                    // Verificamos si estan activas las notificaciones autmaticas
+                    if($settings->mensajes_automaticos == 'si'){
+                        try {
+                            // Notificamos al Usuario
+                            if($settings->recordatorios == 'sms'){
+                                $this->notifyUserSMS(
+                                    $unidad->cliente->numero_contacto,
+                                    $settings->mensaje_personalizado //<- Mensaje automatico
+                                );
+                            }else if($settings->recordatorios == 'whatsapp'){
+                                $clientName  = $unidad->cliente->nombre;
+                                $businesName = "DYD Soluciones";
+                                $amount      = $unidad->pago_mensual;
+                                
+                                $contentSid = config('services.twilio.template_reminder_pay', env('TWILIO_TEMPLATE_REMINDER_PAY'));
+
+                                $this->notifyUserWhatsappTemplate($unidad->cliente->numero_contacto, $contentSid, [
+                                    '1' => $clientName,
+                                    '2' => $businesName,
+                                    '3' => '$' . number_format((float) str_replace(',', '', $amount), 2).' MXN',
+                                ]);
+                            }else if($settings->recordatorios == 'email'){
+                                // TODO: Implement email sending
+                            }
+                        } catch (\Exception $e) {
+                            Log::error("Error al notificar al cliente {$unidad->cliente_id}: " . $e->getMessage());
+                        }
+                    }
+
+                    try {
+                        // Notificamos al Administrador
+                        $this->notifyUser(
+                            1, // SuperAdmin
+                            'gestion_cobranza',
+                            'Gestión de cobranza',
+                            "La mensualidad del cliente {$unidad->cliente->nombre} esta por vencer.",
+                            json_encode(["unidad" => $unidad->id]),
+                            route('collections.index'), // Redireccionamos a caja
+                            now()->addDays(7)
+                        );
+                    } catch (\Exception $e) {
+                        Log::error("Error al notificar al administrador: " . $e->getMessage());
+                    }
+                    
+                    // Marcamos la colección como notificada. 
+                    // Esto evita que vuelva a intentar enviarse repetidas veces en caso de error, 
+                    // previniendo envíos múltiples y bucles infinitos en ejecuciones del cron.
+                    $collection->update(['notified_at' => now()]);
+                }
+
+                Log::info("✔ Unidad #{$unidad->id} | Cliente #{$unidad->cliente_id} | {$estatus}");
+
             }
-
-            // Notificamos al Administrador
-                $this->notifyUser(
-                    1, // SuperAdmin
-                    'gestion_cobranza',
-                    'Gestión de cobranza',
-                    "La mensualidad del cliente {$unidad->cliente->nombre} esta por vencer.",
-                    json_encode(["unidad" => $unidad->id]),
-                    route('collections.index'), // Redireccionamos a caja
-                    now()->addDays(7)
-                );
-
-            Log::info("✔ Unidad #{$unidad->id} | Cliente #{$unidad->cliente_id} | {$estatus}");
-
-        }
+        });
 
         Log::info('🚀 Proceso de cobranza finalizado correctamente.');
 

@@ -210,7 +210,7 @@ Route::group(['middleware' => 'isAdmin'], function () {
     /**
      * Configuraciones
      */
-    Route::get('sendTestNotify/{type}', [SettingsController::class, 'sendTestNoify'])->name('sendTestNoify');
+    Route::post('sendTestNotify', [SettingsController::class, 'sendTestNoify'])->name('sendTestNoify');
     Route::resource('settings', SettingsController::class);
 
     /**

@@ -20,6 +20,8 @@ class ClienteController extends Controller
             'unidades.inventario'
         ])->get();
 
+        
+
         return view('admin.clientes.index', compact('clientes'));
     }
 

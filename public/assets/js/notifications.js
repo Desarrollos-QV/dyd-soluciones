@@ -4,6 +4,7 @@
     $(function () {
         const btnEvent = $('#notificationDropdown');
         const evController = $(".inner-body-card-notify");
+        window.BASE_URL = "/dyd_gestion";
         
         function scrollNotifyHandler() {
             var $el = evController;
@@ -22,13 +23,14 @@
             $(`<div class="dropdown-body loadMoreSpinNotify"><a href="javascript:;" class="dropdown-item"><div class="icon"><i data-feather="alert-circle"></i></div><div class="content"><p class="loading-name"></p><p class="sub-text text-muted loading-time"></p></div></a></div>`).appendTo(".inner-body-card-notify");
             $(`<div class="dropdown-body loadMoreSpinNotify"><a href="javascript:;" class="dropdown-item"><div class="icon"><i data-feather="alert-circle"></i></div><div class="content"><p class="loading-name"></p><p class="sub-text text-muted loading-time"></p></div></a></div>`).appendTo(".inner-body-card-notify");
            
-            var allElements = $('a.card-notify-list').length;
-            var url_pagination = '/notifications';
+            var allElements = $('a.card-notify-list').length || 0;
+            var url_pagination = window.BASE_URL + '/notifications';
 
             $.ajax({
                 url: url_pagination,
                 data: { skip: allElements},
             }).done(function (data) { 
+                data = $.trim(data);
                 if(data){
                     $('.loadMoreSpinNotify').remove();
                     $(data).appendTo(".inner-body-card-notify");
@@ -40,20 +42,23 @@
                     }, 100);
                 }else{
                     $('.loadMoreSpinNotify').remove();
-                    let emptyNotify = `
-                        <a href="javascript:;" class="dropdown-item wrap_no_notifications">
-                            <div class="icon">
-                                <i data-feather="alert-circle"></i>
-                            </div>
-                            <div class="content">
-                                <p>Sin Notificaciones</p>
-                                <p class="sub-text text-muted">
-                                   No tienes notificaciones pendientes
-                                </p>
-                            </div>
-                        </a>
-                    `;
-                    $(emptyNotify).appendTo(".inner-body-card-notify");
+                    if ($('.card-notify-list').length === 0) {
+                        let emptyNotify = `
+                            <a href="javascript:;" class="dropdown-item wrap_no_notifications">
+                                <div class="icon">
+                                    <i data-feather="alert-circle"></i>
+                                </div>
+                                <div class="content">
+                                    <p>Sin Notificaciones</p>
+                                    <p class="sub-text text-muted">
+                                       No tienes notificaciones pendientes
+                                    </p>
+                                </div>
+                            </a>
+                        `;
+                        $(emptyNotify).appendTo(".inner-body-card-notify");
+                        if (window.feather) feather.replace();
+                    }
                 }
             }).fail(function (jqXHR, ajaxOptions, thrownError) {
                 console.log("Eror Ajax More Notify => ",thrownError);
@@ -77,14 +82,15 @@
 
 
         // Obtenemos cantidad de notificaciones
-        function countNotify(){
+        function countNotify(){ 
             $.ajax({
-                url: '/notifications/count',
+                url: window.BASE_URL + '/notifications/count',
                 type: 'GET',
                 success: function (data) { 
                     if(data.count > 0){
+                        console.log(data);
                         // Reproduciremos un audio
-                        var audio = new Audio('/assets/audios/notify.mp3');
+                        var audio = new Audio(window.BASE_URL + '/assets/audios/notify.mp3');
                         audio.play();
                         $('.indicator').show();
                     }else{
@@ -96,8 +102,8 @@
 
         countNotify();
         // Sera un Timer de 10 segundos para obtener la cantidad de notificaciones
-        setInterval(function() {
-            countNotify();
-        }, 10000);
+        // setInterval(function() {
+        //     countNotify();
+        // }, 10000);
     });
 })(jQuery);

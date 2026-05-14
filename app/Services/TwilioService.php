@@ -45,6 +45,40 @@ class TwilioService
         }
     }
 
+    /**
+     * Envía un mensaje de WhatsApp usando un Content Template de Twilio.
+     *
+     * @param  string  $destination   Número destino con formato E.164 (ej. +5216361229546)
+     * @param  string  $contentSid    SID del template (ej. HXxxxxxxxxxxxxxxxxxxxx)
+     * @param  array   $variables     Variables del template, ej. ['1' => 'Juan', '2' => '1500']
+     * @return array
+     */
+    public function sendWhatsappTemplate(string $destination, string $contentSid, array $variables = []): array
+    {
+        try {
+            $client = new \GuzzleHttp\Client([
+                'verify' => false
+            ]);
+
+            $response = $client->request('POST', "https://api.twilio.com/2010-04-01/Accounts/{$this->sid}/Messages.json", [
+                'auth'        => [$this->sid, $this->token],
+                'form_params' => [
+                    'From'             => 'whatsapp:' . $this->from,
+                    'To'               => 'whatsapp:' . $destination,
+                    'ContentSid'       => $contentSid,
+                    'ContentVariables' => json_encode($variables),
+                ],
+                'headers' => [
+                    'Accept' => 'application/json',
+                ],
+            ]);
+
+            return json_decode($response->getBody(), true);
+        } catch (\Exception $e) {
+            throw new \Exception('Error sending WhatsApp template: ' . $e->getMessage());
+        }
+    }
+
     public function sendMessageSMS($destination, $message)
     {
         
@@ -56,9 +90,11 @@ class TwilioService
             $response = $client->request('POST', "https://api.twilio.com/2010-04-01/Accounts/{$this->sid}/Messages.json", [
                 'auth' => [$this->sid, $this->token],
                 'form_params' => [
-                    'To' => $destination,
-                    'From' => $this->from,
-                    'Body' => $message
+                    'To'               => $destination,
+                    'From'             => $this->from,
+                    'Body'             => $message
+                    // 'ContentSid'       => $contentSid,
+                    // 'ContentVariables' => json_encode($variables),
                 ],
                 'headers' => [
                     'Accept' => 'application/json',

@@ -58,11 +58,36 @@ trait NotifiesUsers
         return $notify->sendMessageWhatsapp($telefono, $message);
     }
 
-    public function notifyUserSMS($destination, $message)
+    /**
+     * Envía un WhatsApp usando un Content Template aprobado de Twilio.
+     *
+     * @param  string  $destination  Número del destinatario (sin formato, se normaliza)
+     * @param  string  $contentSid   SID del template en Twilio (HXxxxxxxxxxxxxxxxxxx)
+     * @param  array   $variables    Variables del template ej. ['1'=>'Juan','2'=>'$1,500','3'=>'2026-06-01']
+     */
+    public function notifyUserWhatsappTemplate(string $destination, string $contentSid, array $variables = [])
     {
-        
         $settings = Settings::where('user_id', 1)->first();
-        $notify = new TwilioService($settings->TWILIO_SID, $settings->TWILIO_AUTH_TOKEN, $settings->TWILIO_PHONE);
+        $notify   = new TwilioService($settings->TWILIO_SID, $settings->TWILIO_AUTH_TOKEN, $settings->TWILIO_PHONE);
+        $telefono = PhoneHelper::formatMX($destination);
+
+        if (!$telefono) {
+            Log::info("Número de teléfono inválido... sendWhatsappTemplate: " . $destination);
+            throw new \Exception('Número de teléfono inválido');
+        }
+
+        Log::info("Enviando WhatsApp Template ({$contentSid}) a: " . $telefono);
+
+        return $notify->sendWhatsappTemplate($telefono, $contentSid, $variables);
+    }
+
+    public function notifyUserSMS(string $destination, string $message)
+    {
+        $settings = Settings::where('user_id', 1)->first();
+        $phone_sms_capabilities = config('services.twilio.phone_sms_capabilities',
+                                    env('TWILIO_PHONE_SMS_CAPABILITIES'));
+        // Aca forzamos a usar el PHONE de TWILIO para el envio especificamente de SMS
+        $notify = new TwilioService($settings->TWILIO_SID, $settings->TWILIO_AUTH_TOKEN, $phone_sms_capabilities);
         $telefono = PhoneHelper::formatMX($destination);
 
         if (!$telefono) {
@@ -70,11 +95,9 @@ trait NotifiesUsers
             throw new \Exception('Número de teléfono inválido');
         }
 
-        Log::info("Enviando Mensaje SMS..." . $telefono);
+        Log::info("Enviando Mensaje SMS ({$message}) a: " . $telefono);
 
-
-        $notify->sendMessageSMS($telefono, $message);
-        return true;
+        return $notify->sendMessageSMS($telefono, $message);
     }
 
     public function notifyUserEmail($email, $clientName, $amount, $dueDate, $message)
