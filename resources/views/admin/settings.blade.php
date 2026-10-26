@@ -28,10 +28,10 @@
                             <div class="col-lg-6">
                                 <label for="recordatorios">Tipo de recordatorios</label>
                                 <select name="recordatorios" id="recordatorios" class="form-select" required>
-                                    <option value="sms" @if ($collection->recordatorio == 'sms') selected @endif>SMS</option>
-                                    <option value="whatsapp" @if ($collection->recordatorio == 'whatsapp') selected @endif>Whatsapp
+                                    <option value="sms" @if (($collection->recordatorios ?? $collection->recordatorio ?? '') == 'sms') selected @endif>SMS</option>
+                                    <option value="whatsapp" @if (($collection->recordatorios ?? $collection->recordatorio ?? '') == 'whatsapp') selected @endif>Whatsapp
                                     </option>
-                                    <option value="email" @if ($collection->recordatorio == 'email') selected @endif>Email</option>
+                                    <option value="email" @if (($collection->recordatorios ?? $collection->recordatorio ?? '') == 'email') selected @endif>Email</option>
                                 </select>
                             </div>
                             <div class="col-lg-4">

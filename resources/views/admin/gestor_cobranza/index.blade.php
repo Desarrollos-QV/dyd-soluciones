@@ -202,6 +202,16 @@
                     <button type="button" class="btn-close" data-dismiss="modal"></button>
                 </div>
                 <div class="modal-body p-4">
+                    <div class="mb-4 bg-white border p-3 rounded shadow-sm">
+                        <label class="form-label fw-bold text-primary"><i class="feather icon-phone"></i> Teléfono de Notificación (WhatsApp/SMS)</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light"><i class="feather icon-smartphone"></i></span>
+                            <input type="text" class="form-control" id="clienteTelefonoNotif" placeholder="Teléfono del cliente">
+                            <button class="btn btn-primary" type="button" onclick="actualizarTelefonoCliente()">Actualizar <i class="feather icon-save"></i></button>
+                        </div>
+                        <small class="text-muted d-block mt-1">Revise y/o actualice el teléfono antes de enviar la notificación.</small>
+                    </div>
+
                     <div class="mb-3">
                         <label class="form-label fw-bold">Seleccionar medio de envío</label>
                         <div class="form-check pl-4">
@@ -386,7 +396,56 @@
                 window.clienteNotifActual = JSON.parse(btn.dataset.item);
             }
             if (!window.clienteNotifActual) return;
+            
+            const cliente = window.clienteNotifActual.cliente;
+            document.getElementById('clienteTelefonoNotif').value = cliente ? (cliente.numero_contacto || '') : '';
+
             new bootstrap.Modal(document.getElementById('notificacionModal')).show();
+        }
+
+        function actualizarTelefonoCliente() {
+            if (!window.clienteNotifActual) return;
+            const item = window.clienteNotifActual;
+            const telefono = document.getElementById('clienteTelefonoNotif').value;
+            const route = `{{ url('collections') }}/${item.id}/update-phone`;
+
+            $.ajax({
+                url: route,
+                method: "POST",
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    telefono: telefono
+                },
+                success: function (res) {
+                    if (res.status == true) {
+                        window.clienteNotifActual.cliente.numero_contacto = telefono;
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                title: 'Éxito',
+                                text: res.message,
+                                icon: 'success',
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+                        } else {
+                            alert(res.message);
+                        }
+                    } else {
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire('Error', res.message, 'error');
+                        } else {
+                            alert(res.message);
+                        }
+                    }
+                },
+                error: function (err) {
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire('Error', 'No se pudo actualizar el teléfono', 'error');
+                    } else {
+                        alert('No se pudo actualizar el teléfono');
+                    }
+                }
+            });
         }
 
         function enviarNotificacion() {

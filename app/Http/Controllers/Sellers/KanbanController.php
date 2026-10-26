@@ -135,7 +135,8 @@ class KanbanController extends Controller
         $client = new Cliente;
         $client->nombre             = $prospect->name_prospect;
         $client->direccion          = $prospect->location;
-        $client->numero_contacto    = $prospect->contacts;
+        $client->numero_contacto    = substr($prospect->phone ?: $prospect->contacts, 0, 20);
+        $client->email              = $prospect->email;
         $client->empresa            = $prospect->name_company;
         $client->direccion_empresa  = $prospect->company;
         $client->save();

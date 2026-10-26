@@ -38,6 +38,12 @@ class AssignementsController extends Controller
         return view($this->folder . 'index', compact('assignements', 'tecnicos'));
     }
 
+    public function show($id)
+    {
+        $assignement = Asignaciones::with(['cliente', 'device', 'tecnico', 'getFirma', 'unidad', 'unidades.simcontrol', 'unidades.inventario'])->findOrFail($id);
+        return view($this->folder . 'show', compact('assignement'));
+    }
+
     public function AssignsPerformed()
     {
         $assignements = Asignaciones::with('cliente', 'device', 'tecnico')
@@ -69,10 +75,10 @@ class AssignementsController extends Controller
         $clientes = Cliente::all();
         $tecnicos = User::where('role', 'tecnico')->get();
         $devices = Devices::all();
+        $simcontrols = \App\Models\SimControl::all();
+        $sensores = \App\Models\Devices::where('type', 'sensor')->get();
 
-        
-
-        return view($this->folder . 'create', compact('assignement', 'clientes', 'tecnicos', 'devices'));
+        return view($this->folder . 'create', compact('assignement', 'clientes', 'tecnicos', 'devices', 'simcontrols', 'sensores'));
     }
 
     /**
@@ -93,11 +99,30 @@ class AssignementsController extends Controller
             'viaticos' => 'nullable|string',
             'same_viaticos' => 'nullable|boolean',
             'unidad_id' => 'nullable|exists:unidades,id',
+            'unidad_ids' => 'nullable|array',
             'observaciones' => 'nullable|string',
         ]);
 
         try {
-            $assignment = Asignaciones::create($request->all());
+            $data = $request->all();
+
+            // Enfoque A: Manejo de una o múltiples unidades asignadas
+            $unidadIds = [];
+            if ($request->has('unidad_ids') && is_array($request->unidad_ids)) {
+                $unidadIds = array_filter($request->unidad_ids);
+            } elseif ($request->filled('unidad_id')) {
+                $unidadIds = [$request->unidad_id];
+            }
+
+            if (!empty($unidadIds)) {
+                $data['unidad_id'] = $unidadIds[0];
+            }
+
+            $assignment = Asignaciones::create($data);
+
+            if (!empty($unidadIds)) {
+                $assignment->unidades()->sync($unidadIds);
+            }
 
             if ($request->filled('tecnico_id')) {
                 $tecnico = User::find($request->tecnico_id);
@@ -116,7 +141,7 @@ class AssignementsController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'ok' => false,
-                'message' => 'Error al crear el Dispositivo: ' . $e->getMessage(),
+                'message' => 'Error al crear la asignación: ' . $e->getMessage(),
             ]);
         }
     }
@@ -130,12 +155,14 @@ class AssignementsController extends Controller
      */
     public function edit($id)
     {
-        $assignement = Asignaciones::findOrFail($id);
+        $assignement = Asignaciones::with(['unidades', 'cliente'])->findOrFail($id);
         $clientes = Cliente::all();
         $tecnicos = User::where('role', 'tecnico')->get();
         $devices = Devices::all();
+        $simcontrols = \App\Models\SimControl::all();
+        $sensores = \App\Models\Devices::where('type', 'sensor')->get();
 
-        return view($this->folder . 'edit', compact('assignement', 'clientes', 'tecnicos', 'devices'));
+        return view($this->folder . 'edit', compact('assignement', 'clientes', 'tecnicos', 'devices', 'simcontrols', 'sensores'));
     }
     /**
      * Update the specified resource in storage.
@@ -157,15 +184,32 @@ class AssignementsController extends Controller
             'viaticos' => 'nullable|string',
             'same_viaticos' => 'nullable',
             'unidad_id' => 'nullable|exists:unidades,id',
+            'unidad_ids' => 'nullable|array',
             'observaciones' => 'nullable|string',
         ]);
 
         try {
             $assignement = Asignaciones::findOrFail($id);
-            $assignement->update($request->all());
-
             $originalTecnicoId = $assignement->tecnico_id;
-            $assignement->update($request->all());
+
+            $data = $request->all();
+
+            $unidadIds = [];
+            if ($request->has('unidad_ids') && is_array($request->unidad_ids)) {
+                $unidadIds = array_filter($request->unidad_ids);
+            } elseif ($request->filled('unidad_id')) {
+                $unidadIds = [$request->unidad_id];
+            }
+
+            if (!empty($unidadIds)) {
+                $data['unidad_id'] = $unidadIds[0];
+            }
+
+            $assignement->update($data);
+
+            if (!empty($unidadIds)) {
+                $assignement->unidades()->sync($unidadIds);
+            }
 
             if ($request->filled('tecnico_id')) {
                 $newTecnicoId = $request->tecnico_id;
@@ -192,7 +236,6 @@ class AssignementsController extends Controller
                 }
             }
 
-            $data = $request->all();
             if ($request->hasFile('file')) {
                 // Delete old file if exists
                 if ($assignement->file && file_exists(public_path('uploads/ordenes_servicio/' . $assignement->file))) {
@@ -202,13 +245,12 @@ class AssignementsController extends Controller
                 $file = $request->file('file');
                 $filename = time() . '_' . $file->getClientOriginalName();
                 $file->move(public_path('uploads/ordenes_servicio'), $filename);
-                $data['file'] = $filename;
+                $assignement->file = $filename;
             }
 
             // Handle checkbox logic
-            $data['same_viaticos'] = $request->has('same_viaticos_check') ? 1 : 0;
-
-            $assignement->update($data);
+            $assignement->same_viaticos = $request->has('same_viaticos_check') ? 1 : 0;
+            $assignement->save();
 
 
             return response()->json([

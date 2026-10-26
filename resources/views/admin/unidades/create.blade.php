@@ -78,9 +78,10 @@
 
         form.addEventListener('submit', async function(event) {
             event.preventDefault(); // Evita el envío tradicional del formulario
+            console.log("Enviando FORM")
             if (formSubmitted || formSent) return; // Evita múltiples envíos
             formSubmitted = true; // Marca como enviado
-
+            
             try {
                 // Si hay archivos en Dropzone, procesa la cola
                 // if (myDropzone.getQueuedFiles().length > 0) { 
@@ -111,6 +112,7 @@
             //     return;
             // }
 
+            
             formSent = true;
             const formData = new FormData(form);
 
@@ -168,55 +170,53 @@
                 dispositivo_instalado.removeAttribute('name');
             }
         }
-
-
-
         function filterOptions(type) {
-            const simSelect = document.getElementById('simcontrol_id');
-            const deviceSelect = document.getElementById('devices_id');
+            if (typeof window.filterSelects === 'function') {
+                window.filterSelects();
+            } else {
+                const simSelect = document.getElementById('simcontrol_id');
+                const deviceSelect = document.getElementById('devices_id');
 
-            const filter = (select, type) => {
-                let firstVisible = null;
-                Array.from(select.options).forEach(option => {
-                    const optionType = option.getAttribute('data-type');
-                    // Si no tiene data-type (placeholder), lo dejamos
-                    if (!optionType) { 
-                        return; 
-                    }
-
-                    if (type === 'Otro') {
-                         if (optionType === 'Otro') {
-                             option.hidden = false;
-                             option.disabled = false;
-                             if(!firstVisible) firstVisible = option;
-                         } else {
-                             option.hidden = true;
-                             option.disabled = true;
-                         }
-                    } else {
-                        if (optionType === type) {
-                            option.hidden = false;
-                            option.disabled = false;
-                            if(!firstVisible) firstVisible = option;
-                        } else {
-                             option.hidden = true;
-                             option.disabled = true;
+                const filter = (select, type) => {
+                    let firstVisible = null;
+                    Array.from(select.options).forEach(option => {
+                        const optionType = option.getAttribute('data-type');
+                        if (!optionType) { 
+                            return; 
                         }
-                    }
-                });
-                
-                // Deseleccionar si el seleccionado esta oculto
-                const selected = select.selectedOptions[0];
-                if (selected && selected.hidden && firstVisible && select.value !== "") {
-                    select.value = firstVisible.value;
-                } else if(selected && selected.hidden) {
-                    select.value = ""; 
-                }
-            };
-            if(simSelect) filter(simSelect, type);
-            if(deviceSelect) filter(deviceSelect, type);
-        }
 
+                        if (type === 'Otro') {
+                             if (optionType === 'Otro') {
+                                 option.hidden = false;
+                                 option.disabled = false;
+                                 if(!firstVisible) firstVisible = option;
+                             } else {
+                                 option.hidden = true;
+                                 option.disabled = true;
+                             }
+                        } else {
+                            if (optionType === type) {
+                                option.hidden = false;
+                                option.disabled = false;
+                                if(!firstVisible) firstVisible = option;
+                            } else {
+                                 option.hidden = true;
+                                 option.disabled = true;
+                            }
+                        }
+                    });
+                    
+                    const selected = select.selectedOptions[0];
+                    if (selected && selected.hidden && firstVisible && select.value !== "") {
+                        select.value = firstVisible.value;
+                    } else if(selected && selected.hidden) {
+                        select.value = ""; 
+                    }
+                };
+                if(simSelect) filter(simSelect, type);
+                if(deviceSelect) filter(deviceSelect, type);
+            }
+        }
         // Run on load
         if(dispositivo_instalado.value) {
             filterOptions(dispositivo_instalado.value);

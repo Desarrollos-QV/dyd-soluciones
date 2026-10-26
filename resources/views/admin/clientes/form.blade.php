@@ -9,9 +9,16 @@
                     <label>Nombre</label>
                     <input type="text" name="nombre" value="{{$cliente->nombre}}" class="form-control" required>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-3">
                     <label>Dirección</label>
                     <input type="text" name="direccion" value="{{$cliente->direccion}}" class="form-control" required>
+                </div>
+                <div class="col-md-3">
+                    <label>Identidad</label>
+                    <select name="sex" id="sex" class="form-select" required>
+                        <option value="male" @if($cliente->sexo == 'male') selected @endif>Masculino</option>
+                        <option value="female" @if($cliente->sexo == 'female') selected @endif>Femenino</option>
+                    </select>
                 </div>
             </div>
 
@@ -164,18 +171,40 @@
                 </div>
                 <div class="col-md-12 mt-4">
                     @if(isset($cliente->id))
-                        <label for="identificacion">Sube una Identificación Oficial</label>
-                        <div class="row">
+                        <label for="identificacion">Identificación Oficial (Frontal)</label>
+                        <div class="row mb-3">
                             <div class="col-lg-8">
-                                <input type="file" name="identificacion" id="myDropify2" class="form-control" value="{{$cliente->identificacion}}">
+                                <input type="file" name="identificacion" id="identificacion" class="form-control" value="{{$cliente->identificacion}}">
                             </div>
                             <div class="col-lg-4" style="display: flex;justify-content: center;align-items: center;">
-                                <img src="{{ asset($cliente->identificacion) }}" alt="identificacion" style="width:100px;height: 100px;border-radius: 25px;">
+                                @if($cliente->identificacion)
+                                    <img src="{{ asset($cliente->identificacion) }}" alt="identificacion" style="width:100px;height: 100px;border-radius: 25px;">
+                                @endif
+                            </div>
+                        </div>
+
+                        <label for="identificacion_trasera">Identificación Oficial (Trasera)</label>
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <input type="file" name="identificacion_trasera" id="identificacion_trasera" class="form-control" value="{{$cliente->identificacion_trasera}}">
+                            </div>
+                            <div class="col-lg-4" style="display: flex;justify-content: center;align-items: center;">
+                                @if($cliente->identificacion_trasera)
+                                    <img src="{{ asset($cliente->identificacion_trasera) }}" alt="identificacion trasera" style="width:100px;height: 100px;border-radius: 25px;">
+                                @endif
                             </div>
                         </div>
                     @else
-                        <label for="identificacion">Sube una Identificación Oficial</label>
-                        <input type="file" name="identificacion" id="myDropify2" class="form-control" value="{{$cliente->identificacion}}">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="identificacion">Identificación Oficial (Frontal)</label>
+                                <input type="file" name="identificacion" id="identificacion" class="form-control" value="{{$cliente->identificacion}}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="identificacion_trasera">Identificación Oficial (Trasera)</label>
+                                <input type="file" name="identificacion_trasera" id="identificacion_trasera" class="form-control" value="{{$cliente->identificacion_trasera}}">
+                            </div>
+                        </div>
                     @endif
                 </div>
             </div>

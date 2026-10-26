@@ -20,7 +20,7 @@
                                 <div class="col-md-4">
                                     <label>Fecha de instalación</label>
                                     <input type="date" name="fecha_instalacion" class="form-control" required
-                                        value="{{ $service->cliente->fecha_instalacion }}">
+                                        value="{{ !empty($service->cliente->fecha_instalacion) ? $service->cliente->fecha_instalacion : date('Y-m-d') }}">
                                 </div>
                                 <div class="col-md-4">
                                     <label>Tipo de servicio</label>
@@ -34,16 +34,27 @@
                                 </div>
                             </div>
 
+                            @if(isset($service->unidades) && $service->unidades->count() > 1)
+                            <div class="alert alert-info py-2 mb-3">
+                                <strong><i data-feather="truck" class="mr-1"></i> Unidades cubiertas en esta entrega ({{ $service->unidades->count() }} vehículos):</strong>
+                                <ul class="mb-0 mt-1 pl-3">
+                                    @foreach($service->unidades as $u)
+                                        <li><strong>{{ $u->economico ?? 'Unidad' }}</strong> - {{ $u->marca ?? '' }} {{ $u->submarca ?? '' }} (Placas: {{ $u->placa ?? 'S/P' }})</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                            @endif
+
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label>Nombre del técnico</label>
                                     <input type="text" name="tecnico" class="form-control" disabled
-                                        value="{{ ucwords($service->tecnico->name) }}">
+                                        value="{{ $service->tecnico ? ucwords($service->tecnico->name) : 'No asignado' }}">
                                 </div>
                                 <div class="col-md-6">
                                     <label>¿Encendido correcto tras cerrar switch?</label>
                                     <select name="equipo_encendido" class="form-control">
-                                        <option value="SI">SI</option>
+                                        <option value="SI" selected>SI</option>
                                         <option value="NO">NO</option>
                                     </select>
                                 </div>
@@ -69,9 +80,8 @@
                             @foreach ($preguntas as $name => $label)
                                 <div class="form-group mb-2">
                                     <label>{{ $label }}</label>
-                                    <select name="{{ $name }}" class="form-control" required>
-                                        <option value="">Selecciona</option>
-                                        <option value="SI">SI</option>
+                                    <select name="{{ $name }}" class="form-control">
+                                        <option value="SI" selected>SI</option>
                                         <option value="NO">NO</option>
                                     </select>
                                 </div>
@@ -93,12 +103,13 @@
                             <div class="form-group mb-3">
                                 <label>Nombre del usuario</label>
                                 <input type="text" name="nombre_usuario" class="form-control" required
-                                    value="{{ ucwords($service->cliente->nombre) }}">
+                                    value="{{ $service->cliente ? ucwords($service->cliente->nombre) : ($service->encargado_recibir ?? 'Cliente') }}">
                             </div>
 
+                            @if($service->tipo_servicio != 'Servicio de reparacion o mantenimiento')
                             <div class="form-group mb-3 mt-4 border p-3">
                                 <div class="row mb-3 ml-1">
-                                    <h4>Registro Fotografico</h4>
+                                    <h4>Registro Fotográfico <small class="text-muted fs-6 font-weight-normal">(Opcional / Recomendado)</small></h4>
                                 </div>
 
                                 <div class="row mb-3">
@@ -144,6 +155,11 @@
                                     </div>
                                 </div>
                             </div>
+                            @else
+                            <div class="alert alert-info mt-4">
+                                <strong>¡Atención!</strong> Este es un <b>Servicio de reparación o mantenimiento (NO NUEVO)</b>. Por lo tanto, no es necesario subir evidencia fotográfica.
+                            </div>
+                            @endif
 
                             <div class="form-group mb-3">
                                 <label>Agrega algún comentario extra <small class="text-gray">(Opcional)</small> </label>
@@ -164,7 +180,9 @@
                                 </button>
                             </section>
 
-                            <button type="submit" class="btn btn-primary">Guardar y generar PDF</button>
+                            <button type="submit" id="btnSubmitFirma" class="btn btn-primary btn-lg w-100">
+                                <i data-feather="check-circle" class="mr-1"></i> Guardar Firma y Generar PDF
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -275,83 +293,98 @@
 
 
         document.querySelector('form').addEventListener('submit', function (e) {
-            // Validar que todos los campos de Registro Fotográfico estén completos
-            const fotosFields = [
-                'images_sides',
-                'video_state_unit',
-                'foto_ubicacion_dispositivo',
-                'foto_toma_corriente',
-                'foto_toma_tierra',
-                'foto_coloca_relevador'
-            ];
-
-            let fotosIncompletas = false;
-            for (let fieldName of fotosFields) {
-                const field = document.querySelector(`input[name="${fieldName}"]`);
-                if (!field || !field.value) {
-                    fotosIncompletas = true;
-                    break;
-                }
-            }
-
-            if (fotosIncompletas) {
-                alert("Por favor completa todos los campos del Registro Fotográfico antes de enviar.");
-                e.preventDefault();
-                return false;
-            }
+            e.preventDefault();
 
             // Validar firma digital
             if (signaturePad.isEmpty()) {
-                alert("Por favor firma antes de enviar.");
-                e.preventDefault();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Firma Requerida',
+                    text: 'Por favor realice la firma digital en el recuadro antes de guardar.',
+                    confirmButtonText: 'Entendido'
+                });
                 return false;
             }
 
             const firmaBase64 = signaturePad.toDataURL('image/png');
             document.getElementById('firmaInput').value = firmaBase64;
 
-            // Enviar formulario con fetch para manejar la descarga y cierre de ventana
-            e.preventDefault();
+            const btnSubmit = document.getElementById('btnSubmitFirma');
+            if (btnSubmit) {
+                btnSubmit.disabled = true;
+                btnSubmit.innerHTML = '<span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span> Guardando firma y generando PDF...';
+            }
 
             const form = this;
             const formData = new FormData(form);
 
             fetch(form.action, {
                 method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/pdf, application/json'
+                },
                 body: formData
             })
-                .then(response => {
-                    // Obtener el nombre del archivo del header Content-Disposition
-                    const contentDisposition = response.headers.get('Content-Disposition');
-                    let filename = 'conformidad.pdf';
-                    if (contentDisposition) {
-                        const filenameMatch = contentDisposition.match(/filename[^;=\n]*=(["\']?)([^"\';\n]*)/);
-                        if (filenameMatch) {
-                            filename = filenameMatch[2];
-                        }
+            .then(async response => {
+                if (!response.ok) {
+                    let errorMsg = 'Hubo un error al procesar la firma.';
+                    try {
+                        const errJson = await response.json();
+                        errorMsg = errJson.error || errJson.message || errorMsg;
+                    } catch (e) {
+                        errorMsg = `Error en el servidor (${response.status} ${response.statusText})`;
                     }
+                    throw new Error(errorMsg);
+                }
 
-                    // Descargar el PDF
-                    return response.blob().then(blob => {
-                        const url = window.URL.createObjectURL(blob);
-                        const link = document.createElement('a');
-                        link.href = url;
-                        link.download = filename;
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                        window.URL.revokeObjectURL(url);
+                // Obtener el nombre del archivo del header Content-Disposition
+                const contentDisposition = response.headers.get('Content-Disposition');
+                let filename = 'conformidad_servicio_{{ $service->id }}.pdf';
+                if (contentDisposition) {
+                    const filenameMatch = contentDisposition.match(/filename[^;=\n]*=(["\']?)([^"\';\n]*)/);
+                    if (filenameMatch) {
+                        filename = filenameMatch[2];
+                    }
+                }
 
-                        // Esperar un segundo y cerrar la ventana
-                        setTimeout(() => {
-                            window.close();
-                        }, 800);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('Hubo un error al guardar el formulario. Por favor intenta de nuevo.');
+                // Descargar el PDF
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Firma Guardada con Éxito!',
+                    text: 'La hoja de conformidad ha sido firmada y el PDF descargado.',
+                    timer: 2000,
+                    showConfirmButton: false
                 });
+
+                // Esperar un momento y redirigir
+                setTimeout(() => {
+                    window.location.href = "{{ route('servicios_agendados.performed') }}";
+                }, 1500);
+            })
+            .catch(error => {
+                console.error('Error al guardar firma:', error);
+                if (btnSubmit) {
+                    btnSubmit.disabled = false;
+                    btnSubmit.innerHTML = '<i data-feather="check-circle" class="mr-1"></i> Guardar Firma y Generar PDF';
+                    if (typeof feather !== 'undefined') feather.replace();
+                }
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: error.message || 'Hubo un error al guardar el formulario. Por favor intenta de nuevo.'
+                });
+            });
         });
     </script>
 

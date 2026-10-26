@@ -85,9 +85,11 @@
                 @if($unidad->foto_unidad)
                     @php
                         $unitPics = json_decode($unidad->foto_unidad);
-                        foreach ($unitPics as $pic) {
-                            if (file_exists(public_path('uploads/fotos_unidades/'.$pic))) {
-                                echo '<img src="'.public_path('uploads/fotos_unidades/'.$pic).'" alt="Foto Unidad" width="50" height="50" style="object-fit: cover; margin-right: 5px;">';
+                        if (is_iterable($unitPics)) {
+                            foreach ($unitPics as $pic) {
+                                if (is_string($pic) && file_exists(public_path('uploads/fotos_unidades/'.$pic))) {
+                                    echo '<img src="'.public_path('uploads/fotos_unidades/'.$pic).'" alt="Foto Unidad" width="50" height="50" style="object-fit: cover; margin-right: 5px;">';
+                                }
                             }
                         }
                     @endphp

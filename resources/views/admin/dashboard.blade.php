@@ -174,25 +174,44 @@
                                     <th class="pt-0">Fecha</th>
                                     <th class="pt-0">Técnico</th>
                                     <th class="pt-0">Titular</th>
-                                    <th class="pt-0">Ubicación de instalación</th> 
+                                    <th class="pt-0">Ubicación de instalación</th>
+                                    <th class="pt-0 text-center">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($serviciosEnCurso as $serv)
+                                @forelse($serviciosEnCurso as $serv)
                                 <tr>
-                                    <td>{{$serv->id}}</td>
-                                    <td>{{$serv->tipo_servicio}}</td>
+                                    <td>{{ $serv->id }}</td>
+                                    <td>{{ $serv->tipo_servicio }}</td>
                                     <td><span class="badge badge-danger">
-                                        {{$serv->created_at}}    
+                                        {{ \Carbon\Carbon::parse($serv->created_at)->format('d/m/Y') }}    
                                     </span></td>
-                                    <td>{{ ucwords($serv->tecnico->name)}}</td>
-                                    <td>{{ ucwords($serv->cliente->nombre) }}</td>
-                                    <td>
-                                        {{$serv->location}}
+                                    <td>{{ $serv->tecnico ? ucwords($serv->tecnico->name) : 'Sin Asignar' }}</td>
+                                    <td>{{ $serv->cliente ? ucwords($serv->cliente->nombre) : 'Sin Titular' }}</td>
+                                    <td>{{ $serv->location ?? 'N/A' }}</td>
+                                    <td class="text-center">
+                                        @if(Auth::user()->isTecnico())
+                                            <a href="{{ route('servicios_agendados.edit', $serv->id) }}" class="btn btn-xs btn-outline-primary mr-1" title="Ver / Editar Servicio">
+                                                <i data-feather="eye" class="icon-sm"></i> Ver
+                                            </a>
+                                            <a href="{{ route('servicios_agendados.firmar', ['id' => base64_encode($serv->id)]) }}" class="btn btn-xs btn-success text-white" title="Solicitar Firma del Cliente">
+                                                <i data-feather="edit-3" class="icon-sm"></i> Firmar
+                                            </a>
+                                        @else
+                                            <a href="{{ route('assignements.show', $serv->id) }}" class="btn btn-xs btn-outline-primary" title="Ver Asignación">
+                                                <i data-feather="eye" class="icon-sm"></i> Detalles
+                                            </a>
+                                        @endif
                                     </td>
-                                    
                                 </tr> 
-                                @endforeach
+                                @empty
+                                <tr>
+                                    <td colspan="7" class="text-center text-muted py-4">
+                                        <i data-feather="check-circle" class="text-success mb-2" style="width: 24px; height: 24px;"></i>
+                                        <p class="mb-0">No hay servicios pendientes o en curso en este momento.</p>
+                                    </td>
+                                </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>

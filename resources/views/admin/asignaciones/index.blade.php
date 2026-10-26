@@ -2,6 +2,10 @@
 @section('title')
     Listado de Servicios
 @endsection
+
+@section('css')
+@endsection
+
 @section('content')
     <nav class="page-breadcrumb">
         <ol class="breadcrumb">
@@ -24,6 +28,30 @@
             </div>
         </div>
 
+        <div class="col-lg-12 mb-3">
+            <!-- Buscador predictivo -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body py-3">
+                    <div class="row align-items-center">
+                        <div class="col-md-5">
+                            <label class="form-label fw-bold text-muted mb-1"><i data-feather="search" class="icon-sm"></i> Buscar Servicio por Cliente</label>
+                            <select id="filtroCliente" class="form-control select2">
+                                <option value="">Mostrar todos los clientes</option>
+                                @php
+                                    $uniqueClients = $assignements->pluck('cliente')->filter()->unique('id')->sortBy('nombre');
+                                @endphp
+                                @foreach($uniqueClients as $client)
+                                    <option value="{{ $client->nombre }}">{{ $client->nombre }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-7 text-muted small mt-3 mt-md-0">
+                            * Utiliza el buscador predictivo para filtrar rápidamente los servicios asociados a un cliente específico.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
       
         <div class="col-lg-12 grid-margin stretch-card">
             <div class="card">
@@ -89,7 +117,12 @@
                                                     data-toggle="dropdown" aria-haspopup="true"
                                                     aria-expanded="false">Opciones</button>
                                                 <div class="dropdown-menu">
-                                                    <a class="dropdown-item" href="{{ route('assignements.edit', $assign->id) }}">Editar</a>
+                                                    <a class="dropdown-item" href="{{ route('assignements.show', $assign->id) }}">
+                                                        <i data-feather="eye" class="icon-sm mr-2"></i> Ver detalles
+                                                    </a>
+                                                    <a class="dropdown-item" href="{{ route('assignements.edit', $assign->id) }}">
+                                                        <i data-feather="edit-2" class="icon-sm mr-2"></i> Editar
+                                                    </a>
                                                     @if (isset($assign->getFirma))
                                                         @if($assign->getFirma->firma != null)
                                                         <a class="dropdown-item" target="_blank" href="{{ route('servicios_agendados.generarPDF', ['id' => base64_encode($assign->id)]) }}">
@@ -128,8 +161,31 @@
 @section('js')
     <script>
         $(document).ready(function() {
+            // Inicializar Select2 predictivo
+            if($('.select2').length) {
+                $('.select2').select2({
+                    placeholder: "Escriba para buscar un cliente...",
+                    allowClear: true,
+                    width: '100%',
+                    language: {
+                        noResults: function() {
+                            return "No se encontraron clientes";
+                        }
+                    }
+                });
+            }
+
             const table = $('#dataTableResponsive').DataTable({
                 responsive: true,
+                language: {
+                    search: "Búsqueda general:"
+                }
+            });
+
+            // Filtro custom predictivo por cliente
+            $('#filtroCliente').on('change', function() {
+                var val = $(this).val();
+                table.column(1).search(val, false, true, true).draw();
             });
 
             // Limpiamos todos los Checkbox al cargar la tabla

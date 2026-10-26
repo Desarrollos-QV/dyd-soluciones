@@ -15,6 +15,11 @@ class TecnicoController extends Controller
         return view('admin.tecnicos.index', compact('tecnicos'));
     }
 
+    public function show(User $tecnico)
+    {
+        return view('admin.tecnicos.show', compact('tecnico'));
+    }
+
     public function create()
     {
         $tecnico = new User;
@@ -41,13 +46,12 @@ class TecnicoController extends Controller
         try {
             $data = $request->all();
 
-            $permission[] = 'dashboard,servicios_agendados.index,assignements.index,assignements.inprogress,assignements.performed,assignements.edit';
-            $permission = implode(',', $permission);
+            $permissionsList = 'dashboard,home,servicios_agendados.index,servicios_agendados.inprogress,servicios_agendados.performed,servicios_agendados.edit,servicios_agendados.show,servicios_agendados.update,servicios_agendados.firmar,servicios_agendados.generarPDF,servicios_agendados.seePhotoRecord,servicios_agendados.delete-file';
             $data['password'] = Hash::make($request->password);
             $data['role'] = 'tecnico';
             $data['parent_id'] = auth()->id();
             $data['permission'] = 'none';
-            $data['permissions'] = $permission;
+            $data['permissions'] = $permissionsList;
             $data['is_active'] = 1;
 
             $data['tools'] = json_encode($data['tools']);
@@ -140,20 +144,20 @@ class TecnicoController extends Controller
                 'email' => $request->email,
                 'telefono' => $request->telefono,
                 'password' => Hash::make($request->password),
-                'is_active' => $request->is_active,
+                'is_active' => $request->is_active ?? $tecnico->is_active ?? 1,
                 'avatar' => $data['avatar'],
                 'identificacion' => $data['identificacion'],
-                'tools' => json_encode($data['tools'])
+                'tools' => json_encode($data['tools'] ?? json_decode($tecnico->tools ?? '[]', true))
             ]);
         } else {
             $tecnico->update([
                 'name' => $request->name,
                 'email' => $request->email,
                 'telefono' => $request->telefono,
-                'is_active' => $request->is_active,
+                'is_active' => $request->is_active ?? $tecnico->is_active ?? 1,
                 'avatar' => $data['avatar'],
                 'identificacion' => $data['identificacion'],
-                'tools' => json_encode($data['tools'])
+                'tools' => json_encode($data['tools'] ?? json_decode($tecnico->tools ?? '[]', true))
             ]);
         }
 

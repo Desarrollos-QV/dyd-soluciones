@@ -205,6 +205,8 @@ Route::group(['middleware' => 'isAdmin'], function () {
     Route::resource('collections', CollectionsController::class);
     Route::get('collections/{collection}', [CollectionsController::class, 'show'])->name('collections.show');
     Route::post('collections/{collection}/pay', [CollectionsController::class, 'pagar'])->name('collections.pay');
+    Route::post('collections/{collection}/undo-pay', [CollectionsController::class, 'undoPayment'])->name('collections.undoPayment');
+    Route::post('collections/{collection}/update-phone', [CollectionsController::class, 'updatePhone'])->name('collections.updatePhone');
     Route::post('collections/{collection}/notify', [CollectionsController::class, 'notify'])->name('collections.notify');
 
     /**

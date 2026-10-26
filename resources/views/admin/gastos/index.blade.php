@@ -18,9 +18,9 @@
                 <button class="btn btn-danger btn-sm mr-3" id="delete_selected">
                     <i data-feather="trash-2"></i> Eliminar Selección
                 </button>
-                <a href="{{ route('gastos.create') }}" class="btn btn-primary btn-sm">
+               <!-- <a href="{{ route('gastos.create') }}" class="btn btn-primary btn-sm">
                     <i data-feather="plus"></i> Nuevo Gasto
-                </a>
+                </a>-->
             </div>
         </div>
     </div>

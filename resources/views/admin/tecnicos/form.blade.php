@@ -30,7 +30,7 @@
                     <div class="col-lg-6">
                         <label for="experience">Experiecia</label>
                         <textarea name="experience" id="experience" class="form-control"
-                            placeholder="Ingresa tu Experiecia (No es obligatorio)">{!! $tecnico->experience !!}</textarea>
+                            placeholder="Ingresa tu Experiecia">{!! $tecnico->experience !!}</textarea>
                     </div>
                 </div>
             </div>

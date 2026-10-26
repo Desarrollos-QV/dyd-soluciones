@@ -29,6 +29,16 @@ class ProspectsController extends Controller
     }
 
     /**
+     * Summary of show
+     * @param \App\Models\Prospects $prospect
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     */
+    public function show(Prospects $prospect)
+    {
+        return view($this->folder . '.show', compact('prospect'));
+    }
+
+    /**
      * Summary of create
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
@@ -135,7 +145,8 @@ class ProspectsController extends Controller
             $client = new Cliente;
             $client->nombre             = $prospect->name_prospect;
             $client->direccion          = $prospect->location;
-            $client->numero_contacto    = $prospect->contacts;
+            $client->numero_contacto    = substr($prospect->phone ?: $prospect->contacts, 0, 20);
+            $client->email              = $prospect->email;
             $client->empresa            = $prospect->name_company;
             $client->direccion_empresa  = $prospect->company;
             $client->save();

@@ -159,29 +159,7 @@
                         Auth::user()->hasPermission('historial-caja.index') ||
                         Auth::user()->hasPermission('collections.index'))
                     <li class="nav-item nav-category">Contabilidad y Cobranza</li>
-                    @if (Auth::user()->hasPermission('gastos.index'))
-                        <li class="nav-item">
-                            <a class="nav-link" data-toggle="collapse" href="#reg_fastos" role="button"
-                                aria-expanded="false" aria-controls="reg_fastos">
-                                <i class="link-icon" data-feather="dollar-sign"></i>
-                                <span class="link-title">Registro de gastos</span>
-                                <i class="link-arrow" data-feather="chevron-down"></i>
-                            </a>
-                            <div class="collapse @if (Route::is('gastos.index') || Route::is('gastos.create')) show @endif" id="reg_fastos">
-                                <ul class="nav sub-menu">
-                                    <li class="nav-item">
-                                        <a href="{{ route('gastos.index') }}"
-                                            class="nav-link @if (Route::is('gastos.index')) active @endif">Gastos</a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('gastos.create') }}"
-                                            class="nav-link @if (Route::is('gastos.create')) active @endif">Agregar
-                                            Elemento</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                    @endif
+                    
                     @if (Auth::user()->hasPermission('reports.index'))
                         <li class="nav-item">
                             <a class="nav-link" data-toggle="collapse" href="#reports" role="button"
@@ -198,7 +176,7 @@
                                     </li>
                                     <li class="nav-item">
                                         <a href="{{ route('reportes.units') }}"
-                                            class="nav-link @if (Route::is('reportes.units')) active @endif">Undades</a>
+                                            class="nav-link @if (Route::is('reportes.units')) active @endif">Unidades</a>
                                     </li>
                                 </ul>
                             </div>
@@ -223,13 +201,27 @@
                         </li>
                     @endif
                     @if (Auth::user()->hasPermission('historial-caja.index'))
-                        <li class="nav-item @if (Route::is('historial-caja.index') || Route::is('historial-caja.create')) active @endif">
-                            <a href="{{ route('historial-caja.index') }}"
-                                class="nav-link @if (Route::is('historial-caja.index')) active @endif">
-                                <i class="link-icon" data-feather="inbox"></i>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="collapse" href="#caja_admin" role="button"
+                                aria-expanded="false" aria-controls="caja_admin">
+                                <i class="link-icon" data-feather="dollar-sign"></i>
                                 <span class="link-title">Caja y Administración</span>
-                                <i class="link-arrow" data-feather="chevron-right"></i>
+                                <i class="link-arrow" data-feather="chevron-down"></i>
                             </a>
+                            <div class="collapse @if (Route::is('historial-caja.index') || Route::is('historial-caja.create') || Route::is('gastos.index') || Route::is('gastos.create')) show @endif" id="caja_admin">
+                                <ul class="nav sub-menu">
+                                    <li class="nav-item">
+                                        <a href="{{ route('historial-caja.index') }}"
+                                            class="nav-link @if (Route::is('historial-caja.index')) active @endif">Caja</a>
+                                    </li>
+                                    @if (Auth::user()->hasPermission('gastos.index'))
+                                    <li class="nav-item">
+                                        <a href="{{ route('gastos.index') }}"
+                                            class="nav-link @if (Route::is('gastos.index')) active @endif">Gastos</a>
+                                    </li>
+                                    @endif
+                                </ul>
+                            </div>
                         </li>
                     @endif
                     @if (Auth::user()->hasPermission('collections.index'))
@@ -260,7 +252,7 @@
                         <span class="link-title">Dashboard {{ Auth::user() ? Auth::user()->role : 'General' }}</span>
                     </a>
                 </li>   
-                @if (Auth::user()->hasPermission('servicios_agendados.index'))
+                @if (Auth::user()->isTecnico() || Auth::user()->hasPermission('servicios_agendados.index'))
                     <li class="nav-item nav-category">Servicios</li>
                     <li class="nav-item">
                         <a class="nav-link" data-toggle="collapse" href="#services" role="button" aria-expanded="false"

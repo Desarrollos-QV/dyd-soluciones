@@ -13,6 +13,7 @@ class Cliente extends Model
     protected $fillable = [
         'nombre', // Obligatorio
         'avatar', 
+        'sex',
         'direccion',// Obligatorio
         'numero_contacto',// Obligatorio
         'numero_alterno',
@@ -20,6 +21,7 @@ class Cliente extends Model
         'tipo_empresa',
         'empresa',
         'identificacion',
+        'identificacion_trasera',
         'direccion_empresa',// Obligatorio
         'comprobante_domicilio',
         'copa_factura',
@@ -52,6 +54,7 @@ class Cliente extends Model
 
         $documents = [
             'identificacion',
+            'identificacion_trasera',
             'comprobante_domicilio',
             'copa_factura',
             'tarjeta_circulacion',
@@ -77,6 +80,7 @@ class Cliente extends Model
         $documents = [
             'avatar',
             'identificacion',
+            'identificacion_trasera',
             'comprobante_domicilio',
             'copa_factura',
             'tarjeta_circulacion',

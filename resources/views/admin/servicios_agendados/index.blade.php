@@ -54,9 +54,9 @@
                                             </a>
                                         </td>
                                         <td>{{ '$'.$s->viaticos }}</td>
-                                        <td>{{ ucwords($s->cliente->nombre) }}</td>
-                                        <td>{{  \Carbon\Carbon::parse($s->cliente->fecha_instalacion)->format('d/m/Y') }}</td>
-                                        <td>{{ $s->cliente->numero_contacto.' | '.$s->cliente->numero_alterno }}</td>
+                                        <td>{{ $s->cliente ? ucwords($s->cliente->nombre) : 'Sin Cliente' }}</td>
+                                        <td>{{ !empty($s->cliente->fecha_instalacion) ? \Carbon\Carbon::parse($s->cliente->fecha_instalacion)->format('d/m/Y') : (isset($s->created_at) && $s->created_at ? \Carbon\Carbon::parse($s->created_at)->format('d/m/Y') : 'N/A') }}</td>
+                                        <td>{{ $s->cliente ? ($s->cliente->numero_contacto . ($s->cliente->numero_alterno ? ' | ' . $s->cliente->numero_alterno : '')) : 'N/A' }}</td>
                                         <td>
                                             {{-- Verificamos el status --}}
                                             @if($s->status == 0)

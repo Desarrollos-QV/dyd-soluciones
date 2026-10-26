@@ -50,6 +50,13 @@ class Asignaciones extends Model
         return $this->belongsTo(Unidades::class, 'unidad_id');
     }
 
+    public function unidades()
+    {
+        return $this->belongsToMany(Unidades::class, 'asignacion_unidades', 'asignacion_id', 'unidad_id')
+            ->withPivot('status', 'observaciones')
+            ->withTimestamps();
+    }
+
     public function getFirma()
     {
         return $this->hasOne(FirmaServicio::class, 'servicio_id');

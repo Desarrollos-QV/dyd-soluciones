@@ -61,6 +61,11 @@
                                 onclick="checkToPaid('{{ $item->id }}')">
                                 <i class="feather icon-check-square"></i>
                             </button>
+                        @else
+                            <button type="button" class="btn btn-outline-danger btn-sm"
+                                onclick="undoPayment('{{ $item->id }}')" title="Deshacer pago por error">
+                                <i class="feather icon-rotate-ccw"></i>
+                            </button>
                         @endif
                     </div>
                 </td>

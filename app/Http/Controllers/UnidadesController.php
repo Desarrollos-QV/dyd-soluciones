@@ -25,7 +25,22 @@ class UnidadesController extends Controller
     {
         $unidades = Unidades::with('cliente','simcontrol','inventario')->orderBy('id', 'desc')->get();
         $clientes = Cliente::all();
-        $simcontrols    = SimControl::all();
+        /**
+         * Agregamos validacion para mostrar unicamente Sims que no esten asignadas a una unidad
+         */
+        
+        $Allsimcontrols    = SimControl::all();
+        $simcontrolsList = [];
+        foreach ($unidades as $unit) {
+            foreach($Allsimcontrols as $sim){
+                if ($unit->simcontrol_id != $sim->id) {
+                    $simcontrolsList[] = $sim->id;
+                }
+            }
+        }
+
+        $simcontrols = SimControl::whereIn('id', $simcontrolsList)->get();
+
         $devicesList    = Devices::all();
         $devices        = [];
         
@@ -38,11 +53,34 @@ class UnidadesController extends Controller
         return view('admin.unidades.index', compact('unidades','clientes', 'simcontrols' ,'devices'));
     }
 
+    public function show(Unidades $unidade)
+    {
+        $unidad = $unidade;
+        return view('admin.unidades.show', compact('unidad'));
+    }
+
     public function create()
     {
         $unidad     = new Unidades;
         $clientes   = Cliente::all();
-        $simcontrols       = SimControl::all();
+        
+        /**
+         * Agregamos validacion para mostrar unicamente Sims que no esten asignadas a una unidad
+         */
+        $unidades = Unidades::with('cliente','simcontrol','inventario')->orderBy('id', 'desc')->get();
+        $Allsimcontrols    = SimControl::all();
+        $simcontrolsList = [];
+        foreach ($unidades as $unit) {
+            foreach($Allsimcontrols as $sim){
+                if ($unit->simcontrol_id != $sim->id) {
+                    $simcontrolsList[] = $sim->id;
+                }
+            }
+        }
+        $simcontrols = SimControl::whereIn('id', $simcontrolsList)->get();
+
+        
+
         $devicesList    = Devices::all();
         $sensores       = Devices::where('type', 'sensor')->get();
         $devices        = [];
@@ -104,8 +142,29 @@ class UnidadesController extends Controller
             $data['fecha_instalacion'] = \Carbon\Carbon::parse($request->fecha_instalacion)->format('Y-m-d');
             $data['fecha_cobro'] = \Carbon\Carbon::parse($request->fecha_cobro)->format('Y-m-d');
             
-            Unidades::create($data);
-            // Quitamos del stock en caso de que se haya asignado un dispositivo
+            $nuevaUnidad = Unidades::create($data);
+            /**
+             * Validamos si el stock es mayor a 1 como minimo
+             */
+            $stockDevice = Devices::find($data['devices_id']) ? Devices::find($data['devices_id'])->stock : 0;
+            $stockSensor = !empty($data['sensor']) ? (Devices::find($data['sensor']) ? Devices::find($data['sensor'])->stock : 0) : null;
+
+            if($stockDevice <= 1){
+                return response()->json([
+                    'ok' => false,
+                    'message' => 'El stock de dispositivo es menor o igual a 1, no se puede crear la unidad.',
+                ]);
+            }
+            if(!empty($data['sensor']) && $stockSensor <= 1){
+                return response()->json([
+                    'ok' => false,
+                    'message' => 'El stock de sensor es menor o igual a 1, no se puede crear la unidad.',
+                ]);
+            }
+
+            /**
+             * Quitamos del stock en caso de que se haya asignado un dispositivo
+             */
             $data['devices_id'] != null && $data['devices_id'] != 0 ? Devices::find($data['devices_id'])->decrement('stock') : null;
 
             // Si el stock es menor al minimo para alerta notificamos
@@ -123,24 +182,30 @@ class UnidadesController extends Controller
             }
 
             // Lo Mismo hacemos con sensor, Quitamos del Stock y verificamos su stock_min_alert
-            $data['sensor'] != null && $data['sensor'] != 0 ? Devices::find($data['sensor'])->decrement('stock') : null;
-            if(Devices::find($data['sensor'])->stock <= Devices::find($data['sensor'])->stock_min_alert){
-                // Generamos la notificación para el técnico asignado
-                $this->notifyUser(
-                    1, // Administracion
-                    'stock_alert',
-                    'Stock Alerta',
-                    'Se ha creado un nuevo dispositivo con stock menor al minimo para alerta.',
-                    [],
-                    route('devices.index'),
-                    now()->addDays(7)
-                );
+            if (!empty($data['sensor']) && $data['sensor'] != 0) {
+                $sensorDev = Devices::find($data['sensor']);
+                if ($sensorDev) {
+                    $sensorDev->decrement('stock');
+                    if ($sensorDev->stock <= $sensorDev->stock_min_alert) {
+                        // Generamos la notificación para el técnico asignado
+                        $this->notifyUser(
+                            1, // Administracion
+                            'stock_alert',
+                            'Stock Alerta',
+                            'Se ha creado un nuevo dispositivo con stock menor al minimo para alerta.',
+                            [],
+                            route('devices.index'),
+                            now()->addDays(7)
+                        );
+                    }
+                }
             }
 
             return response()->json([
                 'ok' => true,
                 'message' => 'Elemento creado con éxito.',
                 'code' => 200,
+                'unidad' => $nuevaUnidad,
                 'redirect' => route('unidades.index')
             ]);
         } catch (\Exception $e) {
@@ -280,7 +345,20 @@ class UnidadesController extends Controller
                 Devices::find($unidad->devices_id)?->increment('stock');
             }
 
-            // Decrementamos el stock del nuevo dispositivo asignado
+            /**
+             * Validamos si el stock es mayor a 1 como minimo
+             */
+            $stockDevice = Devices::find($device)->stock;
+            if($stockDevice <= 1){
+                return response()->json([
+                    'ok' => false,
+                    'message' => 'El stock es menor a 1, no se puede asignar el dispositivo.',
+                ]);
+            }
+
+            /**
+             * Decrementamos el stock del nuevo dispositivo asignado
+             */
             Devices::find($device)?->decrement('stock');
             // Si el stock es menor al minimo para alerta notificamos
             if(Devices::find($device)?->stock <= Devices::find($device)?->stock_min_alert){

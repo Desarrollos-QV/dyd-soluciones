@@ -39,9 +39,18 @@ class ProcessCollections extends Command
     {
         Log::info('Iniciando proceso de Gestion de cobranza: ' . now());
         
-        $settings = Settings::where('user_id', 1)->first();
+        $settings = Settings::where('user_id', 1)->first() ?? Settings::first();
+        if (!$settings) {
+            $settings = Settings::create([
+                'user_id' => 1,
+                'dias_tolerancia' => 5,
+                'mensajes_automaticos' => 'no',
+                'recordatorios' => 'sms',
+                'mensaje_personalizado' => 'Recordatorio de pago DYD Soluciones',
+            ]);
+        }
         $hoy = Carbon::today();
-        $alertaDias = $settings->dias_tolerancia; // días antes de vencer
+        $alertaDias = $settings->dias_tolerancia ?? 5; // días antes de vencer
         $limite = $hoy->copy()->addDays($alertaDias);
 
         Log::info('⏳ Iniciando procesamiento de cobranza...');

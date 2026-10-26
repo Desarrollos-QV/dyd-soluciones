@@ -20,7 +20,15 @@ class SettingsController extends Controller
 
     public function index()
     {
-        $collection = Settings::where('user_id',Auth::user()->id)->first();
+        $collection = Settings::firstOrCreate(
+            ['user_id' => Auth::user()->id],
+            [
+                'recordatorios' => 'sms',
+                'mensajes_automaticos' => 'no',
+                'dias_tolerancia' => 3,
+                'mensaje_personalizado' => 'Estimado cliente, le recordamos su pago pendiente.',
+            ]
+        );
         return view($this->folder , compact('collection'));
     }
 

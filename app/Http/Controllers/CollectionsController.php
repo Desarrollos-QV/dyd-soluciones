@@ -140,6 +140,53 @@ class CollectionsController extends Controller
     }
 
     /**
+     * Deshacer el pago
+     */
+    public function undoPayment($id)
+    {
+        $collection = Collection::findOrFail($id);
+        if ($collection->status == 'paid') {
+            $collection->update([
+                'status' => 'pending',
+                'paid_at' => null
+            ]);
+            
+            // Eliminar último pago asociado
+            CollectionPayment::where('collection_id', $id)->orderBy('id', 'desc')->first()?->delete();
+            
+            // Restablecemos el mes en la unidad
+            $unidad = Unidades::find($collection->unidad_id);
+            if ($unidad && $unidad->fecha_cobro) {
+                $unidad->update([
+                    'fecha_cobro' => Carbon::parse($unidad->fecha_cobro)->subMonth()
+                ]);
+            }
+
+            return response()->json([
+                'status' => true,
+                'message' => 'El pago se ha deshecho correctamente.'
+            ]);
+        }
+        return response()->json(['status' => false, 'message' => 'Este cobro no está pagado.']);
+    }
+
+    /**
+     * Actualizar teléfono de notificación
+     */
+    public function updatePhone(Request $request, $id)
+    {
+        $collection = Collection::with('cliente')->findOrFail($id);
+        $request->validate(['telefono' => 'required|string']);
+        
+        $collection->cliente->update(['numero_contacto' => $request->telefono]);
+        
+        return response()->json([
+            'status' => true,
+            'message' => 'Teléfono actualizado correctamente.'
+        ]);
+    }
+
+    /**
      * Notificar cliente (SMS/Email/WhatsApp según config)
      */
     public function notify($id)

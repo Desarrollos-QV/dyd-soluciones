@@ -124,10 +124,39 @@ class User extends Authenticatable
      */
     public function hasPermission($section)
     {
-        $permissions = explode(',', $this->permissions);
+        // 1. Administrador con acceso completo
+        if ($this->role === 'admin' || $this->permissions === 'full_access') {
+            return true;
+        }
+
+        // 2. Técnico: acceso inherente a todas las rutas de su operación técnica
+        if ($this->role === 'tecnico') {
+            $tecnicoAllowed = [
+                'home',
+                'dashboard',
+                'servicios_agendados.index',
+                'servicios_agendados.inprogress',
+                'servicios_agendados.performed',
+                'servicios_agendados.edit',
+                'servicios_agendados.show',
+                'servicios_agendados.update',
+                'servicios_agendados.firmar',
+                'servicios_agendados.generarPDF',
+                'servicios_agendados.seePhotoRecord',
+                'servicios_agendados.delete-file',
+                'firmar.conformidad.guardar',
+                'notifications.index',
+                'notifications.read',
+                'notifications.count',
+            ];
+            if (in_array($section, $tecnicoAllowed)) {
+                return true;
+            }
+        }
+
+        $permissions = explode(',', $this->permissions ?? '');
 
         return in_array($section, $permissions)
-            || $this->permissions == 'full_access'
             || $this->permissions == 'limited_access'
             ? true
             : false;

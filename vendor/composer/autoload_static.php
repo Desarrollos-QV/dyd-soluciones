@@ -608,6 +608,7 @@ class ComposerStaticInitb9aa6e8d587803a05d166e8138ba8d3d
         'App\\Actions\\ElaborateSummary' => __DIR__ . '/..' . '/laravel/pint/app/Actions/ElaborateSummary.php',
         'App\\Actions\\FixCode' => __DIR__ . '/..' . '/laravel/pint/app/Actions/FixCode.php',
         'App\\Commands\\DefaultCommand' => __DIR__ . '/..' . '/laravel/pint/app/Commands/DefaultCommand.php',
+        'App\\Console\\Commands\\NotifySellerUpcomingMeetings' => __DIR__ . '/../..' . '/app/Console/Commands/NotifySellerUpcomingMeetings.php',
         'App\\Console\\Commands\\ProcessCollections' => __DIR__ . '/../..' . '/app/Console/Commands/ProcessCollections.php',
         'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
         'App\\Contracts\\PathsRepository' => __DIR__ . '/..' . '/laravel/pint/app/Contracts/PathsRepository.php',

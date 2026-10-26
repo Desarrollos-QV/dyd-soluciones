@@ -9,6 +9,7 @@ return array(
     'App\\Actions\\ElaborateSummary' => $vendorDir . '/laravel/pint/app/Actions/ElaborateSummary.php',
     'App\\Actions\\FixCode' => $vendorDir . '/laravel/pint/app/Actions/FixCode.php',
     'App\\Commands\\DefaultCommand' => $vendorDir . '/laravel/pint/app/Commands/DefaultCommand.php',
+    'App\\Console\\Commands\\NotifySellerUpcomingMeetings' => $baseDir . '/app/Console/Commands/NotifySellerUpcomingMeetings.php',
     'App\\Console\\Commands\\ProcessCollections' => $baseDir . '/app/Console/Commands/ProcessCollections.php',
     'App\\Console\\Kernel' => $baseDir . '/app/Console/Kernel.php',
     'App\\Contracts\\PathsRepository' => $vendorDir . '/laravel/pint/app/Contracts/PathsRepository.php',

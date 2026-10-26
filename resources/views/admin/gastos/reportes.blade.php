@@ -42,58 +42,87 @@
             </div>
        </div>
 
-        {{-- <
-        <div class="card">
+        <div class="row mt-4">
+            <div class="col-md-6 grid-margin stretch-card">
+                <div class="card bg-danger text-white shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="card-title mb-0 text-white"><i data-feather="trending-down" class="icon-md mr-2"></i> Total de Gastos</h6>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <h3 class="mb-0 fw-bold">-${{ number_format($totalGastos, 2) }}</h3>
+                                <p class="text-white-50 mt-1">Acumulado de egresos en el periodo</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6 grid-margin stretch-card">
+                <div class="card bg-primary text-white shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h6 class="card-title mb-0 text-white"><i data-feather="pie-chart" class="icon-md mr-2"></i> Balance General</h6>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <h3 class="mb-0 fw-bold">-${{ number_format($balance, 2) }}</h3>
+                                <p class="text-white-50 mt-1">Saldo final (Considerando únicamente gastos actuales)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-2 shadow-sm">
             <div class="card-body">
-                h5>Ingresos</h5>
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Hora</th>
-                            <th>Recibido de</th>
-                            <th>Monto</th>
-                            <th>Descripción</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        
-                    </tbody>
-                </table>
-                 
-                <h5 class="mt-4">Gastos</h5>
+                <h5 class="card-title mb-4">Desglose de Gastos Registrados</h5>
                 <div class="table-responsive">
-                    <table id="dataTableExample" class="table">
-                        <thead>
+                    <table id="dataTableExample" class="table table-hover border-top">
+                        <thead class="bg-light">
                             <tr>
-                                <th>Fecha</th>
-                                <th>Hora</th>
-                                <th>Autoriza</th>
+                                <th>Fecha y Hora</th>
+                                <th>Autorizado Por</th>
                                 <th>Monto</th>
-                                <th>Descripción</th>
+                                <th>Descripción del Gasto</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($gastos as $gasto)
+                            @forelse($gastos as $gasto)
                                 <tr>
-                                    <td>{{ $gasto->fecha }}</td>
-                                    <td>{{ $gasto->hora }}</td>
-                                    <td>{{ $gasto->autoriza->name }}</td>
-                                    <td>${{ number_format($gasto->monto, 2) }}</td>
-                                    <td>{{ $gasto->descripcion }}</td>
+                                    <td>
+                                        <span class="badge bg-secondary mb-1">{{ \Carbon\Carbon::parse($gasto->fecha)->format('d/m/Y') }}</span> <br>
+                                        <span class="text-muted tx-12"><i data-feather="clock" class="icon-sm"></i> {{ $gasto->hora }}</span>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="bg-light rounded-circle p-1 mr-2 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                                <i data-feather="user" class="icon-sm text-primary"></i>
+                                            </div>
+                                            <span class="fw-bold">{{ $gasto->autoriza->name ?? 'N/A' }}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-danger text-white fs-6">-${{ number_format($gasto->monto, 2) }}</span>
+                                    </td>
+                                    <td class="text-wrap" style="max-width: 300px;">{{ $gasto->descripcion }}</td>
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted py-5">
+                                        <i data-feather="inbox" class="icon-lg text-light mb-3"></i>
+                                        <p>No se encontraron gastos registrados en este rango de fechas.</p>
+                                    </td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
-
-                 <div class="mt-4">
-                    <h5>Total Gastos: ${{ number_format($totalGastos, 2) }}</h5>
-                    <h5><strong>Balance: ${{ number_format($balance, 2) }}</strong></h5>
-                </div> 
             </div>
         </div>
-    </div>--}}
+    </div>
 </div>
 @endsection
 

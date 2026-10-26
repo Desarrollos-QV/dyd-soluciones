@@ -6,12 +6,12 @@
                     <div class="col-md-6">
                         <label>Tipo de servicio</label>
                         <input type="text" name="tipo_servicio" class="form-control" disabled
-                            value="{{ $servicio->tipo_servicio }}">
+                            value="{{ $servicio->tipo_servicio ?? 'N/A' }}">
                     </div>
                     <div class="col-md-6">
                         <label for="encargado_recibir">Encargado de recibir</label>
                         <input type="text" name="encargado_recibir" class="form-control" disabled
-                            value="{{ ucwords($servicio->cliente->nombre) }}">
+                            value="{{ $servicio->cliente ? ucwords($servicio->cliente->nombre) : ($servicio->encargado_recibir ?? 'N/A') }}">
                     </div>
                 </div>
 
@@ -31,12 +31,12 @@
                             <div class="col-md-6">
                                 <label for="nombre">Nombre</label>
                                 <input type="text" name="nombre" id="nombre" class="form-control" disabled
-                                    value="{{ $servicio->cliente->nombre }}">
+                                    value="{{ $servicio->cliente->nombre ?? 'N/A' }}">
                             </div>
                             <div class="col-md-6">
                                 <label for="direccion">Dirección</label>
                                 <input type="text" name="direccion" class="form-control" id="direccion" disabled
-                                    value="{{ $servicio->cliente->direccion }}">
+                                    value="{{ $servicio->cliente->direccion ?? 'N/A' }}">
                             </div>
                         </div>
 
@@ -44,12 +44,12 @@
                             <div class="col-md-6">
                                 <label for="numero_contacto">Número de contacto</label>
                                 <input type="text" name="numero_contacto" class="form-control" id="numero_contacto"
-                                    disabled value="{{ $servicio->cliente->numero_contacto }}">
+                                    disabled value="{{ $servicio->cliente->numero_contacto ?? 'N/A' }}">
                             </div>
                             <div class="col-md-6">
                                 <label for="numero_alterno">Número Alterno</label>
                                 <input type="text" name="numero_alterno" class="form-control" id="numero_alterno"
-                                    disabled value="{{ $servicio->cliente->numero_alterno }}">
+                                    disabled value="{{ $servicio->cliente->numero_alterno ?? 'N/A' }}">
                             </div>
                         </div>
                     </div>
@@ -65,17 +65,17 @@
                             <div class="col-md-6">
                                 <label for="compañia">Compañia</label>
                                 <input type="text" name="compañia" id="compañia" class="form-control" disabled
-                                    value="{{ $servicio->unidad->simcontrol->compañia }}">
+                                    value="{{ $servicio->unidad->simcontrol->compañia ?? 'N/A' }}">
                             </div>
                             <div class="col-md-12">
                                 <label for="numero_sim">Número de SIM</label>
                                 <input type="text" name="numero_sim" class="form-control" id="numero_sim" disabled
-                                    value="{{ $servicio->unidad->simcontrol->numero_sim }}">
+                                    value="{{ $servicio->unidad->simcontrol->numero_sim ?? 'N/A' }}">
                             </div>
                             <div class="col-md-12">
                                 <label for="numero_publico">Número público</label>
                                 <input type="text" name="numero_publico" class="form-control" id="numero_publico"
-                                    disabled value="{{ $servicio->unidad->simcontrol->numero_publico }}">
+                                    disabled value="{{ $servicio->unidad->simcontrol->numero_publico ?? 'N/A' }}">
                             </div>
                         </div>
 
@@ -84,7 +84,7 @@
                                 <label for="observaciones">Observaciones</label>
                                 <textarea name="observaciones" id="observaciones" class="form-control" disabled
                                     cols="30"
-                                    rows="10">{!! $unidad->simcontrol->observaciones ?? 'Sin Observaciones' !!}</textarea>
+                                    rows="10">{!! $servicio->unidad->simcontrol->observaciones ?? 'Sin Observaciones' !!}</textarea>
                             </div>
                         </div>
                     </div>
@@ -99,14 +99,14 @@
                 <div class="row mb-3">
                     <div class="col-md-12">
                         <label for="location">Ubicación del servicio</label>
-                        <input class="controls form-control" name="location" value="{{ $servicio->location }}"
+                        <input class="controls form-control" name="location" value="{{ $servicio->location ?? 'N/A' }}"
                             type="text" disabled>
                         <div class="row">
                             <div class="form-group col-md-6"><input type="hidden" name="lat" id="lat"
-                                    class="form-control" placeholder="Latitude" value="{{ $servicio->coords['lat'] }}">
+                                    class="form-control" placeholder="Latitude" value="{{ $servicio->coords['lat'] ?? ($servicio->lat ?? '0') }}">
                             </div>
                             <div class="form-group col-md-6"><input type="hidden" name="lng" id="lng"
-                                    class="form-control" placeholder="Longitude" value="{{ $servicio->coords['lng'] }}">
+                                    class="form-control" placeholder="Longitude" value="{{ $servicio->coords['lng'] ?? ($servicio->lng ?? '0') }}">
                             </div>
                         </div>
                         <div id="map" style="width: 100%;height: 300px;border-radius:25px;"></div>
@@ -117,13 +117,13 @@
 
         <div class="card mt-3">
             <div class="card-header">
-                @if ($servicio->firma != null)
+                @if (isset($servicio->firma) && $servicio->firma != null)
                     <a class="dropdown-item" target="_blank"
                         href="{{ route('servicios_agendados.generarPDF', ['id' => base64_encode($servicio->id)]) }}">Descargar
                         Reporte</a>
                     <a class="dropdown-item" href="javascript:void(0)" onclick="ShareLink()">Compartir Link</a>
 
-                    <img src="{{ asset($servicio->firma->firma) }}" style="width: 600px; height: auto;margin: 25px;">
+                    <img src="{{ asset($servicio->firma->firma ?? '') }}" style="width: 600px; height: auto;margin: 25px;">
                 @else
                     <a class="btn btn-primary " target="_blank"
                         href="{{ route('servicios_agendados.firmar', ['id' => base64_encode($servicio->id)]) }}">Solicitar
@@ -134,6 +134,48 @@
     </div>
 </div>
 
+@if(isset($servicio->unidades) && $servicio->unidades->count() > 1)
+<div class="row">
+    <div class="col-12 grid-margin stretch-card">
+        <div class="card mt-3">
+            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 text-primary"><i data-feather="truck" class="mr-2"></i> Flotilla: Unidades Asignadas a este Servicio ({{ $servicio->unidades->count() }} Vehículos)</h5>
+                <span class="badge badge-primary">Multivehículo</span>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-bordered mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th style="width: 50px;">#</th>
+                                <th>Económico</th>
+                                <th>Placa</th>
+                                <th>Marca / Submarca</th>
+                                <th>Año</th>
+                                <th>Tipo</th>
+                                <th>Dispositivo a Instalar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($servicio->unidades as $idx => $u)
+                            <tr>
+                                <td>{{ $idx + 1 }}</td>
+                                <td><strong>{{ $u->economico ?? 'S/E' }}</strong></td>
+                                <td><span class="badge badge-outline-secondary">{{ $u->placa ?? 'Sin Placa' }}</span></td>
+                                <td>{{ $u->marca ?? '' }} {{ $u->submarca ?? '' }}</td>
+                                <td>{{ $u->anio_unidad ?? 'N/A' }}</td>
+                                <td>{{ $u->tipo_unidad ?? 'N/A' }}</td>
+                                <td>{{ $u->dispositivo_instalado ?? 'GPS' }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
 
 <div class="row">
     <div class="col-lg-12 grid-margin stretch-card">
@@ -147,24 +189,24 @@
                         <div class="col-md-6">
                             <label for="type">Tipo</label>
                             <input type="text" name="type" id="type" class="form-control" disabled
-                                value="{{ $servicio->unidad->inventario->type }}">
+                                value="{{ $servicio->unidad->inventario->type ?? 'N/A' }}">
                         </div>
                         <div class="col-md-6">
                             <label for="dispositivo">Dispositivo</label>
                             <input type="text" name="dispositivo" id="dispositivo" class="form-control" disabled
-                                value="{{ $servicio->unidad->inventario->dispositivo }}">
+                                value="{{ $servicio->unidad->inventario->dispositivo ?? 'N/A' }}">
                         </div>
                     </div>
                     <div class="row mt-3">
                         <div class="col-md-6">
                             <label for="marca">Marca</label>
                             <input type="text" name="marca" id="marca" class="form-control" disabled
-                                value="{{ $servicio->unidad->inventario->marca }}">
+                                value="{{ $servicio->unidad->inventario->marca ?? 'N/A' }}">
                         </div>
                         <div class="col-md-6">
                             <label for="camaras">Camaras</label>
                             <input type="text" name="camaras" id="camaras" class="form-control" disabled
-                                value="{{ $servicio->unidad->inventario->camaras }}">
+                                value="{{ $servicio->unidad->inventario->camaras ?? 'N/A' }}">
                         </div>
                     </div>
 
@@ -172,24 +214,24 @@
                         <div class="col-md-6">
                             <label for="generacion">Generación</label>
                             <input type="text" name="generacion" id="generacion" class="form-control" disabled
-                                value="{{ $servicio->unidad->inventario->generacion }}">
+                                value="{{ $servicio->unidad->inventario->generacion ?? 'N/A' }}">
                         </div>
                         <div class="col-md-6">
                             <label for="imei">IMEI</label>
                             <input type="text" name="imei" id="imei" class="form-control" disabled
-                                value="{{ $servicio->unidad->inventario->imei }}">
+                                value="{{ $servicio->unidad->inventario->imei ?? 'N/A' }}">
                         </div>
                     </div>
                     <div class="row mt-3">
                         <div class="col-md-6">
                             <label for="garantia">Garantía</label>
                             <input type="text" name="garantia" id="garantia" class="form-control" disabled
-                                value="{{ $servicio->unidad->inventario->garantia }}">
+                                value="{{ $servicio->unidad->inventario->garantia ?? 'N/A' }}">
                         </div>
                         <div class="col-md-6">
                             <label for="accesorios">Accesorios</label>
                             <input type="text" name="accesorios" id="accesorios" class="form-control" disabled
-                                value="{{ $servicio->unidad->inventario->accesorios }}">
+                                value="{{ $servicio->unidad->inventario->accesorios ?? 'N/A' }}">
                         </div>
                     </div>
 
@@ -197,7 +239,7 @@
                         <div class="col-md-6">
                             <label for="ia">IA</label>
                             <input type="text" name="ia" id="ia" class="form-control" disabled
-                                value="{{ $servicio->unidad->inventario->ia }}">
+                                value="{{ $servicio->unidad->inventario->ia ?? 'N/A' }}">
                         </div>
                     </div>
                 </div>
@@ -213,17 +255,17 @@
                         <div class="col-md-6">
                             <label for="dispositivo_instalado">Dispositivo a instalar</label>
                             <input type="text" name="dispositivo_instalado" id="dispositivo_instalado"
-                                class="form-control" disabled value="{{ $servicio->unidad['dispositivo_instalado'] }}">
+                                class="form-control" disabled value="{{ $servicio->unidad->dispositivo_instalado ?? ($servicio->unidad['dispositivo_instalado'] ?? 'N/A') }}">
                         </div>
                         <div class="col-md-3">
                             <label for="economico">Economico</label>
                             <input type="text" name="economico" class="form-control" id="economico" disabled
-                                value="{{ $servicio->unidad['economico'] }}">
+                                value="{{ $servicio->unidad->economico ?? ($servicio->unidad['economico'] ?? 'N/A') }}">
                         </div>
                         <div class="col-md-3">
                             <label for="placa">Placa</label>
                             <input type="text" name="placa" class="form-control" id="placa" disabled
-                                value="{{ $servicio->unidad['placa'] }}">
+                                value="{{ $servicio->unidad->placa ?? ($servicio->unidad['placa'] ?? ($servicio->placa ?? 'N/A')) }}">
                         </div>
                     </div>
 
@@ -231,12 +273,12 @@
                         <div class="col-md-6">
                             <label for="tipo_unidad">Tipo de unidad</label>
                             <input type="text" name="tipo_unidad" id="tipo_unidad" class="form-control" disabled
-                                value="{{ $servicio->unidad['tipo_unidad'] }}">
+                                value="{{ $servicio->unidad->tipo_unidad ?? ($servicio->unidad['tipo_unidad'] ?? ($servicio->tipo_vehiculo ?? 'N/A')) }}">
                         </div>
                         <div class="col-md-6">
                             <label for="anio_unidad">Año de la unidad</label>
                             <input type="text" name="anio_unidad" class="form-control" id="anio_unidad" disabled
-                                value="{{ $servicio->unidad['anio_unidad'] }}">
+                                value="{{ $servicio->unidad->anio_unidad ?? ($servicio->unidad['anio_unidad'] ?? 'N/A') }}">
                         </div>
                     </div>
 
@@ -244,12 +286,12 @@
                         <div class="col-md-6">
                             <label for="marca">Marca</label>
                             <input type="text" name="marca" id="marca" class="form-control" disabled
-                                value="{{ $servicio->unidad['marca'] }}">
+                                value="{{ $servicio->unidad->marca ?? ($servicio->unidad['marca'] ?? ($servicio->marca ?? 'N/A')) }}">
                         </div>
                         <div class="col-md-6">
                             <label for="submarca">SubMarca</label>
                             <input type="text" name="submarca" class="form-control" id="submarca" disabled
-                                value="{{ $servicio->unidad['submarca'] }}">
+                                value="{{ $servicio->unidad->submarca ?? ($servicio->unidad['submarca'] ?? ($servicio->modelo ?? 'N/A')) }}">
                         </div>
                     </div>
 
@@ -257,12 +299,12 @@
                         <div class="col-md-6">
                             <label for="numero_de_motor">Número de motor</label>
                             <input type="text" name="numero_de_motor" id="numero_de_motor" class="form-control" disabled
-                                value="{{ $servicio->unidad['numero_de_motor'] }}">
+                                value="{{ $servicio->unidad->numero_de_motor ?? ($servicio->unidad['numero_de_motor'] ?? 'N/A') }}">
                         </div>
                         <div class="col-md-6">
                             <label for="vin">VIN</label>
                             <input type="text" name="vin" class="form-control" id="vin" disabled
-                                value="{{ $servicio->unidad['vin'] }}">
+                                value="{{ $servicio->unidad->vin ?? ($servicio->unidad['vin'] ?? 'N/A') }}">
                         </div>
                     </div>
 
@@ -270,15 +312,16 @@
                         <div class="col-md-6">
                             <label for="imei">IMEI</label>
                             <input type="text" name="imei" id="imei" class="form-control" disabled
-                                value="{{ $servicio->unidad['imei'] }}">
+                                value="{{ $servicio->unidad->imei ?? ($servicio->unidad['imei'] ?? 'N/A') }}">
                         </div>
                         <div class="col-md-6">
                             <label for="cuenta_con_apagado">Cuenta con apagado</label>
                             <input type="text" name="cuenta_con_apagado" class="form-control" id="cuenta_con_apagado"
-                                disabled value="{{ $servicio->unidad['cuenta_con_apagado'] }}">
+                                disabled value="{{ $servicio->unidad->cuenta_con_apagado ?? ($servicio->unidad['cuenta_con_apagado'] ?? 'N/A') }}">
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>

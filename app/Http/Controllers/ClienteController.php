@@ -36,6 +36,7 @@ class ClienteController extends Controller
             $request->validate([
                 'nombre' => 'required',
                 'email' => 'required',
+                'sex' => 'required',
                 'direccion' => 'required',
                 'numero_contacto' => 'required',
                 'numero_alterno' => 'nullable',
@@ -60,6 +61,14 @@ class ClienteController extends Controller
                 $filename = time() . '_identificacion_' . uniqid() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/identificaciones'), $filename); // Guardar en la carpeta 'uploads/ine_comprobantes'
                 $data['identificacion'] = 'uploads/identificaciones/' . $filename; // Ruta relativa para guardar en la base de datos
+            }
+
+            // Manejo de la imagen identificacion_trasera
+            if ($request->hasFile('identificacion_trasera')) {
+                $file = $request->file('identificacion_trasera');
+                $filename = time() . '_identificacion_trasera_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('uploads/identificaciones'), $filename);
+                $data['identificacion_trasera'] = 'uploads/identificaciones/' . $filename;
             }
 
             // Manejo de Documentacion Adicional
@@ -100,11 +109,12 @@ class ClienteController extends Controller
                 $data['anexo'] = 'uploads/documentacion/' . $filename; // Ruta relativa para guardar en la base de datos
             }
 
-            Cliente::create($data);
+            $cliente = Cliente::create($data);
             return response()->json([
                 'ok' => true,
                 'message' => 'Cliente creado con éxito.',
                 'code' => 200,
+                'data' => $cliente,
                 'redirect' => route('clientes.index')
             ]);
         } catch (\Exception $e) {
@@ -165,6 +175,20 @@ class ClienteController extends Controller
                 $data['identificacion'] = 'uploads/identificaciones/' . $filename; // Ruta relativa para guardar en la base de datos
             }
 
+            // Manejo de la imagen identificacion_trasera
+            if ($request->hasFile('identificacion_trasera')) {
+                // Eliminar el archivo anterior si existe
+                if ($cliente->identificacion_trasera && file_exists(public_path($cliente->identificacion_trasera))) {
+                    unlink(public_path($cliente->identificacion_trasera));
+                }
+
+                // Subir el nuevo archivo
+                $file = $request->file('identificacion_trasera');
+                $filename = time() . '_identificacion_trasera_' . uniqid() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('uploads/identificaciones'), $filename);
+                $data['identificacion_trasera'] = 'uploads/identificaciones/' . $filename;
+            }
+
             // Manejo de Documentacion Adicional
             if ($request->hasFile('comprobante_domicilio')) {
                 $file = $request->file('comprobante_domicilio');
@@ -219,6 +243,28 @@ class ClienteController extends Controller
         }
     }
 
+    public function show(Cliente $cliente)
+    {
+        try {
+            $cliente = Cliente::findOrFail($cliente->id);
+            $documentosAdicionales = false; 
+            $comprobante_domicilio = $cliente->comprobante_domicilio;
+            $copa_factura = $cliente->copa_factura;
+            $tarjeta_circulacion = $cliente->tarjeta_circulacion;
+            $copia_consesion = $cliente->copia_consesion;
+            $contrato = $cliente->contrato;
+            $anexo = $cliente->anexo;
+
+            if($comprobante_domicilio != null || $copa_factura != null || $tarjeta_circulacion != null || $copia_consesion != null || $contrato != null || $anexo != null) {
+                $documentosAdicionales = true;
+            }
+
+            return view('admin.clientes.show', compact('cliente', 'documentosAdicionales'));
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Ha ocurrido un problema: ' . $e->getMessage());
+        }
+    }
+
     public function destroy(Cliente $cliente)
     {
         try {
@@ -240,6 +286,7 @@ class ClienteController extends Controller
         if ($zip->open($zipFilePath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE) === TRUE) {
             $documentFields = [
                 'identificacion',
+                'identificacion_trasera',
                 'comprobante_domicilio',
                 'copa_factura',
                 'tarjeta_circulacion',

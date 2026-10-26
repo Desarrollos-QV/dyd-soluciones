@@ -58,6 +58,13 @@ class Unidades extends Model
         return $this->belongsTo(Devices::class,'sensor');
     }
 
+    public function asignaciones()
+    {
+        return $this->belongsToMany(Asignaciones::class, 'asignacion_unidades', 'unidad_id', 'asignacion_id')
+            ->withPivot('status', 'observaciones')
+            ->withTimestamps();
+    }
+
     static function checkCompleteness($unidadId) {
         $unidad = self::find($unidadId);
         $requiredFields = [

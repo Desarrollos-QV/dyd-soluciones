@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->unsignedBigInteger('parent_id')->nullable()->after('id');
+            $table->foreignId('parent_id')->nullable();
             $table->string('role')->default('admin'); // admin, subadmin, etc.
             $table->boolean('is_active')->default(true);
 

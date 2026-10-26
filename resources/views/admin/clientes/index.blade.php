@@ -30,6 +30,7 @@
                             <thead class="table-light">
                                 <tr>
                                     <th></th>
+                                    <th>Identidad</th>
                                     <th>Imagen</th>
                                     <th>Identificación</th>
                                     <th>Nombre</th>
@@ -48,6 +49,19 @@
                                             <input type="checkbox" id="select_element_{{ $cliente->id }}" name="select_element_{{ $cliente->id }}">
                                         </td>
                                         <td>
+                                            {{-- Agregamos una imagen Avatar segun su identidad --}}
+                                            @if ($cliente->sex == 'male')
+                                                <img src="{{ asset('assets/images/men.png') }}"
+                                                    alt="Imagen de {{ $cliente->nombre }}">
+                                            @elseif ($cliente->sex == 'female')
+                                                <img src="{{ asset('assets/images/women.jpg') }}"
+                                                    alt="Imagen de {{ $cliente->nombre }}">
+                                            @else
+                                                <img src="{{ asset('assets/images/placeholder.jpg') }}"
+                                                    alt="Sin Imagen">
+                                            @endif
+                                        </td>
+                                        <td>
                                             @if ($cliente->avatar != null)
                                                 <a href="{{ asset($cliente->avatar) }}" target="_blank">
                                                     <img src="{{ asset($cliente->avatar) }}" alt="Imagen de {{ $cliente->nombre }}">
@@ -61,10 +75,18 @@
                                             @if ($cliente->identificacion != null)
                                             <a href="{{ asset($cliente->identificacion) }}" target="_blank">
                                                 <img src="{{ asset($cliente->identificacion) }}"
-                                                    alt="Imagen de {{ $cliente->nombre }}"
+                                                    alt="Frontal de {{ $cliente->nombre }}"
                                                     style="border-radius: 12px !important">
                                             </a>
-                                            @else
+                                            @endif
+                                            @if ($cliente->identificacion_trasera != null)
+                                            <a href="{{ asset($cliente->identificacion_trasera) }}" target="_blank">
+                                                <img src="{{ asset($cliente->identificacion_trasera) }}"
+                                                    alt="Trasera de {{ $cliente->nombre }}"
+                                                    style="border-radius: 12px !important">
+                                            </a>
+                                            @endif
+                                            @if ($cliente->identificacion == null && $cliente->identificacion_trasera == null)
                                                 <img src="{{ asset('assets/images/placeholder.jpg') }}"
                                                     alt="Sin Imagen">
                                             @endif
@@ -82,7 +104,13 @@
                                                     aria-expanded="false">Opciones</button>
                                                 <div class="dropdown-menu">
                                                     <a class="dropdown-item"
-                                                        href="{{ route('clientes.edit', $cliente->id) }}">Editar</a>
+                                                        href="{{ route('clientes.show', $cliente->id) }}">
+                                                        <i data-feather="eye" class="icon-sm mr-2"></i> Ver detalles
+                                                    </a>
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('clientes.edit', $cliente->id) }}">
+                                                        <i data-feather="edit-2" class="icon-sm mr-2"></i> Editar
+                                                    </a>
                                                     <a class="dropdown-item"
                                                         href="{{ route('clientes.downloadDocs', $cliente->id) }}">Descargar
                                                         Zip de Documentos</a>

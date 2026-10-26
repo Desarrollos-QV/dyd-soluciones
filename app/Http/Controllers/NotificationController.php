@@ -58,10 +58,15 @@ class NotificationController extends Controller
             $count = Notification::where('seller_id', Auth::guard('sellers')->id())
                 ->where('is_read', false)
                 ->count();
-        } else {
+        } else if (auth()->check()) {
             $count = Notification::where('user_id', auth()->id())
                 ->where('is_read', false)
                 ->count();
+        } else {
+            return response()->json([
+                'status' => 'success',
+                'count' => 0
+            ]);
         }
 
         return response()->json([

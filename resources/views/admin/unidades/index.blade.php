@@ -39,15 +39,15 @@
                                 <tr>
                                     <th></th>
                                     <td>Cliente asignado</td>
-                                    <td>Dispositivo Asignado</td>
+                                    <td>Económico / Placa</td>
+                                    <td>Usuario y Contraseña</td>
+                                    <td>Número de contacto</td>
                                     <td>SIM Asignada</td>
+                                    <td>Dispositivo Asignado</td>
                                     <td>Disp. Instalado</td>
                                     <td>Instalacion</td>
                                     <td>Corte</td>
                                     <td>Año/Marca/Submarca</td>
-                                    <td>Número de motor</td>
-                                    <td>VIN / IMEI</td>
-                                    <td>Número de emergencias</td>
                                     <th class="w-100 d-flex justify-content-end align-items-center">Acciones</th>
                                 </tr>
                             </thead>
@@ -81,27 +81,21 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="btn-group">
-                                                <button type="button"
-                                                    class="btn @if ($unit->devices_id == 0 || $unit->devices_id == null) btn-danger @else btn-primary @endif dropdown-toggle"
-                                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                    {{ $unit->device ? ucwords($unit->device->dispositivo) : 'Sin Asignar' }}
-                                                </button>
-                                                <div class="dropdown-menu">
-                                                    @foreach ($devices as $device)
-                                                        @if ($device['id'] !== $unit->devices_id)
-                                                            <a class="dropdown-item py-2"
-                                                                href="{{ route('unidades.assignDevice', ['id' => $unit->id, 'device' => $device['id']]) }}">
-                                                                {{ ucwords($device['dispositivo']) }}
-                                                            </a>
-                                                        @endif
-                                                    @endforeach
-                                                    <a class="dropdown-item py-2"
-                                                        href="{{ route('unidades.assignDevice', ['id' => $unit->id, 'device' => 0]) }}">
-                                                        Dejar sin asignar
-                                                    </a>
-                                                </div>
-                                            </div>
+                                            <span class="badge bg-info text-white">{{ $unit->economico }}</span> / <span class="badge bg-secondary text-white">{{ $unit->placa }}</span>
+                                        </td>
+                                        <td>
+                                            @php
+                                                $cred = json_decode($unit->credenciales ?? '[]', true);
+                                                $usr = $cred['user'][0] ?? 'N/A';
+                                                $pwd = $cred['pass'][0] ?? 'N/A';
+                                            @endphp
+                                            <span class="badge bg-primary text-white">{{ $usr }}</span> / <span class="badge bg-warning text-dark">{{ $pwd }}</span>
+                                        </td>
+                                        <td>
+                                            <a href="tel:{{ $unit->numero_de_emergencia }}" target="_blank">
+                                                <i class="link-icon icon-sm" data-feather="phone"></i>
+                                                {{ $unit->numero_de_emergencia }}
+                                            </a>
                                         </td>
                                         <td>
                                             <div class="btn-group">
@@ -121,6 +115,29 @@
                                                     @endforeach
                                                     <a class="dropdown-item py-2"
                                                         href="{{ route('unidades.assignSIM', ['id' => $unit->id, 'sim' => 0]) }}">
+                                                        Dejar sin asignar
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <button type="button"
+                                                    class="btn @if ($unit->devices_id == 0 || $unit->devices_id == null) btn-danger @else btn-primary @endif dropdown-toggle"
+                                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    {{ $unit->device ? ucwords($unit->device->dispositivo) : 'Sin Asignar' }}
+                                                </button>
+                                                <div class="dropdown-menu">
+                                                    @foreach ($devices as $device)
+                                                        @if ($device['id'] !== $unit->devices_id)
+                                                            <a class="dropdown-item py-2"
+                                                                href="{{ route('unidades.assignDevice', ['id' => $unit->id, 'device' => $device['id']]) }}">
+                                                                {{ ucwords($device['dispositivo']) }}
+                                                            </a>
+                                                        @endif
+                                                    @endforeach
+                                                    <a class="dropdown-item py-2"
+                                                        href="{{ route('unidades.assignDevice', ['id' => $unit->id, 'device' => 0]) }}">
                                                         Dejar sin asignar
                                                     </a>
                                                 </div>
@@ -179,25 +196,19 @@
                                                 class="badge bg-success">{{ $unit->submarca }}</span>
                                         </td>
                                         <td>
-                                            <span class="badge bg-primary text-white">{{ $unit->numero_de_motor }}</span>
-                                        </td>
-                                        <td><span class="badge bg-secondary text-white">{{ $unit->vin }}</span> / <span
-                                                class="badge bg-primary text-white">{{ $unit->imei }}</span>
-                                        </td>
-                                        <td>
-                                            <a href="tel:{{ $unit->numero_de_emergencia }}" target="_blank">
-                                                <i class="link-icon icon-sm" data-feather="phone"></i>
-                                                {{ $unit->numero_de_emergencia }}
-                                            </a>
-                                        </td>
-                                        <td>
                                             <div class="btn-group">
                                                 <button type="button" class="btn btn-primary dropdown-toggle"
                                                     data-toggle="dropdown" aria-haspopup="true"
                                                     aria-expanded="false">Opciones</button>
                                                 <div class="dropdown-menu">
                                                     <a class="dropdown-item"
-                                                        href="{{ route('unidades.edit', $unit->id) }}">Editar</a>
+                                                        href="{{ route('unidades.show', $unit->id) }}">
+                                                        <i data-feather="eye" class="icon-sm mr-2"></i> Ver detalles
+                                                    </a>
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('unidades.edit', $unit->id) }}">
+                                                        <i data-feather="edit-2" class="icon-sm mr-2"></i> Editar
+                                                    </a>
                                                     <a href="javascript:void(0)" class="dropdown-item"
                                                         onclick="alertSwwet('Observaciones', '{{ $unit->observaciones ?? 'Sin Obersaciones' }}')">Ver
                                                         observaciones</a>

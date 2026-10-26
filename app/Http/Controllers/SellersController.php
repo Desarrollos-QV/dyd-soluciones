@@ -22,6 +22,16 @@ class SellersController extends Controller
     }
 
     /**
+     * Summary of show
+     * @param \App\Models\Sellers $seller
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     */
+    public function show(Sellers $seller)
+    {
+        return view($this->folder . '.show', compact('seller'));
+    }
+
+    /**
      * Summary of create
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */

@@ -64,7 +64,13 @@
                                             aria-expanded="false">Opciones</button>
                                         <div class="dropdown-menu">
                                             <a class="dropdown-item"
-                                                href="{{ route('sellers.edit', $sell->id) }}">Editar</a>
+                                                href="{{ route('sellers.show', $sell->id) }}">
+                                                <i data-feather="eye" class="icon-sm mr-2"></i> Ver detalles
+                                            </a>
+                                            <a class="dropdown-item"
+                                                href="{{ route('sellers.edit', $sell->id) }}">
+                                                <i data-feather="edit-2" class="icon-sm mr-2"></i> Editar
+                                            </a>
                                             <hr /> 
                                             <form action="{{ route('sellers.destroy', $sell) }}"
                                                 method="POST" style="display:inline-block;">

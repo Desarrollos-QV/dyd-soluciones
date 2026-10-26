@@ -50,12 +50,13 @@ class SimControlController extends Controller
             $data = $request->all();
 
             
-            SimControl::create($data);
+            $simcontrol = SimControl::create($data);
 
             return response()->json([
                 'ok' => true,
                 'message' => 'SIM Control created successfully.',
-                'redirect' => route('simcontrol.index')
+                'redirect' => route('simcontrol.index'),
+                'data' => $simcontrol
             ]);
         } catch (\Exception $e) {
             return response()->json([

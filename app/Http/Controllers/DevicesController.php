@@ -79,7 +79,8 @@ class DevicesController extends Controller
                 'ok' => true,
                 'message' => 'Dispositivo creado exitosamente',
                 'code' => 200,
-                'redirect' => route('devices.index')
+                'redirect' => route('devices.index'),
+                'data' => $device
             ]);
         } catch (\Exception $e) {
             return response()->json([
