@@ -5,12 +5,20 @@
 @section('content')
     <div class="container-fluid py-4">
         <!-- Header -->
-        <div class="row mb-4">
-            <div class="col-md-8">
-                <h1 class="h3 fw-bold text-dark">
+        <div class="row mb-4 align-items-center">
+            <div class="col-md-7">
+                <h1 class="h3 fw-bold text-dark mb-1">
                     <i class="feather icon-handshake"></i> Gestor de Cobranza
                 </h1>
-                <p class="text-muted small">Gestiona pagos, deudas e ingresos de la plataforma</p>
+                <p class="text-muted small mb-0">Gestiona pagos, deudas e ingresos de la plataforma</p>
+            </div>
+            <div class="col-md-5 text-md-end mt-3 mt-md-0">
+                <button type="button" class="btn btn-outline-primary btn-sm me-2" onclick="sincronizarCobranza()" id="btnSync">
+                    <i class="feather icon-refresh-cw"></i> Sincronizar Unidades
+                </button>
+                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#modalNuevaCobranza">
+                    <i class="feather icon-plus"></i> Nueva Cobranza
+                </button>
             </div>
         </div>
 
@@ -256,6 +264,57 @@
                         <i class="feather icon-send"></i> Enviar
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Nueva Cobranza Directa -->
+    <div class="modal fade" id="modalNuevaCobranza" tabindex="-1" aria-labelledby="modalNuevaCobranzaLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-light border-bottom">
+                    <h5 class="modal-title fw-bold" id="modalNuevaCobranzaLabel">Registrar Nueva Cobranza</h5>
+                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="formNuevaCobranza">
+                    @csrf
+                    <div class="modal-body p-4">
+                        <div class="mb-3">
+                            <label for="new_cob_cliente_id" class="form-label fw-bold">Cliente <span class="text-danger">*</span></label>
+                            <select name="cliente_id" id="new_cob_cliente_id" class="form-select" required>
+                                <option value="">-- Seleccionar Cliente --</option>
+                                @foreach($clientes as $cli)
+                                    <option value="{{ $cli->id }}">{{ $cli->nombre }} ({{ $cli->empresa ?? 'Particular' }})</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="new_cob_unidad_id" class="form-label fw-bold">Unidad Vehicular (Opcional)</label>
+                            <select name="unidad_id" id="new_cob_unidad_id" class="form-select">
+                                <option value="">-- Sin unidad / General --</option>
+                                @foreach($unidades as $u)
+                                    <option value="{{ $u->id }}" data-cliente="{{ $u->cliente_id }}">
+                                        {{ $u->economico }} - {{ $u->placa }} ({{ $u->cliente?->nombre }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="new_cob_due_date" class="form-label fw-bold">Fecha de Cobro / Vencimiento <span class="text-danger">*</span></label>
+                            <input type="date" name="due_date" id="new_cob_due_date" class="form-control" value="{{ date('Y-m-d') }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="new_cob_amount" class="form-label fw-bold">Monto a Cobrar ($) <span class="text-danger">*</span></label>
+                            <input type="number" step="0.01" name="amount" id="new_cob_amount" class="form-control" placeholder="Ej: 350.00" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-top">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary" id="btnGuardarCobranza">
+                            <i class="feather icon-save"></i> Guardar Cobranza
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -516,6 +575,139 @@
                         Swal.fire('Error', 'No se pudo procesar el pago', 'error');
                     } else {
                         alert('Error al procesar pago');
+                    }
+                }
+            });
+        }
+
+        function sincronizarCobranza() {
+            const btn = document.getElementById('btnSync');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Sincronizando...';
+
+            fetch("{{ route('collections.sync') }}", {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                }
+            })
+            .then(res => res.json())
+            .then(data => {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Sincronizado',
+                        text: data.message,
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+                cargarDatos();
+            })
+            .catch(err => {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'No se pudo sincronizar la cobranza.'
+                    });
+                }
+            });
+        }
+
+        // Filtro dinámico de unidades al seleccionar cliente
+        const selectClienteCob = document.getElementById('new_cob_cliente_id');
+        const selectUnidadCob = document.getElementById('new_cob_unidad_id');
+        if (selectClienteCob && selectUnidadCob) {
+            selectClienteCob.addEventListener('change', function () {
+                const clienteId = this.value;
+                Array.from(selectUnidadCob.options).forEach(opt => {
+                    if (!opt.value) {
+                        opt.hidden = false;
+                        return;
+                    }
+                    const optCliente = opt.getAttribute('data-cliente');
+                    if (!clienteId || optCliente === clienteId) {
+                        opt.hidden = false;
+                        opt.disabled = false;
+                    } else {
+                        opt.hidden = true;
+                        opt.disabled = true;
+                    }
+                });
+                selectUnidadCob.value = '';
+            });
+        }
+
+        // Enviar nueva cobranza
+        const formNuevaCobranza = document.getElementById('formNuevaCobranza');
+        if (formNuevaCobranza) {
+            formNuevaCobranza.addEventListener('submit', async function (e) {
+                e.preventDefault();
+                const btn = document.getElementById('btnGuardarCobranza');
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Guardando...';
+
+                const formData = new FormData(this);
+
+                try {
+                    const response = await fetch("{{ route('collections.store') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: formData
+                    });
+
+                    const data = await response.json();
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="feather icon-save"></i> Guardar Cobranza';
+
+                    if (response.ok && data.ok) {
+                        $('#modalNuevaCobranza').modal('hide');
+                        formNuevaCobranza.reset();
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: '¡Éxito!',
+                                text: data.message,
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+                        }
+                        cargarDatos();
+                    } else {
+                        let msg = data.message || 'Error al guardar la cobranza.';
+                        if (data.errors) {
+                            msg = Object.values(data.errors).flat().join('\n');
+                        }
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error de validación',
+                                text: msg
+                            });
+                        } else {
+                            alert(msg);
+                        }
+                    }
+                } catch (error) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="feather icon-save"></i> Guardar Cobranza';
+                    if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error de conexión',
+                            text: 'No se pudo conectar con el servidor.'
+                        });
                     }
                 }
             });

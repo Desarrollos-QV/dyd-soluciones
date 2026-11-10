@@ -10,7 +10,8 @@ use App\Models\{
     SimControl
 };
 use Illuminate\Http\Request;
-
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
 use Maatwebsite\Excel\Facades\Excel;
@@ -82,20 +83,11 @@ class UnidadesController extends Controller
         
 
         $devicesList    = Devices::all();
-        $sensores       = Devices::where('type', 'sensor')->get();
-        $devices        = [];
-        foreach ($devicesList as $device) {
-            if ($device->stock >= $device->stock_min_alert) {
-                $devices[] = $device;
-            }
-        }
-
-        // return response()->json([
-        //     'unidad' => $unidad,
-        //     'clientes' => $clientes,
-        //     'simcontrols' => $simcontrols,
-        //     'devices' => $devices
-        // ]);
+        $sensores       = Devices::where('stock', '>', 0)
+            ->where(function($q) {
+                $q->where('type', 'sensor')->orWhere('type', 'SENSOR');
+            })->get();
+        $devices        = Devices::where('stock', '>', 0)->get();
 
         return view('admin.unidades.create', compact('unidad', 'clientes', 'simcontrols' ,'devices', 'sensores'));
     }
@@ -130,75 +122,104 @@ class UnidadesController extends Controller
         ]);
 
         try {
-
             $data = $request->all();
 
             $data['credenciales'] = json_encode([
                 'user' => $request->credenciales_user,
                 'pass' => $request->credenciales_pass,
             ]);
-            
 
             $data['fecha_instalacion'] = \Carbon\Carbon::parse($request->fecha_instalacion)->format('Y-m-d');
             $data['fecha_cobro'] = \Carbon\Carbon::parse($request->fecha_cobro)->format('Y-m-d');
-            
-            $nuevaUnidad = Unidades::create($data);
-            /**
-             * Validamos si el stock es mayor a 1 como minimo
-             */
-            $stockDevice = Devices::find($data['devices_id']) ? Devices::find($data['devices_id'])->stock : 0;
-            $stockSensor = !empty($data['sensor']) ? (Devices::find($data['sensor']) ? Devices::find($data['sensor'])->stock : 0) : null;
 
-            if($stockDevice <= 1){
+            // 1. Validar existencia y stock del dispositivo ANTES de insertar
+            $device = Devices::find($data['devices_id']);
+            if (!$device) {
                 return response()->json([
                     'ok' => false,
-                    'message' => 'El stock de dispositivo es menor o igual a 1, no se puede crear la unidad.',
-                ]);
+                    'message' => 'El dispositivo seleccionado no existe en el inventario.',
+                ], 422);
             }
-            if(!empty($data['sensor']) && $stockSensor <= 1){
+
+            if ($device->stock < 1) {
                 return response()->json([
                     'ok' => false,
-                    'message' => 'El stock de sensor es menor o igual a 1, no se puede crear la unidad.',
-                ]);
+                    'message' => 'El dispositivo "' . $device->dispositivo . '" no cuenta con stock disponible (stock actual: ' . $device->stock . '). Por favor seleccione o registre otro dispositivo.',
+                ], 422);
             }
 
-            /**
-             * Quitamos del stock en caso de que se haya asignado un dispositivo
-             */
-            $data['devices_id'] != null && $data['devices_id'] != 0 ? Devices::find($data['devices_id'])->decrement('stock') : null;
+            // 2. Validar stock del sensor si fue seleccionado
+            $sensorDev = null;
+            if (!empty($data['sensor']) && $data['sensor'] != 0) {
+                $sensorDev = Devices::find($data['sensor']);
+                if ($sensorDev && $sensorDev->stock < 1) {
+                    return response()->json([
+                        'ok' => false,
+                        'message' => 'El sensor/accesorio "' . $sensorDev->dispositivo . '" no cuenta con stock disponible (stock actual: ' . $sensorDev->stock . ').',
+                    ], 422);
+                }
+            }
 
-            // Si el stock es menor al minimo para alerta notificamos
-            if(Devices::find($data['devices_id'])->stock <= Devices::find($data['devices_id'])->stock_min_alert){
-                // Generamos la notificación para el técnico asignado
+            // 3. Crear la unidad y descontar stock dentro de una transacción segura
+            $nuevaUnidad = DB::transaction(function () use ($data, $device, $sensorDev) {
+                $unidad = Unidades::create($data);
+
+                // Descontar 1 del stock del dispositivo
+                $device->decrement('stock');
+                $device->refresh();
+
+                // Descontar 1 del stock del sensor si fue asignado
+                if ($sensorDev) {
+                    $sensorDev->decrement('stock');
+                    $sensorDev->refresh();
+                }
+
+                return $unidad;
+            });
+
+            // 4. Si el stock llegó al umbral de alerta, notificar al administrador
+            if ($device->stock <= $device->stock_min_alert) {
                 $this->notifyUser(
-                    1, // Administracion
+                    1, // Administración
                     'stock_alert',
                     'Stock Alerta',
-                    'Se ha creado un nuevo dispositivo con stock menor al minimo para alerta.',
+                    'El dispositivo ' . $device->dispositivo . ' ha alcanzado o está por debajo del stock mínimo (' . $device->stock . ' restantes).',
                     [],
                     route('devices.index'),
                     now()->addDays(7)
                 );
             }
 
-            // Lo Mismo hacemos con sensor, Quitamos del Stock y verificamos su stock_min_alert
-            if (!empty($data['sensor']) && $data['sensor'] != 0) {
-                $sensorDev = Devices::find($data['sensor']);
-                if ($sensorDev) {
-                    $sensorDev->decrement('stock');
-                    if ($sensorDev->stock <= $sensorDev->stock_min_alert) {
-                        // Generamos la notificación para el técnico asignado
-                        $this->notifyUser(
-                            1, // Administracion
-                            'stock_alert',
-                            'Stock Alerta',
-                            'Se ha creado un nuevo dispositivo con stock menor al minimo para alerta.',
-                            [],
-                            route('devices.index'),
-                            now()->addDays(7)
-                        );
-                    }
-                }
+            if ($sensorDev && $sensorDev->stock <= $sensorDev->stock_min_alert) {
+                $this->notifyUser(
+                    1, // Administración
+                    'stock_alert',
+                    'Stock Alerta',
+                    'El sensor/accesorio ' . $sensorDev->dispositivo . ' ha alcanzado o está por debajo del stock mínimo (' . $sensorDev->stock . ' restantes).',
+                    [],
+                    route('devices.index'),
+                    now()->addDays(7)
+                );
+            }
+
+            // Sincronizar cobranza para esta unidad de forma inmediata
+            if (!empty($nuevaUnidad->fecha_cobro) && !empty($nuevaUnidad->cliente_id)) {
+                $fechaCobro = \Carbon\Carbon::parse($nuevaUnidad->fecha_cobro);
+                $hoy = \Carbon\Carbon::today();
+                $estatus = $fechaCobro->lt($hoy) ? 'overdue' : 'pending';
+
+                \App\Models\Collection::updateOrCreate(
+                    [
+                        'unidad_id' => $nuevaUnidad->id,
+                        'status'    => $estatus == 'overdue' ? 'overdue' : 'pending',
+                    ],
+                    [
+                        'cliente_id' => $nuevaUnidad->cliente_id,
+                        'due_date'   => $fechaCobro->toDateString(),
+                        'amount'     => $nuevaUnidad->pago_mensual ?? 0,
+                        'status'     => $estatus,
+                    ]
+                );
             }
 
             return response()->json([
@@ -212,7 +233,7 @@ class UnidadesController extends Controller
             return response()->json([
                 'ok' => false,
                 'message' => 'Error al crear la unidad: ' . $e->getMessage(),
-            ]);
+            ], 500);
         }
     }
 
@@ -220,15 +241,25 @@ class UnidadesController extends Controller
     {
         $unidad = $unidade;
         $clientes = Cliente::all();
-        $simcontrols       = SimControl::all();
-        $devicesList    = Devices::all();
-        $sensores       = Devices::where('type', 'sensor')->get();
-        $devices        = [];
-        foreach ($devicesList as $device) {
-            if ($device->stock >= $device->stock_min_alert) {
-                $devices[] = $device;
+        $simcontrols = SimControl::all();
+        $devicesList = Devices::all();
+
+        // Mostrar dispositivos con stock > 0 o el que actualmente tenga asignado la unidad
+        $devices = Devices::where(function($q) use ($unidade) {
+            $q->where('stock', '>', 0);
+            if ($unidade->devices_id) {
+                $q->orWhere('id', $unidade->devices_id);
             }
-        }
+        })->get();
+
+        $sensores = Devices::where(function($q) use ($unidade) {
+            $q->where('stock', '>', 0);
+            if ($unidade->sensor) {
+                $q->orWhere('id', $unidade->sensor);
+            }
+        })->where(function($q) {
+            $q->where('type', 'sensor')->orWhere('type', 'SENSOR');
+        })->get();
 
         return view('admin.unidades.edit', compact('unidad','clientes', 'simcontrols' ,'devices', 'sensores'));
     }
@@ -270,11 +301,84 @@ class UnidadesController extends Controller
                 'pass' => $request->credenciales_pass,
             ]);
 
-            // $data['fecha_instalacion'] = \Carbon\Carbon::parse($request->garantia)->format('Y-m-d');
             $data['fecha_instalacion'] = \Carbon\Carbon::parse($request->fecha_instalacion)->format('Y-m-d');
             $data['fecha_cobro'] = \Carbon\Carbon::parse($request->fecha_cobro)->format('Y-m-d');
 
-            $unidade->update($data);
+            // Validar stock si se cambió el dispositivo
+            $newDeviceId = $data['devices_id'] ?? null;
+            $oldDeviceId = $unidade->devices_id;
+            $newDevice = null;
+
+            if ($newDeviceId && $newDeviceId != $oldDeviceId) {
+                $newDevice = Devices::find($newDeviceId);
+                if (!$newDevice) {
+                    return response()->json([
+                        'ok' => false,
+                        'message' => 'El dispositivo seleccionado no existe en el inventario.',
+                    ], 422);
+                }
+                if ($newDevice->stock < 1) {
+                    return response()->json([
+                        'ok' => false,
+                        'message' => 'El dispositivo "' . $newDevice->dispositivo . '" no cuenta con stock disponible (stock actual: ' . $newDevice->stock . ').',
+                    ], 422);
+                }
+            }
+
+            // Validar stock si se cambió el sensor
+            $newSensorId = !empty($data['sensor']) && $data['sensor'] != 0 ? $data['sensor'] : null;
+            $oldSensorId = $unidade->sensor;
+            $newSensor = null;
+
+            if ($newSensorId && $newSensorId != $oldSensorId) {
+                $newSensor = Devices::find($newSensorId);
+                if ($newSensor && $newSensor->stock < 1) {
+                    return response()->json([
+                        'ok' => false,
+                        'message' => 'El sensor/accesorio "' . $newSensor->dispositivo . '" no cuenta con stock disponible (stock actual: ' . $newSensor->stock . ').',
+                    ], 422);
+                }
+            }
+
+            DB::transaction(function () use ($unidade, $data, $oldDeviceId, $newDeviceId, $newDevice, $oldSensorId, $newSensorId, $newSensor) {
+                $unidade->update($data);
+
+                // Ajustar inventario si cambió de dispositivo
+                if ($newDeviceId && $newDeviceId != $oldDeviceId) {
+                    if ($oldDeviceId) {
+                        Devices::where('id', $oldDeviceId)->increment('stock');
+                    }
+                    if ($newDevice) {
+                        $newDevice->decrement('stock');
+                    }
+                }
+
+                // Ajustar inventario si cambió de sensor
+                if ($newSensorId != $oldSensorId) {
+                    if ($oldSensorId) {
+                        Devices::where('id', $oldSensorId)->increment('stock');
+                    }
+                    if ($newSensor) {
+                        $newSensor->decrement('stock');
+                    }
+                }
+            });
+
+            // Sincronizar cobranza para esta unidad de forma inmediata
+            if (!empty($unidade->fecha_cobro) && !empty($unidade->cliente_id)) {
+                $fechaCobro = \Carbon\Carbon::parse($unidade->fecha_cobro);
+                $hoy = \Carbon\Carbon::today();
+                $estatus = $fechaCobro->lt($hoy) ? 'overdue' : 'pending';
+
+                \App\Models\Collection::where('unidad_id', $unidade->id)
+                    ->where('status', '!=', 'paid')
+                    ->update([
+                        'cliente_id' => $unidade->cliente_id,
+                        'due_date'   => $fechaCobro->toDateString(),
+                        'amount'     => $unidade->pago_mensual ?? 0,
+                        'status'     => $estatus,
+                    ]);
+            }
 
             return response()->json([
                 'ok' => true,
@@ -285,20 +389,57 @@ class UnidadesController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'ok' => false,
-                'message' => 'Error al crear la unidad: ' . $e->getMessage(),
-            ]);
+                'message' => 'Error al actualizar la unidad: ' . $e->getMessage(),
+            ], 500);
         }
     }
 
-    public function destroy(Unidades $unidades, $id)
+    protected function deleteUnidadCompletely(Unidades $unidad): void
+    {
+        DB::transaction(function () use ($unidad) {
+            // Eliminar las imágenes asociadas si existen
+            if ($unidad->foto_unidad) {
+                $fotos = json_decode($unidad->foto_unidad, true);
+                if (is_array($fotos)) {
+                    foreach ($fotos as $foto) {
+                        $filePath = public_path('uploads/fotos_unidades/' . $foto);
+                        if (File::exists($filePath)) {
+                            File::delete($filePath);
+                        }
+                    }
+                }
+            }
+
+            // Desvincular dispositivos y asignaciones que referencien esta unidad
+            DB::table('devices')->where('unidad_id', $unidad->id)->update(['unidad_id' => null]);
+            DB::table('asignaciones')->where('unidad_id', $unidad->id)->update(['unidad_id' => null]);
+            DB::table('asignacion_unidades')->where('unidad_id', $unidad->id)->delete();
+
+            // Eliminar registros de cobranza asociados a esta unidad
+            $collectionIds = DB::table('collections')->where('unidad_id', $unidad->id)->pluck('id');
+            if ($collectionIds->isNotEmpty()) {
+                DB::table('collections_payments')->whereIn('collection_id', $collectionIds)->delete();
+                DB::table('collections')->whereIn('id', $collectionIds)->delete();
+            }
+
+            $unidad->delete();
+        });
+    }
+
+    public function destroy($id)
     {
         try {
-            $unidades = Unidades::findOrFail($id);
-            // Eliminar el archivo anterior si existe
-            $unidades->delete();
-            return redirect()->route('unidades.index')->with('success', 'unidad eliminada exitosamente.');
+            $unidad = Unidades::findOrFail($id);
+            $this->deleteUnidadCompletely($unidad);
+
+            return redirect()->route('unidades.index')->with('success', 'Unidad eliminada exitosamente.');
+        } catch (QueryException $e) {
+            $mensaje = $e->getCode() == '23000'
+                ? 'No se puede eliminar la unidad porque tiene registros vinculados (cobranza, servicios o dispositivos).'
+                : 'Ocurrió un problema en la base de datos al intentar eliminar la unidad.';
+            return redirect()->route('unidades.index')->with('error', $mensaje);
         } catch (\Exception $e) {
-            return redirect()->route('unidades.index')->with('error', 'Error al eliminar la unidad: ' . $e->getMessage());
+            return redirect()->route('unidades.index')->with('error', 'No se pudo eliminar la unidad seleccionada. Intente nuevamente.');
         }
     }
 
@@ -476,29 +617,26 @@ class UnidadesController extends Controller
         try {
             foreach ($ids as $id) {
                 $unidad = Unidades::findOrFail($id);
-                // Eliminamos las imagenes asociadas
-                if ($unidad->foto_unidad) {
-                    $fotos = json_decode($unidad->foto_unidad);
-                    foreach ($fotos as $foto) {
-                        $file_path = public_path('uploads/fotos_unidades/' . $foto);
-                        if (File::exists($file_path)) {
-                            File::delete($file_path);
-                        }
-                    }
-                }
-
-                $unidad->delete();
+                $this->deleteUnidadCompletely($unidad);
             }
 
             return response()->json([
                 'ok' => true,
                 'message' => 'Unidades eliminadas con éxito.',
             ]);
+        } catch (QueryException $e) {
+            $mensaje = $e->getCode() == '23000'
+                ? 'No se pueden eliminar una o más unidades porque tienen registros vinculados (cobranza, servicios o dispositivos).'
+                : 'Ocurrió un problema en la base de datos al intentar eliminar las unidades.';
+            return response()->json([
+                'ok' => false,
+                'message' => $mensaje,
+            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'ok' => false,
-                'message' => 'Error al eliminar las unidades: ' . $e->getMessage(),
-            ]);
+                'message' => 'No se pudieron eliminar las unidades seleccionadas. Intente nuevamente.',
+            ], 500);
         }
     }
 

@@ -248,28 +248,24 @@
                 submitForm();
             } catch (error) {
                 console.error('Error:', error);
-                ormSubmitted = false;
+                formSubmitted = false;
+                formSent = false;
                 processingFiles = false;
                 Swal.fire({
-                    type: 'error',
+                    icon: 'error',
                     title: 'Oops...',
                     text: "Ocurrió un error inesperado."
-                }).then(() => {
-                    window.location.reload();
                 });
             }
         });
 
 
         async function submitForm() {
-            // if (formSent || (processingFiles && myDropzone.getQueuedFiles().length > 0)) {
-            //     return;
-            // }
-
             formSent = true;
             const formData = new FormData(form);
 
-            const response = await fetch(form.action, {
+            try {
+                const response = await fetch(form.action, {
                     method: 'POST',
                     headers: {
                         'Accept': 'application/json',
@@ -277,25 +273,44 @@
                             .getAttribute('content')
                     },
                     body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.ok) {
-                        window.location.href =
-                            `${data.redirect}?success=${encodeURIComponent(data.message)}`;
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    // alert('Hubo un error al enviar el formulario.');
-                    Swal.fire({
-                        type: 'error',
-                        title: 'Oops... Hubo un error al enviar el formulario.',
-                        text: error.message
-                    }).then(() => {
-                        window.location.reload();
-                    });
                 });
+
+                const data = await response.json();
+
+                if (response.ok && data.ok) {
+                    window.location.href =
+                        `${data.redirect}?success=${encodeURIComponent(data.message)}`;
+                } else {
+                    formSubmitted = false;
+                    formSent = false;
+
+                    let errorHtml = data.message || 'Hubo un error al actualizar la unidad.';
+                    if (data.errors) {
+                        errorHtml += '<ul class="text-left mt-2" style="text-align: left;">';
+                        for (const field in data.errors) {
+                            data.errors[field].forEach(err => {
+                                errorHtml += `<li>${err}</li>`;
+                            });
+                        }
+                        errorHtml += '</ul>';
+                    }
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'No se pudo actualizar la unidad',
+                        html: errorHtml
+                    });
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                formSubmitted = false;
+                formSent = false;
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error de conexión',
+                    text: error.message || 'Hubo un error al enviar el formulario.'
+                });
+            }
         }
 
         // Dropzone y envio de Formulario

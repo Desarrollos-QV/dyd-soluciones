@@ -49,24 +49,37 @@ class SellersController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|max:255',
-            'password' => 'required|string|max:255',
+            'email' => 'required|string|max:255|unique:sellers,email',
+            'password' => 'required|string|min:6|max:255',
             'address' => 'required|string',
             'phone' => 'required|string|max:20',
             'level_education' => 'required|string|max:100',
-            'picture' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'picture' => 'required|file|mimes:jpeg,png,jpg,gif,pdf|max:10240',
             'observations' => 'nullable|string'
+        ], [
+            'name.required' => 'El nombre es obligatorio.',
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.unique' => 'Este correo electrónico ya está registrado.',
+            'password.required' => 'La contraseña es obligatoria.',
+            'password.min' => 'La contraseña debe tener al menos 6 caracteres.',
+            'address.required' => 'La dirección es obligatoria.',
+            'phone.required' => 'El teléfono es obligatorio.',
+            'level_education.required' => 'El nivel de estudios es obligatorio.',
+            'picture.required' => 'La identificación oficial (INE) es obligatoria.',
+            'picture.file' => 'La identificación oficial debe ser un archivo válido.',
+            'picture.mimes' => 'La identificación oficial debe ser una imagen (JPG, PNG) o un archivo PDF.',
+            'picture.max' => 'La identificación oficial no debe superar los 10 MB.',
         ]);
 
         try {
             $data = $request->all();
-            // Manejo de la imagen avatar
+            // Manejo de la identificación oficial (imagen o PDF)
             if ($request->hasFile('picture')) {
                 // Subir el nuevo archivo
                 $file = $request->file('picture');
                 $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('uploads/identificaciones'), $filename); // Guardar en la carpeta 'uploads/ine_comprobantes'
-                $data['picture'] = 'uploads/identificaciones/' . $filename; // Ruta relativa para guardar en la base de datos
+                $file->move(public_path('uploads/identificaciones'), $filename);
+                $data['picture'] = 'uploads/identificaciones/' . $filename;
             }
 
             $data['password'] = Hash::make($data['password']);
@@ -82,7 +95,7 @@ class SellersController extends Controller
             return response()->json([
                 'ok' => false,
                 'message' => 'Error al crear el vendedor: ' . $e->getMessage(),
-            ]);
+            ], 500);
         }
     }
 
@@ -106,35 +119,50 @@ class SellersController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|max:255',
-            'password' => 'required|string|max:255',
+            'email' => 'required|string|max:255|unique:sellers,email,' . $seller->id,
+            'password' => 'nullable|string|min:6|max:255',
             'address' => 'required|string',
             'phone' => 'required|string|max:20',
             'level_education' => 'required|string|max:100',
-            'picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'picture' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:10240',
             'observations' => 'nullable|string'
+        ], [
+            'name.required' => 'El nombre es obligatorio.',
+            'email.required' => 'El correo electrónico es obligatorio.',
+            'email.unique' => 'Este correo electrónico ya está registrado.',
+            'password.min' => 'La contraseña debe tener al menos 6 caracteres.',
+            'address.required' => 'La dirección es obligatoria.',
+            'phone.required' => 'El teléfono es obligatorio.',
+            'level_education.required' => 'El nivel de estudios es obligatorio.',
+            'picture.file' => 'La identificación oficial debe ser un archivo válido.',
+            'picture.mimes' => 'La identificación oficial debe ser una imagen (JPG, PNG) o un archivo PDF.',
+            'picture.max' => 'La identificación oficial no debe superar los 10 MB.',
         ]);
 
         try {
             $data = $request->all();
 
-            // Manejo de la imagen avatar
+            // Manejo de la identificación oficial (imagen o PDF)
             if ($request->hasFile('picture')) {
                 // Eliminar el archivo anterior si existe
                 if ($seller->picture && file_exists(public_path($seller->picture))) {
-                    unlink(public_path($seller->picture));
+                    @unlink(public_path($seller->picture));
                 }
 
                 // Subir el nuevo archivo
                 $file = $request->file('picture');
                 $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('uploads/identificaciones'), $filename); // Guardar en la carpeta 'uploads/ine_comprobantes'
-                $data['picture'] = 'uploads/identificaciones/' . $filename; // Ruta relativa para guardar en la base de datos
+                $file->move(public_path('uploads/identificaciones'), $filename);
+                $data['picture'] = 'uploads/identificaciones/' . $filename;
+            } else {
+                $data['picture'] = $seller->picture;
             }
 
             // Validamos si la contraseña ha sido cambiada
-            if ($request->has('password') && $request->password != '') {
+            if ($request->filled('password')) {
                 $data['password'] = Hash::make($request->password);
+            } else {
+                unset($data['password']);
             }
 
             $seller->update($data);
@@ -147,8 +175,8 @@ class SellersController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'ok' => false,
-                'message' => 'Error al crear el vendedor: ' . $e->getMessage(),
-            ]);
+                'message' => 'Error al actualizar el vendedor: ' . $e->getMessage(),
+            ], 500);
         }
     }
 

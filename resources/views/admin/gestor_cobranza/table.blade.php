@@ -15,13 +15,13 @@
                 <td>
                     <div class="d-flex align-items-center">
                         <div class="ms-2">
-                            <h6 class="mb-0 fw-bold">{{ ucWords($item->cliente->nombre) }}</h6>
-                            <small class="text-muted">{{ $item->cliente->email ?? 'Sin correo' }}</small>
+                            <h6 class="mb-0 fw-bold">{{ ucWords($item->cliente?->nombre ?? 'Sin cliente') }}</h6>
+                            <small class="text-muted">{{ $item->cliente?->email ?? 'Sin correo' }}</small>
                         </div>
                     </div>
                 </td>
                 <td>
-                    <span class="badge bg-light text-dark border">{{ $item->unidad?->economico }}</span>
+                    <span class="badge bg-light text-dark border">{{ $item->unidad?->economico ?? 'General' }}</span>
                 </td>
                 <td>
                     <div class="d-flex align-items-center">

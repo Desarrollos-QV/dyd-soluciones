@@ -32,20 +32,35 @@ class ClienteController extends Controller
 
     public function store(Request $request)
     {
-        try {
-            $request->validate([
-                'nombre' => 'required',
-                'email' => 'required',
-                'sex' => 'required',
-                'direccion' => 'required',
-                'numero_contacto' => 'required',
-                'numero_alterno' => 'nullable',
-                'tipo_empresa' => 'required',
-                'empresa' => 'required',
-                'direccion_empresa' => 'required',
-            ]);
+        $request->validate([
+            'nombre' => 'required',
+            'email' => 'required',
+            'sex' => 'required',
+            'direccion' => 'required',
+            'numero_contacto' => 'required',
+            'numero_alterno' => 'nullable',
+            'tipo_empresa' => 'required',
+            'empresa' => 'required',
+            'direccion_empresa' => 'required',
+            'identificacion' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:10240',
+            'identificacion_trasera' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:10240',
+        ], [
+            'identificacion.mimes' => 'La identificación frontal debe ser una imagen (JPG, PNG) o un archivo PDF.',
+            'identificacion_trasera.mimes' => 'La identificación trasera debe ser una imagen (JPG, PNG) o un archivo PDF.',
+        ]);
 
-            $data = $request->all();
+        try {
+            $data = $request->except([
+                'avatar',
+                'identificacion',
+                'identificacion_trasera',
+                'comprobante_domicilio',
+                'copa_factura',
+                'tarjeta_circulacion',
+                'copia_consesion',
+                'contrato',
+                'anexo',
+            ]);
 
             // Manejo de la imagen ine_comprobante
             if ($request->hasFile('avatar')) {
@@ -120,8 +135,8 @@ class ClienteController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'ok' => false,
-                'message' => 'Error al crear el inventario: ' . $e->getMessage(),
-            ]);
+                'message' => 'Error al crear el cliente: ' . $e->getMessage(),
+            ], 500);
         }
     }
 
@@ -133,19 +148,34 @@ class ClienteController extends Controller
 
     public function update(Request $request, Cliente $cliente)
     {
-        try {
-            $request->validate([
-                'nombre' => 'required',
-                'email' => 'required',
-                'direccion' => 'required',
-                'numero_contacto' => 'required',
-                'numero_alterno' => 'nullable',
-                'tipo_empresa' => 'required',
-                'empresa' => 'required',
-                'direccion_empresa' => 'required',
-            ]);
+        $request->validate([
+            'nombre' => 'required',
+            'email' => 'required',
+            'direccion' => 'required',
+            'numero_contacto' => 'required',
+            'numero_alterno' => 'nullable',
+            'tipo_empresa' => 'required',
+            'empresa' => 'required',
+            'direccion_empresa' => 'required',
+            'identificacion' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:10240',
+            'identificacion_trasera' => 'nullable|file|mimes:jpeg,png,jpg,gif,pdf|max:10240',
+        ], [
+            'identificacion.mimes' => 'La identificación frontal debe ser una imagen (JPG, PNG) o un archivo PDF.',
+            'identificacion_trasera.mimes' => 'La identificación trasera debe ser una imagen (JPG, PNG) o un archivo PDF.',
+        ]);
 
-            $data = $request->all();
+        try {
+            $data = $request->except([
+                'avatar',
+                'identificacion',
+                'identificacion_trasera',
+                'comprobante_domicilio',
+                'copa_factura',
+                'tarjeta_circulacion',
+                'copia_consesion',
+                'contrato',
+                'anexo',
+            ]);
 
             // Manejo de la imagen avatar
             if ($request->hasFile('avatar')) {
@@ -238,8 +268,8 @@ class ClienteController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'ok' => false,
-                'message' => 'Error al crear el inventario: ' . $e->getMessage(),
-            ]);
+                'message' => 'Error al actualizar el cliente: ' . $e->getMessage(),
+            ], 500);
         }
     }
 
@@ -268,10 +298,18 @@ class ClienteController extends Controller
     public function destroy(Cliente $cliente)
     {
         try {
-            $cliente->delete();
-            return redirect()->route('clientes.index')->with('success', 'Cliente eliminado.');
+            \Illuminate\Support\Facades\DB::transaction(function () use ($cliente) {
+                $cliente->delete();
+                Cliente::deleteClientDocuments($cliente);
+            });
+            return redirect()->route('clientes.index')->with('success', 'Cliente eliminado exitosamente.');
+        } catch (\Illuminate\Database\QueryException $e) {
+            $mensaje = $e->getCode() == '23000'
+                ? 'No se puede eliminar el cliente porque tiene unidades, asignaciones o cobros asociados. Elimine primero sus unidades.'
+                : 'Ocurrió un problema en la base de datos al intentar eliminar el cliente.';
+            return redirect()->back()->with('error', $mensaje);
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Ha ocurrido un problema: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'No se pudo eliminar el cliente. Verifique que no tenga registros dependientes.');
         }
     }
 
@@ -322,22 +360,32 @@ class ClienteController extends Controller
         $ids = $request->input('ids', []);
 
         try {
-            Cliente::whereIn('id', $ids)->delete();
+            \Illuminate\Support\Facades\DB::transaction(function () use ($ids) {
+                $clientes = Cliente::whereIn('id', $ids)->get();
+                Cliente::whereIn('id', $ids)->delete();
 
-            // Mandamos llamar la función para eliminar los documentos asociados
-            foreach ($ids as $id) {
-                Cliente::deleteClientDocuments($id);
-            }
+                foreach ($clientes as $cliente) {
+                    Cliente::deleteClientDocuments($cliente);
+                }
+            });
 
             return response()->json([
                 'ok' => true,
                 'message' => 'Clientes eliminados con éxito.',
             ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            $mensaje = $e->getCode() == '23000'
+                ? 'No se pueden eliminar uno o más clientes porque tienen unidades, asignaciones o cobros asociados. Elimine primero sus unidades.'
+                : 'Ocurrió un problema en la base de datos al intentar eliminar los clientes.';
+            return response()->json([
+                'ok' => false,
+                'message' => $mensaje,
+            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'ok' => false,
-                'message' => 'Error al eliminar los clientes: ' . $e->getMessage(),
-            ]);
+                'message' => 'No se pudieron eliminar los clientes seleccionados.',
+            ], 500);
         }
     }
 

@@ -78,80 +78,77 @@
 
         form.addEventListener('submit', async function(event) {
             event.preventDefault(); // Evita el envío tradicional del formulario
-            console.log("Enviando FORM")
+            console.log("Enviando FORM");
             if (formSubmitted || formSent) return; // Evita múltiples envíos
             formSubmitted = true; // Marca como enviado
             
             try {
-                // Si hay archivos en Dropzone, procesa la cola
-                // if (myDropzone.getQueuedFiles().length > 0) { 
-                //     processingFiles = true;
-                //     myDropzone.processQueue();
-                // } else {
-                //     // Si no hay archivos, envía el formulario normalmente 
-                //     submitForm();
-                // }
-                submitForm(); // Procesamos la cola directamente...
+                submitForm(); // Procesamos el formulario
             } catch (error) {
                 console.error('Error:', error);
-                ormSubmitted = false;
+                formSubmitted = false;
+                formSent = false;
                 processingFiles = false;
                 Swal.fire({
-                    type: 'error',
+                    icon: 'error',
                     title: 'Oops...',
-                    text: "Ocurrió un error inesperado."
-                }).then(() => {
-                    window.location.reload();
+                    text: "Ocurrió un error inesperado al procesar el formulario."
                 });
             }
         });
 
-
         async function submitForm() {
-            // if (formSent || (processingFiles && myDropzone.getQueuedFiles().length > 0)) {
-            //     return;
-            // }
-
-            
             formSent = true;
             const formData = new FormData(form);
 
-            const response = await fetch(form.action, {
-                method: 'POST',
-                headers: {
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
-                        .getAttribute('content')
-                },
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-                if (data.ok) {
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                            .getAttribute('content')
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+                console.log('Response:', data);
+
+                if (response.ok && data.ok) {
                     window.location.href =
                         `${data.redirect}?success=${encodeURIComponent(data.message)}`;
-                }else {
+                } else {
+                    formSubmitted = false;
+                    formSent = false;
+
+                    let errorHtml = data.message || 'Hubo un error al procesar el formulario.';
+                    if (data.errors) {
+                        errorHtml += '<ul class="text-left mt-2" style="text-align: left;">';
+                        for (const field in data.errors) {
+                            data.errors[field].forEach(err => {
+                                errorHtml += `<li>${err}</li>`;
+                            });
+                        }
+                        errorHtml += '</ul>';
+                    }
+
                     Swal.fire({
-                        type: 'error',
-                        title: 'Oops... Hubo un error al enviar el formulario.',
-                        text: data.message
-                    }).then(() => {
-                        window.location.reload();
+                        icon: 'error',
+                        title: 'No se pudo crear la unidad',
+                        html: errorHtml
                     });
                 }
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error('Error:', error);
-                // alert('Hubo un error al enviar el formulario.');
+                formSubmitted = false;
+                formSent = false;
                 Swal.fire({
-                    type: 'error',
-                    title: 'Oops... Hubo un error al enviar el formulario.',
-                    text: error.message
-                }).then(() => {
-                    window.location.reload();
+                    icon: 'error',
+                    title: 'Error de conexión',
+                    text: error.message || 'Hubo un error al enviar el formulario.'
                 });
-            });            
+            }
         }
 
 

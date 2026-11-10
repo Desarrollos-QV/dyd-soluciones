@@ -45,12 +45,20 @@
                         </thead>
                         <tbody>
                             @foreach($sellers as $sell)
-                            <tr>
+                            <tr @if(!App\Models\Sellers::checkCompleteness($sell->id)) class="table-warning" @endif>
                                 <td>
                                     <input type="checkbox" id="select_element_{{ $sell->id }}" name="select_element_{{ $sell->id }}">
                                 </td>
                                 <td>
-                                    <img src="{{ asset($sell->picture) }}" alt="Imagen de {{ $sell->name }}" width="50" height="50" class="rounded-circle">
+                                    @if(Str::endsWith(strtolower($sell->picture), '.pdf'))
+                                        <a href="{{ asset($sell->picture) }}" target="_blank" class="badge bg-danger text-white p-2" title="Ver Identificación (PDF)">
+                                            <i data-feather="file-text"></i> PDF
+                                        </a>
+                                    @else
+                                        <a href="{{ asset($sell->picture) }}" target="_blank">
+                                            <img src="{{ asset($sell->picture) }}" alt="Imagen de {{ $sell->name }}" width="50" height="50" class="rounded-circle" style="object-fit: cover;">
+                                        </a>
+                                    @endif
                                 </td>
                                 <td>{{ $sell->name }}</td>
                                 <td>{{ $sell->address }}</td>

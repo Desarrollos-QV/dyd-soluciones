@@ -39,6 +39,10 @@ class IsAdmin
     {
 
         if ($this->auth->guest()) { // Si es invitado y/o no esta logeado Requerimos acceso
+            // Si el vendedor tiene sesión activa bajo su guard y accede a cobranza, permitir acceso
+            if (\Illuminate\Support\Facades\Auth::guard('sellers')->check()) {
+                return $next($request);
+            }
 			return redirect()->guest('login')->with(['login_required' => "Inicia sesión..."]);
 		} else if ($this->auth->user()->role == 'admin' || $this->auth->user()->role == 'subadmin' || $this->auth->user()->role == 'tecnico') { // Si el Rol es admin y/o Subadmin damos acceso
             if ($request->route()->getName() != 'dashboard' && // Si la ruta es diferente del Dashboard

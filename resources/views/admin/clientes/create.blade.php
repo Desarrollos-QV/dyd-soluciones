@@ -49,22 +49,29 @@
                 } else {
                     const errorData = await response.json();
                     console.error('Errores:', errorData); 
+
+                    let errorMsg = errorData.message || 'Error al validar el formulario.';
+                    if (errorData.errors) {
+                        const errorList = Object.values(errorData.errors).flat().join('<br>');
+                        if (errorList) {
+                            errorMsg = errorList;
+                        }
+                    }
+
                     Swal.fire({
+                        icon: 'error',
                         type: 'error',
-                        title: 'Oops... Hubo un error al enviar el formulario.',
-                        text: errorData.message
-                    }).then(() => {
-                        window.location.reload();
+                        title: 'Oops... Revisa la siguiente información:',
+                        html: errorMsg
                     });
                 }
             } catch (error) {
                 console.error('Error:', error);
                 Swal.fire({
+                    icon: 'error',
                     type: 'error',
                     title: 'Oops...',
-                    text: "Ocurrió un error inesperado."
-                }).then(() => {
-                    window.location.reload();
+                    text: "Ocurrió un error inesperado al procesar la solicitud."
                 });
             }
         });

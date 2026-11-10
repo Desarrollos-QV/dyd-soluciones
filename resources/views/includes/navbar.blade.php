@@ -36,7 +36,11 @@
                     @if(Auth::user())
                         <img src="{{ Auth::user()->avatar ? asset(Auth::user()->avatar) : asset('assets/images/background-login.jpg') }}" alt="">
                     @elseif(Auth::guard('sellers')->check())
-                        <img src="{{ Auth::guard('sellers')->user()->picture ? asset(Auth::guard('sellers')->user()->picture) : asset('assets/images/background-login.jpg') }}" alt="">
+                        @php
+                            $sellerPic = Auth::guard('sellers')->user()->picture;
+                            $isPdf = $sellerPic && \Illuminate\Support\Str::endsWith(strtolower($sellerPic), '.pdf');
+                        @endphp
+                        <img src="{{ ($sellerPic && !$isPdf) ? asset($sellerPic) : asset('assets/images/background-login.jpg') }}" alt="">
                     @else
                         <img src="{{ asset('assets/images/background-login.jpg') }}" alt="">
                     @endif
@@ -47,7 +51,11 @@
                             @if(Auth::user())
                                 <img src="{{ Auth::user()->avatar ? asset(Auth::user()->avatar) : asset('assets/images/background-login.jpg') }}" alt="">
                             @elseif(Auth::guard('sellers')->check())
-                                <img src="{{ Auth::guard('sellers')->user()->picture ? asset(Auth::guard('sellers')->user()->picture) : asset('assets/images/background-login.jpg') }}" alt="">
+                                @php
+                                    $sellerPic = Auth::guard('sellers')->user()->picture;
+                                    $isPdf = $sellerPic && \Illuminate\Support\Str::endsWith(strtolower($sellerPic), '.pdf');
+                                @endphp
+                                <img src="{{ ($sellerPic && !$isPdf) ? asset($sellerPic) : asset('assets/images/background-login.jpg') }}" alt="">
                             @else
                                 <img src="{{ asset('assets/images/background-login.jpg') }}" alt="">
                             @endif

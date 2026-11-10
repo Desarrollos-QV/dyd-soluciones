@@ -74,16 +74,24 @@
                                         <td>
                                             @if ($cliente->identificacion != null)
                                             <a href="{{ asset($cliente->identificacion) }}" target="_blank">
-                                                <img src="{{ asset($cliente->identificacion) }}"
-                                                    alt="Frontal de {{ $cliente->nombre }}"
-                                                    style="border-radius: 12px !important">
+                                                @if(Str::endsWith(strtolower($cliente->identificacion), '.pdf'))
+                                                    <span class="badge bg-danger text-white mb-1 d-inline-block"><i data-feather="file-text"></i> PDF Frontal</span>
+                                                @else
+                                                    <img src="{{ asset($cliente->identificacion) }}"
+                                                        alt="Frontal de {{ $cliente->nombre }}"
+                                                        style="border-radius: 12px !important">
+                                                @endif
                                             </a>
                                             @endif
                                             @if ($cliente->identificacion_trasera != null)
                                             <a href="{{ asset($cliente->identificacion_trasera) }}" target="_blank">
-                                                <img src="{{ asset($cliente->identificacion_trasera) }}"
-                                                    alt="Trasera de {{ $cliente->nombre }}"
-                                                    style="border-radius: 12px !important">
+                                                @if(Str::endsWith(strtolower($cliente->identificacion_trasera), '.pdf'))
+                                                    <span class="badge bg-danger text-white mb-1 d-inline-block"><i data-feather="file-text"></i> PDF Trasera</span>
+                                                @else
+                                                    <img src="{{ asset($cliente->identificacion_trasera) }}"
+                                                        alt="Trasera de {{ $cliente->nombre }}"
+                                                        style="border-radius: 12px !important">
+                                                @endif
                                             </a>
                                             @endif
                                             @if ($cliente->identificacion == null && $cliente->identificacion_trasera == null)

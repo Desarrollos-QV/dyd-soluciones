@@ -218,16 +218,15 @@
                                                             Fotos de la unidad</a>
                                                     @endif
                                                     <hr />
-                                                    <a href="{{ route('unidades.destroy', $unit) }}" class="dropdown-item"
-                                                        onclick="event.preventDefault(); if(confirm('¿Estás seguro de que deseas eliminar esta unidad? Esta acción no se puede deshacer.')) { this.querySelector('form').submit(); }">
-                                                        <form action="{{ route('unidades.destroy', $unit) }}"
-                                                            class="dropdown-item" method="POST"
-                                                            style="display:inline-block;">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <span type="submit">Eliminar</span>
-                                                        </form>
-                                                    </a>
+                                                    <form action="{{ route('unidades.destroy', $unit->id) }}"
+                                                        method="POST"
+                                                        onsubmit="return confirm('¿Estás seguro de que deseas eliminar la unidad {{ $unit->economico ?? $unit->placa }}? Esta acción no se puede deshacer.');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="dropdown-item text-danger">
+                                                            <i data-feather="trash-2" class="icon-sm mr-2"></i> Eliminar
+                                                        </button>
+                                                    </form>
                                                 </div>
                                             </div>
                                         </td>
@@ -355,11 +354,14 @@
                             // Recargar la página o eliminar las filas de la tabla
                             location.reload();
                         } else {
-                            alertSwwet('Error', response.message);
+                            alertSwwet('Error', response.message || 'No se pudieron eliminar las unidades seleccionadas.');
                         }
                     },
                     error: function(xhr) {
-                        alertSwwet('Error', 'Ocurrió un error al eliminar los prospectos.');
+                        const msg = xhr.responseJSON && xhr.responseJSON.message
+                            ? xhr.responseJSON.message
+                            : 'Ocurrió un error al eliminar las unidades seleccionadas.';
+                        alertSwwet('Error', msg);
                     }
                 });
             });

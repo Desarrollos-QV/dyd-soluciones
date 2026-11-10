@@ -14,7 +14,14 @@
         <div class="card">
             <div class="card-body text-center">
                 <div class="mb-4 d-flex justify-content-center">
-                    <img src="{{ asset($seller->picture) }}" alt="Imagen de {{ $seller->name }}" class="img-fluid rounded-circle shadow-sm" style="width: 150px; height: 150px; object-fit: cover; border: 4px solid #fff;">
+                    @if($seller->picture && Str::endsWith(strtolower($seller->picture), '.pdf'))
+                        <a href="{{ asset($seller->picture) }}" target="_blank" class="btn btn-outline-danger p-3 d-flex flex-column align-items-center justify-content-center" style="width: 150px; height: 150px; border-radius: 25px;">
+                            <i data-feather="file-text" style="width: 48px; height: 48px;"></i>
+                            <span class="mt-2 fw-bold" style="font-size: 0.85rem;">Ver INE (PDF)</span>
+                        </a>
+                    @else
+                        <img src="{{ asset($seller->picture) }}" alt="Imagen de {{ $seller->name }}" class="img-fluid rounded-circle shadow-sm" style="width: 150px; height: 150px; object-fit: cover; border: 4px solid #fff;">
+                    @endif
                 </div>
                 <h5 class="card-title mb-1 fw-bold">{{ $seller->name }}</h5>
                 <p class="text-muted mb-4">{{ $seller->email }}</p>

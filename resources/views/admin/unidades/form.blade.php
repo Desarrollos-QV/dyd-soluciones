@@ -11,12 +11,12 @@
                     <div class="col-lg-6">
                         <label for="economico">Economico</label>
                         <input type="text" name="economico" id="economico" class="form-control" required
-                            value="{{ $unidad->economico }}">
+                            value="{{ old('economico', $unidad->economico ?? '') }}">
                     </div>
                     <div class="col-lg-6">
                         <label for="placa">Placa</label>
                         <input type="text" name="placa" id="placa" class="form-control" required
-                            value="{{ $unidad->placa }}">
+                            value="{{ old('placa', $unidad->placa ?? '') }}">
                     </div>
                 </div>
 
@@ -24,7 +24,7 @@
                     <div class="col-lg-4">
                         <label for="tipo_unidad">Tipo de unidad</label>
                         <input type="text" name="tipo_unidad" id="tipo_unidad" class="form-control" required max="20"
-                            value="{{ $unidad->tipo_unidad }}" required>
+                            value="{{ old('tipo_unidad', $unidad->tipo_unidad ?? '') }}" required>
                     </div>
                     <div class="col-lg-4">
                         <label for="fecha_instalacion">Fecha Instalacion</label>
@@ -42,15 +42,15 @@
                     <div class="col-lg-6">
                         <label for="dispositivo_instalado">Dispositivo instalado</label>
                         <select name="dispositivo_instalado" id="dispositivo_instalado" class="form-select" required>
-                            <option value="DVR" @if($unidad->dispositivo_instalado == 'DVR') selected @endif>DVR</option>
-                            <option value="GPS" @if($unidad->dispositivo_instalado == 'GPS') selected @endif>GPS</option>
-                            <option value="DASHCAM" @if($unidad->dispositivo_instalado == 'DASHCAM') selected @endif>DASHCAM</option>
-                            <option value="SENSOR" @if($unidad->dispositivo_instalado == 'SENSOR') selected @endif>SENSOR Y/O ACCESORIOS</option>
+                            <option value="DVR" @if(old('dispositivo_instalado', $unidad->dispositivo_instalado ?? '') == 'DVR') selected @endif>DVR</option>
+                            <option value="GPS" @if(old('dispositivo_instalado', $unidad->dispositivo_instalado ?? '') == 'GPS') selected @endif>GPS</option>
+                            <option value="DASHCAM" @if(old('dispositivo_instalado', $unidad->dispositivo_instalado ?? '') == 'DASHCAM') selected @endif>DASHCAM</option>
+                            <option value="SENSOR" @if(old('dispositivo_instalado', $unidad->dispositivo_instalado ?? '') == 'SENSOR') selected @endif>SENSOR Y/O ACCESORIOS</option>
                         </select>
                         <div class="row" id="other_dispositivo_instalado" style="display: none;">
                             <div class="col-md-12 mt-2" id="inner_other_disp">
                                  <input type="text" id="input_dispositivo_instalado" class="form-control"
-                                    value="{{ $unidad->dispositivo_instalado }}" placeholder="Ingrese el nombre de la plataforma">
+                                    value="{{ old('dispositivo_instalado', $unidad->dispositivo_instalado ?? '') }}" placeholder="Ingrese el nombre de la plataforma">
                             </div>
                         </div>
                     </div>
@@ -70,7 +70,7 @@
                             <select name="simcontrol_id" id="simcontrol_id" class="form-select" required>
                                 <option value="">Seleccionar SIM</option>
                                 @foreach($simcontrols as $sim)
-                                    <option value="{{ $sim->id }}" data-type="{{ $sim->type }}" @if($unidad->simcontrol_id == $sim->id) selected @endif>
+                                    <option value="{{ $sim->id }}" data-type="{{ $sim->type }}" @if(old('simcontrol_id', $unidad->simcontrol_id ?? '') == $sim->id) selected @endif>
                                         {{ $sim->compañia }} - {{ $sim->numero_publico }}
                                     </option>
                                 @endforeach
@@ -94,8 +94,8 @@
                             <select name="devices_id" id="devices_id" class="form-select" required>
                                 <option value="">Seleccionar Dispositivo</option>
                                 @foreach($devices as $device)
-                                    <option value="{{ $device->id }}" data-type="{{ $device->type }}" @if($unidad->devices_id == $device->id) selected @endif>
-                                        {{ $device->dispositivo }} - {{ $device->marca }}
+                                    <option value="{{ $device->id }}" data-type="{{ $device->type }}" @if(old('devices_id', $unidad->devices_id ?? '') == $device->id) selected @endif>
+                                        {{ $device->dispositivo }} - {{ $device->marca }} (Stock: {{ $device->stock }})
                                     </option>
                                 @endforeach
                             </select>
@@ -105,7 +105,7 @@
                     <div class="col-lg-3">
                         <label for="numero_de_motor">Número de motor</label>
                         <input type="text" name="numero_de_motor" id="numero_de_motor" class="form-control" required
-                            value="{{ $unidad->numero_de_motor }}">
+                            value="{{ old('numero_de_motor', $unidad->numero_de_motor ?? '') }}">
                     </div>
                     
                     <div class="col-lg-3">
@@ -120,11 +120,11 @@
                                 🔍
                             </span>
                             <input type="text" id="search_sensor" class="form-control form-control-sm ps-1" placeholder="Buscar..." style="border-left: none; max-width: 90px; font-size: 0.8rem;">
-                            <select name="sensor" id="sensor" class="form-select" required>
+                            <select name="sensor" id="sensor" class="form-select">
                                 <option value="">Seleccionar</option>
                                 @foreach($sensores as $sensor)
-                                    <option value="{{ $sensor->id }}" data-type="{{ $sensor->type }}" @if($unidad->sensor == $sensor->id) selected @endif>
-                                        {{ $sensor->dispositivo }}
+                                    <option value="{{ $sensor->id }}" data-type="{{ $sensor->type }}" @if(old('sensor', $unidad->sensor ?? '') == $sensor->id) selected @endif>
+                                        {{ $sensor->dispositivo }} (Stock: {{ $sensor->stock }})
                                     </option>
                                 @endforeach
                             </select>
@@ -136,18 +136,18 @@
                     <div class="col-lg-6">
                         <label for="marca">Marca Del Vehículo</label>
                         <input type="text" name="marca" id="marca" class="form-control" required
-                            value="{{ $unidad->marca }}">
+                            value="{{ old('marca', $unidad->marca ?? '') }}">
                     </div>
                     <div class="col-lg-4">
                         <label for="submarca">Submarca Del Vehículo</label>
                         <input type="text" name="submarca" id="submarca" class="form-control" required
-                            value="{{ $unidad->submarca }}">
+                            value="{{ old('submarca', $unidad->submarca ?? '') }}">
                     </div>
                     <div class="col-lg-2">
                         <label for="anio_unidad">Año del Vehículo</label>
                         <input type="number" name="anio_unidad" id="anio_unidad" class="form-control"
                         min="1900" max="{{ date('Y') }}"
-                        value="{{ $unidad->anio_unidad ?? old('anio_unidad') }}" required>
+                        value="{{ old('anio_unidad', $unidad->anio_unidad ?? '') }}" required>
                     </div>
                 </div>
 
@@ -155,13 +155,13 @@
                     <div class="col-lg-6">
                         <label for="vin">Número VIN</label>
                         <input type="text" name="vin" id="vin" class="form-control" required
-                            value="{{ $unidad->vin }}">
+                            value="{{ old('vin', $unidad->vin ?? '') }}">
                     </div>
                     <div class="col-lg-6">
                         <label for="cuenta_con_apagado">¿Cuenta con apagado?</label>
                         <select name="cuenta_con_apagado" id="cuenta_con_apagado" class="form-select" required>
-                            <option value="si">SI</option>
-                            <option value="no">NO</option>
+                            <option value="si" @if(old('cuenta_con_apagado', $unidad->cuenta_con_apagado ?? '') == 'si') selected @endif>SI</option>
+                            <option value="no" @if(old('cuenta_con_apagado', $unidad->cuenta_con_apagado ?? '') == 'no') selected @endif>NO</option>
                         </select>
                     </div>
                 </div>
@@ -169,7 +169,7 @@
                 <div class="row mt-4">
                     <div class="col-lg-12">
                         <label for="observaciones">Observaciones</label>
-                        <textarea name="observaciones" id="observaciones" class="form-control mb-4" rows="5" cols="5" placeholder="Ingresa las observaciones correspondientes">{!! $unidad->observaciones !!}</textarea>
+                        <textarea name="observaciones" id="observaciones" class="form-control mb-4" rows="5" cols="5" placeholder="Ingresa las observaciones correspondientes">{!! old('observaciones', $unidad->observaciones ?? '') !!}</textarea>
                     </div>
                 </div>
             </div>
@@ -190,12 +190,12 @@
                     <div class="col-lg-6">
                         <label for="costo_plataforma">Costo de la Plataforma</label>
                         <input name="costo_plataforma" id="costo_plataforma" class="form-control" step="0.01" data-inputmask="'alias': 'currency'"
-                            value="{{ $unidad->costo_plataforma ?? 0 }}">
+                            value="{{ old('costo_plataforma', $unidad->costo_plataforma ?? 0) }}">
                     </div>
                     <div class="col-lg-6">
                         <label for="costo_sim">Costo del SIM</label>
                         <input name="costo_sim" id="costo_sim" class="form-control" step="0.01" data-inputmask="'alias': 'currency'"
-                            value="{{ $unidad->costo_sim ?? 0 }}">
+                            value="{{ old('costo_sim', $unidad->costo_sim ?? 0) }}">
                     </div>
                 </div>
 
@@ -203,7 +203,7 @@
                     <div class="col-lg-6">
                         <label for="pago_mensual">Pago Mensual</label>
                         <input  name="pago_mensual" id="pago_mensual" class="form-control" step="0.01" data-inputmask="'alias': 'currency'"
-                            value="{{ $unidad->pago_mensual ?? 0 }}">
+                            value="{{ old('pago_mensual', $unidad->pago_mensual ?? 0) }}">
                     </div>
                 </div>
 
@@ -228,7 +228,7 @@
                     <div class="col-lg-12">
                         <label for="name_empresa">Nombre de la empresa</label>
                         <input type="text" name="name_empresa" id="name_empresa" class="form-control"
-                            value="{{ $unidad->name_empresa }}">
+                            value="{{ old('name_empresa', $unidad->name_empresa ?? '') }}">
                     </div>
                 </div>
                 
@@ -238,21 +238,21 @@
                 <div class="row mt-4">
                     <div class="col-lg-6">
                         <label for="credenciales_user[]">Nombre usuario</label>
-                        <input type="text" name="credenciales_user[]" id="credenciales_user[]" class="form-control" value="{{ $credenciales['user'][0] ?? '' }}">
+                        <input type="text" name="credenciales_user[]" class="form-control" value="{{ old('credenciales_user.0', $credenciales['user'][0] ?? '') }}">
                     </div>
                     <div class="col-lg-6">
                         <label for="credenciales_pass[]">Contraseña</label>
-                        <input type="text" name="credenciales_pass[]" id="credenciales_pass[]" class="form-control" value="{{ $credenciales['pass'][0] ?? '' }}">
+                        <input type="text" name="credenciales_pass[]" class="form-control" value="{{ old('credenciales_pass.0', $credenciales['pass'][0] ?? '') }}">
                     </div>
                 </div>
                 <div class="row mt-4">
                     <div class="col-lg-6">
                         <label for="credenciales_user[]">Nombre usuario</label>
-                        <input type="text" name="credenciales_user[]" id="credenciales_user[]" class="form-control" value="{{ $credenciales['user'][1] ?? '' }}">
+                        <input type="text" name="credenciales_user[]" class="form-control" value="{{ old('credenciales_user.1', $credenciales['user'][1] ?? '') }}">
                     </div>
                     <div class="col-lg-6">
                         <label for="credenciales_pass[]">Contraseña</label>
-                        <input type="text" name="credenciales_pass[]" id="credenciales_pass[]" class="form-control" value="{{ $credenciales['user'][1] ?? '' }}">
+                        <input type="text" name="credenciales_pass[]" class="form-control" value="{{ old('credenciales_pass.1', $credenciales['pass'][1] ?? '') }}">
                     </div>
                 </div>
             </div>
@@ -283,7 +283,7 @@
                             <input type="text" id="search_cliente" class="form-control form-control-sm ps-1" placeholder="Buscar cliente..." style="border-left: none; max-width: 180px; font-size: 0.8rem;">
                             <select name="cliente_id" id="cliente_id" class="form-select" required>
                                 @foreach($clientes as $client)
-                                <option value="{{ $client->id }}" @if($client->id == $unidad->cliente_id) selected @endif >{{$client->nombre}}</option>
+                                <option value="{{ $client->id }}" @if(old('cliente_id', $unidad->cliente_id ?? '') == $client->id) selected @endif >{{$client->nombre}}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -292,7 +292,7 @@
                         <label for="numero_de_emergencia">Número de emergencia</label>
                         <input type="tel" name="numero_de_emergencia" id="numero_de_emergencia"
                             class="form-control"
-                            value="{{ $unidad->numero_de_emergencia ?? old('numero_de_emergencia') }}">
+                            value="{{ old('numero_de_emergencia', $unidad->numero_de_emergencia ?? '') }}">
                     </div>
 
                     <!--<div class="col-lg-12 mt-4">

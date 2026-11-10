@@ -202,6 +202,7 @@ Route::group(['middleware' => 'isAdmin'], function () {
     Route::get('collections/completed', [CollectionsController::class, 'completed'])->name('collections.completed');
     Route::post('collections/deleteSelected', [CollectionsController::class, 'deleteSelected'])->name('collections.bulkDelete');
     Route::get('collections/getCollecionAll', [CollectionsController::class, 'getCollecionAll'])->name('collections.getCollecionAll');
+    Route::post('collections/sync', [CollectionsController::class, 'syncNow'])->name('collections.sync');
     Route::resource('collections', CollectionsController::class);
     Route::get('collections/{collection}', [CollectionsController::class, 'show'])->name('collections.show');
     Route::post('collections/{collection}/pay', [CollectionsController::class, 'pagar'])->name('collections.pay');

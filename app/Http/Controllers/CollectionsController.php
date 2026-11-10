@@ -13,7 +13,9 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\HistorialCaja;
 use App\Models\Notification;
+use App\Models\Settings;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class CollectionsController extends Controller
 {
@@ -21,19 +23,70 @@ class CollectionsController extends Controller
     private $folder = "admin.gestor_cobranza.";
 
     /**
+     * Sincroniza en tiempo real las unidades hacia la tabla de cobranzas
+     */
+    public function syncUnidadesToCollections(): void
+    {
+        try {
+            $settings = Settings::where('user_id', 1)->first() ?? Settings::first();
+            $alertaDias = $settings->dias_tolerancia ?? 5;
+            $hoy = Carbon::today();
+            $limite = $hoy->copy()->addDays($alertaDias);
+
+            $unidades = Unidades::whereNotNull('fecha_cobro')
+                ->whereDate('fecha_cobro', '<=', $limite)
+                ->get();
+
+            foreach ($unidades as $unidad) {
+                if (!$unidad->cliente_id) {
+                    continue;
+                }
+
+                $fechaCobro = Carbon::parse($unidad->fecha_cobro);
+                $estatus = $fechaCobro->lt($hoy) ? 'overdue' : 'pending';
+                $monto = $unidad->pago_mensual ?? 0;
+
+                $collection = Collection::where('unidad_id', $unidad->id)
+                    ->where('status', '!=', 'paid')
+                    ->first();
+
+                if ($collection) {
+                    $collection->update([
+                        'cliente_id' => $unidad->cliente_id,
+                        'due_date'   => $fechaCobro->toDateString(),
+                        'amount'     => $monto,
+                        'status'     => $collection->status === 'notified' ? 'notified' : $estatus,
+                    ]);
+                } else {
+                    Collection::create([
+                        'unidad_id'  => $unidad->id,
+                        'cliente_id' => $unidad->cliente_id,
+                        'due_date'   => $fechaCobro->toDateString(),
+                        'amount'     => $monto,
+                        'status'     => $estatus,
+                    ]);
+                }
+            }
+        } catch (\Exception $e) {
+            Log::error('Error en syncUnidadesToCollections: ' . $e->getMessage());
+        }
+    }
+
+    /**
      * Dashboard principal del Gestor de Cobranza
      */
-
     public function index(Request $request)
     {
+        $this->syncUnidadesToCollections();
+
         $totalDeuda = Collection::where('status', '!=', 'paid')->sum('amount');
         $pagosprocesados = CollectionPayment::count();
-        $ingresosRegistrados = CollectionPayment::selectRaw('SUM(REPLACE(amount, ",", "") + 0) as total_amount')->value('total_amount');
+        $ingresosRegistrados = CollectionPayment::selectRaw('SUM(REPLACE(amount, ",", "") + 0) as total_amount')->value('total_amount') ?? 0;
         $clientesMorosos = Collection::where('status', '!=', 'paid')
             ->where('due_date', '<', Carbon::now())
             ->count();
 
-        $query = Collection::with(['cliente', 'cliente.unidades', 'cliente.asignaciones']);
+        $query = Collection::with(['cliente', 'unidad', 'cliente.unidades', 'cliente.asignaciones']);
 
         if ($request->search) {
             $query->whereHas('cliente', function ($q) use ($request) {
@@ -51,18 +104,24 @@ class CollectionsController extends Controller
 
         $data = $query->orderBy('due_date', 'ASC')->get();
 
-       
+        $clientes = Cliente::orderBy('nombre', 'ASC')->get();
+        $unidades = Unidades::with('cliente')->orderBy('economico', 'ASC')->get();
 
         return view($this->folder . 'index', compact(
             'data',
             'totalDeuda',
             'pagosprocesados',
             'ingresosRegistrados',
-            'clientesMorosos'
+            'clientesMorosos',
+            'clientes',
+            'unidades'
         ));
     }
+
     public function getCollecionAll(Request $request)
     {
+        $this->syncUnidadesToCollections();
+
         $query = Collection::with(['cliente', 'unidad', 'cliente.unidades', 'cliente.asignaciones', 'pagos']);
 
         if ($request->search) {
@@ -88,16 +147,74 @@ class CollectionsController extends Controller
     }
 
     /**
+     * Endpoint para sincronización manual de cobranza con las unidades
+     */
+    public function syncNow()
+    {
+        $this->syncUnidadesToCollections();
+
+        return response()->json([
+            'ok' => true,
+            'message' => 'Cobranza sincronizada exitosamente con las unidades.'
+        ]);
+    }
+
+    /**
+     * Crear un registro de cobranza manual
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'cliente_id' => 'required|exists:clientes,id',
+            'unidad_id'  => 'nullable|exists:unidades,id',
+            'due_date'   => 'required|date',
+            'amount'     => 'required|numeric|min:0',
+        ], [
+            'cliente_id.required' => 'Debe seleccionar un cliente.',
+            'cliente_id.exists'   => 'El cliente seleccionado no es válido.',
+            'due_date.required'   => 'La fecha de cobro es obligatoria.',
+            'amount.required'     => 'El monto a cobrar es obligatorio.',
+            'amount.numeric'      => 'El monto debe ser un valor numérico.',
+        ]);
+
+        try {
+            $hoy = Carbon::today();
+            $dueDate = Carbon::parse($request->due_date);
+            $status = $dueDate->lt($hoy) ? 'overdue' : 'pending';
+
+            $collection = Collection::create([
+                'cliente_id' => $request->cliente_id,
+                'unidad_id'  => $request->filled('unidad_id') ? $request->unidad_id : null,
+                'due_date'   => $dueDate->toDateString(),
+                'amount'     => $request->amount,
+                'status'     => $status,
+            ]);
+
+            return response()->json([
+                'ok' => true,
+                'message' => 'Cobranza registrada exitosamente.',
+                'collection' => $collection,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'ok' => false,
+                'message' => 'Error al registrar cobranza: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
      * Registrar pago
      */
     public function pagar(Request $request, $id)
     {
         $collection = Collection::with('cliente')->findOrFail($id);
-        $unidad = Unidades::find($collection->unidad_id);
+        $unidad = $collection->unidad_id ? Unidades::find($collection->unidad_id) : null;
+        $userId = auth()->id() ?? (Auth::guard('sellers')->id() ?? 1);
 
         CollectionPayment::create([
             'collection_id' => $collection->id,
-            'paid_by' => auth()->id(),
+            'paid_by' => $userId,
             'amount' => $collection->amount,
         ]);
 
@@ -106,33 +223,37 @@ class CollectionsController extends Controller
             'paid_at' => Carbon::now()
         ]);
 
-        // Restablecemos el mes en la unidad
-        $unidad->update([
-            'fecha_cobro' => Carbon::now()->addMonth()
-        ]);
+        // Restablecemos el mes en la unidad si existe
+        if ($unidad && $unidad->fecha_cobro) {
+            $unidad->update([
+                'fecha_cobro' => Carbon::parse($unidad->fecha_cobro)->addMonth()
+            ]);
+        }
 
         // Registramos el ingreso
         HistorialCaja::create([
-            'user_id' => auth()->id(),
+            'user_id' => $userId,
             'fecha' => Carbon::now(),
             'hora' => Carbon::now()->format('H:i:s'),
             'tipo' => 'ingreso',
             'concepto' => 'Pago Mensualidad',
             'monto' => $collection->amount,
-            'descripcion' => "Pago de mensualidad del cliente: " . $collection->cliente->nombre,
+            'descripcion' => "Pago de mensualidad del cliente: " . ($collection->cliente?->nombre ?? 'General'),
             'autorizado_por' => 1,
         ]);
 
         // Notificamos al Administrador
+        $clienteNombre = $collection->cliente?->nombre ?? 'Cliente';
         $this->notifyUser(
             1, // SuperAdmin
             'gestion_cobranza',
             'Pago realizado',
-            "La mensualidad del cliente {$collection->cliente->nombre} ha sido pagada.",
+            "La mensualidad del cliente {$clienteNombre} ha sido pagada.",
             json_encode(["unidad" => $collection->id]),
             route('collections.index'),
             now()->addDays(7)
         );
+
         return response()->json([
             'status' => true,
             'message' => "Pago realizado con éxito."

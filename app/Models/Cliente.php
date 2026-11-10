@@ -51,31 +51,42 @@ class Cliente extends Model
     static function checkDocuments($clientId)
     {
         $cliente = self::find($clientId);
+        if (!$cliente) {
+            return false;
+        }
 
-        $documents = [
-            'identificacion',
-            'identificacion_trasera',
-            'comprobante_domicilio',
-            'copa_factura',
-            'tarjeta_circulacion',
-            'copia_consesion',
-            'contrato',
-            'anexo'
+        $requiredFields = [
+            'nombre',
+            'direccion',
+            'numero_contacto',
+            'email',
+            'empresa',
         ];
 
-        foreach ($documents as $document) {
-            if (empty($cliente->$document) || !File::exists(public_path($cliente->$document))) {
+        foreach ($requiredFields as $field) {
+            if (empty($cliente->$field)) {
                 return false;
             }
+        }
+
+        // Requiere al menos una identificación oficial válida cargada en el servidor
+        $hasFront = !empty($cliente->identificacion) && File::exists(public_path($cliente->identificacion));
+        $hasBack  = !empty($cliente->identificacion_trasera) && File::exists(public_path($cliente->identificacion_trasera));
+
+        if (!$hasFront && !$hasBack) {
+            return false;
         }
 
         return true;
     }
 
     // Funcion para Eliminar las imagenes asociadas al cliente
-    public static function deleteClientDocuments($clientId)
+    public static function deleteClientDocuments($clientOrId)
     {
-        $cliente = self::find($clientId);
+        $cliente = $clientOrId instanceof self ? $clientOrId : self::find($clientOrId);
+        if (!$cliente) {
+            return;
+        }
 
         $documents = [
             'avatar',

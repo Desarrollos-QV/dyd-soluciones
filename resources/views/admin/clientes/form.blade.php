@@ -174,11 +174,20 @@
                         <label for="identificacion">Identificación Oficial (Frontal)</label>
                         <div class="row mb-3">
                             <div class="col-lg-8">
-                                <input type="file" name="identificacion" id="identificacion" class="form-control" value="{{$cliente->identificacion}}">
+                                <input type="file" name="identificacion" id="identificacion" class="form-control" accept="image/*,.pdf,application/pdf" value="{{$cliente->identificacion}}">
                             </div>
                             <div class="col-lg-4" style="display: flex;justify-content: center;align-items: center;">
                                 @if($cliente->identificacion)
-                                    <img src="{{ asset($cliente->identificacion) }}" alt="identificacion" style="width:100px;height: 100px;border-radius: 25px;">
+                                    @if(Str::endsWith(strtolower($cliente->identificacion), '.pdf'))
+                                        <a href="{{ asset($cliente->identificacion) }}" target="_blank" class="btn btn-outline-danger btn-sm text-center p-2" title="Ver documento PDF">
+                                            <i data-feather="file-text" style="width: 24px; height: 24px; display: block; margin: 0 auto 3px;"></i>
+                                            <small class="fw-bold">Ver Frontal (PDF)</small>
+                                        </a>
+                                    @else
+                                        <a href="{{ asset($cliente->identificacion) }}" target="_blank">
+                                            <img src="{{ asset($cliente->identificacion) }}" alt="identificacion" style="width:100px;height: 100px;border-radius: 25px; object-fit: cover;">
+                                        </a>
+                                    @endif
                                 @endif
                             </div>
                         </div>
@@ -186,11 +195,20 @@
                         <label for="identificacion_trasera">Identificación Oficial (Trasera)</label>
                         <div class="row">
                             <div class="col-lg-8">
-                                <input type="file" name="identificacion_trasera" id="identificacion_trasera" class="form-control" value="{{$cliente->identificacion_trasera}}">
+                                <input type="file" name="identificacion_trasera" id="identificacion_trasera" class="form-control" accept="image/*,.pdf,application/pdf" value="{{$cliente->identificacion_trasera}}">
                             </div>
                             <div class="col-lg-4" style="display: flex;justify-content: center;align-items: center;">
                                 @if($cliente->identificacion_trasera)
-                                    <img src="{{ asset($cliente->identificacion_trasera) }}" alt="identificacion trasera" style="width:100px;height: 100px;border-radius: 25px;">
+                                    @if(Str::endsWith(strtolower($cliente->identificacion_trasera), '.pdf'))
+                                        <a href="{{ asset($cliente->identificacion_trasera) }}" target="_blank" class="btn btn-outline-danger btn-sm text-center p-2" title="Ver documento PDF">
+                                            <i data-feather="file-text" style="width: 24px; height: 24px; display: block; margin: 0 auto 3px;"></i>
+                                            <small class="fw-bold">Ver Trasera (PDF)</small>
+                                        </a>
+                                    @else
+                                        <a href="{{ asset($cliente->identificacion_trasera) }}" target="_blank">
+                                            <img src="{{ asset($cliente->identificacion_trasera) }}" alt="identificacion trasera" style="width:100px;height: 100px;border-radius: 25px; object-fit: cover;">
+                                        </a>
+                                    @endif
                                 @endif
                             </div>
                         </div>
@@ -198,11 +216,11 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <label for="identificacion">Identificación Oficial (Frontal)</label>
-                                <input type="file" name="identificacion" id="identificacion" class="form-control" value="{{$cliente->identificacion}}">
+                                <input type="file" name="identificacion" id="identificacion" class="form-control" accept="image/*,.pdf,application/pdf" value="{{$cliente->identificacion}}">
                             </div>
                             <div class="col-md-6">
                                 <label for="identificacion_trasera">Identificación Oficial (Trasera)</label>
-                                <input type="file" name="identificacion_trasera" id="identificacion_trasera" class="form-control" value="{{$cliente->identificacion_trasera}}">
+                                <input type="file" name="identificacion_trasera" id="identificacion_trasera" class="form-control" accept="image/*,.pdf,application/pdf" value="{{$cliente->identificacion_trasera}}">
                             </div>
                         </div>
                     @endif

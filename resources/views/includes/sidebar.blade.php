@@ -315,6 +315,13 @@
                     </a>
 
                 </li>
+                <li class="nav-item @if (Route::is('collections.index')) active @endif">
+                    <a class="nav-link" href="{{ url('./collections') }}">
+                        <i class="link-icon" data-feather="bell"></i>
+                        <span class="link-title">Gestión de cobranza</span>
+                        <i class="link-arrow" data-feather="chevron-right"></i>
+                    </a>
+                </li>
                 <li class="nav-item">
                     <form action="{{ route('sellers.logout') }}" method="POST">
                         @csrf
