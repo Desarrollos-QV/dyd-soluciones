@@ -549,36 +549,128 @@
         }
 
         function checkToPaid(item) {
-            const route = `{{ url('collections') }}/${item}/pay`;
+            const executePay = () => {
+                const route = `{{ url('collections') }}/${item}/pay`;
 
-            $.ajax({
-                url: route,
-                method: "POST",
-                data: {
-                    _token: '{{ csrf_token() }}',
-                    'id': item
-                },
-                success: function (res) {
-                    if (res.status == true) {
-                        if (typeof Swal !== 'undefined') {
-                            Swal.fire('Éxito', res.message, 'success').then(() => {
+                $.ajax({
+                    url: route,
+                    method: "POST",
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        'id': item
+                    },
+                    success: function (res) {
+                        if (res.status == true) {
+                            if (typeof Swal !== 'undefined') {
+                                Swal.fire('Éxito', res.message, 'success').then(() => {
+                                    cargarDatos();
+                                });
+                            } else {
+                                alert(res.message);
                                 cargarDatos();
-                            });
+                            }
+                        }
+                    },
+                    error: function (err) {
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire('Error', 'No se pudo procesar el pago', 'error');
                         } else {
-                            alert(res.message);
-                            cargarDatos();
+                            alert('Error al procesar pago');
                         }
                     }
-                },
-                error: function (err) {
-                    if (typeof Swal !== 'undefined') {
-                        Swal.fire('Error', 'No se pudo procesar el pago', 'error');
-                    } else {
-                        alert('Error al procesar pago');
+                });
+            };
+
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: '¿Registrar pago?',
+                    text: 'Se marcará la cobranza como pagada y se generará el ingreso en caja.',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Sí, marcar pagado',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed || result.value) {
+                        executePay();
                     }
+                });
+            } else {
+                if (confirm('¿Desea marcar este cobro como pagado?')) {
+                    executePay();
                 }
-            });
+            }
         }
+
+        function undoPayment(item) {
+            const executeUndo = () => {
+                const route = `{{ url('collections') }}/${item}/undo-pay`;
+
+                $.ajax({
+                    url: route,
+                    method: "POST",
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        'id': item
+                    },
+                    success: function (res) {
+                        if (res.status == true) {
+                            if (typeof Swal !== 'undefined') {
+                                Swal.fire({
+                                    title: 'Pago revertido',
+                                    text: res.message,
+                                    icon: 'success',
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+                            } else {
+                                alert(res.message);
+                            }
+                            cargarDatos();
+                        } else {
+                            if (typeof Swal !== 'undefined') {
+                                Swal.fire('Error', res.message, 'error');
+                            } else {
+                                alert(res.message);
+                            }
+                        }
+                    },
+                    error: function (err) {
+                        if (typeof Swal !== 'undefined') {
+                            Swal.fire('Error', 'No se pudo deshacer el pago', 'error');
+                        } else {
+                            alert('No se pudo deshacer el pago');
+                        }
+                    }
+                });
+            };
+
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: '¿Deshacer este pago?',
+                    text: 'El estatus volverá a pendiente/vencido y se revertirá el registro de pago.',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Sí, deshacer',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed || result.value) {
+                        executeUndo();
+                    }
+                });
+            } else {
+                if (confirm('¿Está seguro de que desea deshacer este pago?')) {
+                    executeUndo();
+                }
+            }
+        }
+
+        // Exponer globalmente con alias para evitar cualquier 'ndoPayment is not defined'
+        window.undoPayment = undoPayment;
+        window.ndoPayment = undoPayment;
 
         function sincronizarCobranza() {
             const btn = document.getElementById('btnSync');

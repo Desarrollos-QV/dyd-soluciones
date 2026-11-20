@@ -265,23 +265,35 @@ class CollectionsController extends Controller
      */
     public function undoPayment($id)
     {
-        $collection = Collection::findOrFail($id);
+        $collection = Collection::with('cliente')->findOrFail($id);
         if ($collection->status == 'paid') {
+            $hoy = Carbon::today();
+            $dueDate = $collection->due_date ? Carbon::parse($collection->due_date) : $hoy;
+            $newStatus = $dueDate->lt($hoy) ? 'overdue' : 'pending';
+
             $collection->update([
-                'status' => 'pending',
+                'status' => $newStatus,
                 'paid_at' => null
             ]);
             
             // Eliminar último pago asociado
             CollectionPayment::where('collection_id', $id)->orderBy('id', 'desc')->first()?->delete();
             
-            // Restablecemos el mes en la unidad
-            $unidad = Unidades::find($collection->unidad_id);
+            // Restablecemos el mes en la unidad si aplica
+            $unidad = $collection->unidad_id ? Unidades::find($collection->unidad_id) : null;
             if ($unidad && $unidad->fecha_cobro) {
                 $unidad->update([
                     'fecha_cobro' => Carbon::parse($unidad->fecha_cobro)->subMonth()
                 ]);
             }
+
+            // Revertir el registro en HistorialCaja si existía
+            HistorialCaja::where('tipo', 'ingreso')
+                ->where('concepto', 'Pago Mensualidad')
+                ->where('descripcion', 'LIKE', '%' . ($collection->cliente?->nombre ?? '') . '%')
+                ->where('monto', $collection->amount)
+                ->orderBy('id', 'desc')
+                ->first()?->delete();
 
             return response()->json([
                 'status' => true,
