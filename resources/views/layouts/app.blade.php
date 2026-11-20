@@ -119,7 +119,7 @@
     <script src="{{ asset('assets/js/datepicker.js') }}"></script>
     <!-- end custom js for this page -->
     <!-- custom js for Notifications -->
-    <script src="{{ asset('assets/js/notifications.js') }}"></script>
+    <script src="{{ asset('assets/js/notifications.js') }}?v={{ filemtime(public_path('assets/js/notifications.js')) }}"></script>
     @yield('js')
     @stack('custom-scripts')
 

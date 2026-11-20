@@ -4,7 +4,7 @@
     $(function () {
         const btnEvent = $('#notificationDropdown');
         const evController = $(".inner-body-card-notify");
-        window.BASE_URL = "/dyd_gestion";
+        window.BASE_URL = window.BASE_URL || "";
         
         function scrollNotifyHandler() {
             var $el = evController;
