@@ -110,10 +110,9 @@ class TwilioService
 
     public function sendMessageEmail($destination, $message)
     {
-        Mail::raw($message, function ($mail) use ($destination) {
-            $mail->to($destination)
-                ->subject('Notificación desde la plataforma');
-        });
+        Mail::to($destination)->send(
+            new \App\Mail\TestNotificationMail($destination, $message)
+        );
         return true;
     }
 }

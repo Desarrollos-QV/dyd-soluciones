@@ -39,7 +39,7 @@ class PaymentReminderMail extends Mailable
     public function envelope()
     {
         return new Envelope(
-            subject: 'Recordatorio de Pago - DYD Soluciones',
+            subject: 'Recordatorio de Pago - DYD Soluciones Integrales',
         );
     }
 
