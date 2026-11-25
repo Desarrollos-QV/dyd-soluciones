@@ -44,7 +44,7 @@ trait NotifiesUsers
     public function notifyUserWhatsapp($destination, $message)
     {
         
-        $settings = Settings::where('user_id', 1)->first();
+        $settings = Settings::where('user_id', auth()->id() ?? 1)->first() ?? Settings::first();
         $notify = new TwilioService($settings->TWILIO_SID, $settings->TWILIO_AUTH_TOKEN, $settings->TWILIO_PHONE);
         $telefono = PhoneHelper::formatMX($destination);
 
@@ -67,7 +67,7 @@ trait NotifiesUsers
      */
     public function notifyUserWhatsappTemplate(string $destination, string $contentSid, array $variables = [])
     {
-        $settings = Settings::where('user_id', 1)->first();
+        $settings = Settings::where('user_id', auth()->id() ?? 1)->first() ?? Settings::first();
         $notify   = new TwilioService($settings->TWILIO_SID, $settings->TWILIO_AUTH_TOKEN, $settings->TWILIO_PHONE);
         $telefono = PhoneHelper::formatMX($destination);
 
@@ -83,7 +83,7 @@ trait NotifiesUsers
 
     public function notifyUserSMS(string $destination, string $message)
     {
-        $settings = Settings::where('user_id', 1)->first();
+        $settings = Settings::where('user_id', auth()->id() ?? 1)->first() ?? Settings::first();
         $phone_sms_capabilities = config('services.twilio.phone_sms_capabilities',
                                     env('TWILIO_PHONE_SMS_CAPABILITIES'));
         // Aca forzamos a usar el PHONE de TWILIO para el envio especificamente de SMS

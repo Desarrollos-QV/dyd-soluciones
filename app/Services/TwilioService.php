@@ -103,8 +103,8 @@ class TwilioService
 
             return json_decode($response->getBody(), true);
         }catch(\Exception $e){
-            return true;
-            // throw new \Exception('Error sending SMS: ' . $e->getMessage());
+            \Illuminate\Support\Facades\Log::error('Error sending SMS: ' . $e->getMessage());
+            throw new \Exception('Error Twilio SMS: ' . $e->getMessage());
         }
     }
 
